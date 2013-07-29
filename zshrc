@@ -69,3 +69,9 @@ setopt EXTENDED_GLOB
 
 # Local config
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# recommended by brew doctor
+export PATH='/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin:/Users/andrewsolomon/.bin'
+
+eval "$(rbenv init -)"
+# DO NOT EDIT BELOW THIS LINE
