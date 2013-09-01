@@ -1,6 +1,6 @@
 " Leader
 let mapleader = ","
-
+set rtp+=~/dotfiles/vim/bundles/powerline/powerline/bindings/vim
 set nocompatible  " Use Vim settings, rather then Vi settings
 set nobackup
 set nowritebackup
@@ -10,7 +10,19 @@ set ruler         " show the cursor position all the time
 set showcmd       " display incomplete commands
 set incsearch     " do incremental searching
 set laststatus=2  " Always display the status line
-set undofile
+set modelines=0
+set noundofile
+set ignorecase
+set smartcase
+set gdefault
+set incsearch
+set showmatch
+set hlsearch
+set wrap
+set textwidth=79
+set formatoptions=qrn1
+set colorcolumn=85
+set t_Co=256
 
 nnoremap / /\v
 nnoremap <space> /
@@ -18,6 +30,19 @@ vnoremap / /\v
 nnoremap ? /\v
 vnoremap ? /\v
 
+nnoremap <C-n> :NERDTreeToggle<CR>
+
+" strip all trailing whitespace in the current file
+nnoremap <leader>W :%s/\s\+$//<cr>:let @/=''<CR> 
+" reselect the text that was just pasted so I can perform commands
+nnoremap <leader>v V`]
+nnoremap <leader>w <C-w>v<C-w>l
+
+" Move your splits around
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
 nnoremap <leader><space> :noh<cr>
 nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
@@ -34,6 +59,10 @@ onoremap il( :<c-u>normal! F)vi(<cr>
 
 iabbrev <buffer> --- &mdash;
 
+" Space to toggle folds.
+nnoremap <Space> za
+vnoremap <Space> za
+
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -48,8 +77,15 @@ endif
 filetype plugin indent on
 set smartindent
 
+
+let g:Powerline_symbols = 'fancy'
+
+au FocusLost * :wa
+" Folding for vim-javascript
+au FileType javascript call JavaScriptFold()
+
 autocmd BufRead,BufWritePre *.html normal gg=G
-autocmd BufNewFile,BufRead *.html setlocal nowrap
+"autocmd BufNewFile,BufRead *.html setlocal nowrap
 
 autocmd Filetype html nnoremap <buffer> <leader>c I<!--<esc>A--><esc>
 autocmd Filetype html setlocal tabstop=2 shiftwidth=2 softtabstop=2
@@ -97,29 +133,15 @@ endif
 
 " Color scheme
 colorscheme github
+set background=light
 highlight NonText guibg=#060606
 highlight Folded  guibg=#0A0A0A guifg=#9090D0
+hi IndentGuidesOdd  ctermbg=white
+hi IndentGuidesEven ctermbg=green
 
 " Numbers
 set nonumber
 
-" Snippets are activated by Shift+Tab
-let g:snippetsEmu_key = "<S-Tab>"
-
-" Tab completion
-" will insert tab at beginning of line,
-" will use completion if not at beginning
-set wildmode=full
-set complete=.,w,t
-function! InsertTabWrapper()
-    let col = col('.') - 1
-    if !col || getline('.')[col - 1] !~ '\k'
-        return "\<tab>"
-    else
-        return "\<c-p>"
-    endif
-endfunction
-inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
 
 " Get off my lawn
 nnoremap <Left> :echoe "Use h"<CR>
