@@ -60,8 +60,8 @@ onoremap il( :<c-u>normal! F)vi(<cr>
 iabbrev <buffer> --- &mdash;
 
 " Space to toggle folds.
-nnoremap <Space> za
-vnoremap <Space> za
+" nnoremap <Space> za
+" vnoremap <Space> za
 
 
 " Switch syntax highlighting on, when the terminal has colors
