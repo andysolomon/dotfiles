@@ -34,6 +34,7 @@ nnoremap <C-n> :NERDTreeToggle<CR>
 
 " strip all trailing whitespace in the current file
 nnoremap <leader>W :%s/\s\+$//<cr>:let @/=''<CR> 
+
 " reselect the text that was just pasted so I can perform commands
 nnoremap <leader>v V`]
 nnoremap <leader>w <C-w>v<C-w>l
@@ -84,8 +85,8 @@ au FocusLost * :wa
 " Folding for vim-javascript
 au FileType javascript call JavaScriptFold()
 
-autocmd BufRead,BufWritePre *.html normal gg=G
-"autocmd BufNewFile,BufRead *.html setlocal nowrap
+" autocmd BufRead,BufWritePre *.html normal gg=G
+" autocmd BufNewFile,BufRead *.html setlocal nowrap
 
 autocmd Filetype html nnoremap <buffer> <leader>c I<!--<esc>A--><esc>
 autocmd Filetype html setlocal tabstop=2 shiftwidth=2 softtabstop=2

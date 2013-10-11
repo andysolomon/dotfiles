@@ -34,5 +34,10 @@ alias rk="rake"
 alias s="rspec"
 alias z="zeus"
 
+# Postgres
+alias pg-start="postgres -D /usr/local/var/postgres"
+alias pg-stop="pg_ctl -D /usr/local/var/postgres stop -s -m fast"
+
+
 # Include custom aliases
 [[ -f ~/.aliases.local ]] && source ~/.aliases.local
