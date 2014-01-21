@@ -71,7 +71,9 @@ setopt EXTENDED_GLOB
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 # recommended by brew doctor
-export PATH='/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin:/Users/andrewsolomon/.bin'
+export PATH='/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin:/Users/andrewsolomon/.bin:/Users/andrewsolomon/lynxapp/yeoman/yeoman-custom/cli/bin:/usr/local/share/npm/bin'
+export NODE_PATH=/usr/local/bin/node:/usr/local/lib/node_modules:$NODE_PATH
+export SSL_CERT_FILE=/usr/local/etc/openssl/certs/cacert.pem
 
 eval "$(rbenv init -)"
 # DO NOT EDIT BELOW THIS LINE

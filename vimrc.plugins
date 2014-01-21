@@ -1,0 +1,98 @@
+" Toggle NERDTree
+noremap <C-T> :NERDTreeToggle<CR>
+
+" Make bookmarks Visible
+let NERDTreeShowBookmarks = 1
+
+"Enable Colors
+let NERDChristmasTree = 1
+
+" Nerdcommenter
+" ,/ to invert comment on the current line/selection
+nmap <leader>/ :call NERDComment(0, "invert")<cr>
+vmap <leader>/ :call NERDComment(0, "invert")<cr>
+
+let g:Powerline_symbols = 'fancy'
+
+" Rainbow Paraens
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
+
+" Use The Silver Searcher https://github.com/ggreer/the_silver_searcher
+if executable('ag')
+  " Use Ag over Grep
+  set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+endif
+
+" Color scheme
+colorscheme badwolf
+highlight NonText guibg=#060606
+highlight Folded  guibg=#0A0A0A guifg=#9090D0
+hi IndentGuidesOdd  ctermbg=white
+hi IndentGuidesEven ctermbg=green
+
+" Format JSON
+autocmd BufNewFile,BufRead *.json call jacinto#syntax()
+
+" Remap multiple cursors
+let g:multi_cursor_use_default_mapping=0
+
+" Default mapping Multiple Cursors
+let g:multi_cursor_next_key='<C-f>'
+let g:multi_cursor_prev_key='<C-b>'
+let g:multi_cursor_skip_key='<C-x>'
+let g:multi_cursor_quit_key='<Esc>'
+
+" Mustache and Handlebars abbreviations
+let g:mustache_abbreviations = 1
+
+
+" configure syntastic syntax checking to check on open as well as save
+let g:syntastic_check_on_open=1
+let g:syntastic_enable_signs=1
+let g:syntastic_auto_loc_list=2
+let g:syntastic_error_symbol='✗'
+let g:syntastic_warning_symbol='⚠'
+
+" CNTRLP
+" let g:ctrlp_map = '<leader>,'
+" let g:ctrlp_cmd = 'CtrlP'
+" let g:ctrlp_max_height = 40
+
+" Gundo
+nmap <leader>u :GundoToggle<CR>
+let g:gundo_close_on_revert = 1
+
+" Tabularize
+let mapleader=','
+if exists(":Tabularize")
+  nmap <Leader>l= :Tabularize /=<CR>
+  vmap <Leader>l= :Tabularize /=<CR>
+  nmap <Leader>l: :Tabularize /:\zs<CR>
+  vmap <Leader>l: :Tabularize /:\zs<CR>
+endif
+
+" Unite
+let g:unite_source_history_yank_enable = 1
+call unite#filters#matcher_default#use(['matcher_fuzzy'])
+nnoremap <leader>t :<C-u>Unite -no-split -buffer-name=files   -start-insert file_rec/async:!<cr>
+nnoremap <leader>f :<C-u>Unite -no-split -buffer-name=files   -start-insert file<cr>
+nnoremap <leader>r :<C-u>Unite -no-split -buffer-name=mru     -start-insert file_mru<cr>
+nnoremap <leader>o :<C-u>Unite -no-split -buffer-name=outline -start-insert outline<cr>
+nnoremap <leader>y :<C-u>Unite -no-split -buffer-name=yank    history/yank<cr>
+nnoremap <leader>e :<C-u>Unite -no-split -buffer-name=buffer  buffer<cr>
+
+" " Custom mappings for the unite buffer
+autocmd FileType unite call s:unite_settings()
+function! s:unite_settings()
+  " Play nice with supertab
+  let b:SuperTabDisabled=1
+  " Enable navigation with control-j and control-k in insert mode
+  imap <buffer> <C-j>   <Plug>(unite_select_next_line)
+  imap <buffer> <C-k>   <Plug>(unite_select_previous_line)
+endfunction
