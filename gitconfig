@@ -21,3 +21,6 @@
   ff = only
 [include]
   path = .gitconfig.local
+[user]
+	name = Andrew Solomon
+	email = andrewsolomon.edu@gmail.com

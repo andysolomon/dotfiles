@@ -72,8 +72,14 @@ setopt EXTENDED_GLOB
 
 # recommended by brew doctor
 export PATH='/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin:/Users/andrewsolomon/.bin:/Users/andrewsolomon/lynxapp/yeoman/yeoman-custom/cli/bin:/usr/local/share/npm/bin'
+export PATH=$HOME/local/bin:$PATH
 export NODE_PATH=/usr/local/bin/node:/usr/local/lib/node_modules:$NODE_PATH
 export SSL_CERT_FILE=/usr/local/etc/openssl/certs/cacert.pem
+export MONGO_PATH=/usr/local/mongodb
+export PATH=$PATH:$MONGO_PATH/bin
+export PATH=$PATH:/usr/local/mysql/bin
+export SSL_CERT_FILE=/usr/local/etc/openssl/certs/cert.pem
+export PATH=/usr/local/share/python:$PATH
 
 eval "$(rbenv init -)"
 # DO NOT EDIT BELOW THIS LINE
