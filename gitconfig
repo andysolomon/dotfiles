@@ -24,3 +24,5 @@
 [user]
 	name = Andrew Solomon
 	email = andrewsolomon.edu@gmail.com
+[mergetool]
+	keepBackup = true

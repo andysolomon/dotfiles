@@ -61,6 +61,9 @@ onoremap il( :<c-u>normal! F)vi(<cr>
 noremap <leader>bp :bprevious<cr>
 noremap <leader>bn :bnext<cr>
 
+" Unite to act like ag or ack
+nnoremap <space>/ :Unite grep:.<cr>
+
 " Splits ,v and ,h to open new splits (vertical and horizontal)
 nnoremap <leader>v <C-w>v<C-w>l
 nnoremap <leader>h <C-w>s<C-w>j
@@ -106,8 +109,8 @@ let g:html_indent_tags = 'li\|p'
 set nonumber
 
 " Open new split panes to right and bottom, which feels more natural
-set splitbelow
-set splitright
+"set splitbelow
+"set splitright
 
 " Quicker window movement
 nnoremap <C-j> <C-w>j

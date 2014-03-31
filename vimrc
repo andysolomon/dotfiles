@@ -53,3 +53,6 @@ set omnifunc=csscomplete#CompleteCSS
 if filereadable($HOME . "/.vimrc.local")
   source ~/.vimrc.local
 endif
+
+" Powerline Installation
+set rtp+={/Users/andrewsolomon/powerline-fonts/}/powerline/bindings/vim

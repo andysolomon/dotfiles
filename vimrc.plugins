@@ -20,14 +20,62 @@ au Syntax * RainbowParenthesesLoadRound
 au Syntax * RainbowParenthesesLoadSquare
 au Syntax * RainbowParenthesesLoadBraces
 
-" Use The Silver Searcher https://github.com/ggreer/the_silver_searcher
-if executable('ag')
-  " Use Ag over Grep
-  set grepprg=ag\ --nogroup\ --nocolor
+" Vim Airline
+let g:airline_powerline_fonts = 1
+" the separator used on the left side >
+let g:airline_left_sep='>'
 
-  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-endif
+" the separator used on the right side >
+let g:airline_right_sep='<'
+
+" enable modified detection >
+let g:airline_detect_modified=1
+
+" enable paste detection >
+let g:airline_detect_paste=1
+
+" enable iminsert detection >
+let g:airline_detect_iminsert=0
+
+" determine whether inactive windows should have the left section collapsed to
+"  only the filename of that buffer.
+let g:airline_inactive_collapse=1
+
+" themes are automatically selected based on the matching colorscheme. this
+"  can be overridden by defining a value. >
+"  let g:airline_theme=
+
+" if you want to patch the airline theme before it gets applied, you can
+"  supply the name of a function where you can modify the palette. >
+let g:airline_theme_patch_func = 'AirlineThemePatch'
+function! AirlineThemePatch(palette)
+  if g:airline_theme == 'badwolf'
+    for colors in values(a:palette.inactive)
+      let colors[3] = 245
+    endfor
+  endif
+endfunction
+
+" enable/disable automatic population of the `g:airline_symbols` dictionary
+"  with powerline symbols. >
+"  let g:airline_powerline_fonts=0
+
+" define the set of text to display for each mode.  >
+let g:airline_mode_map = {} " see source for the defaults
+
+" unicode symbols
+let g:airline_left_sep = '»'
+"let g:airline_left_sep = '▶'
+let g:airline_right_sep = '«'
+"let g:airline_right_sep = '◀''
+"let g:airline_symbols.linenr = '␊'
+"let g:airline_symbols.linenr = '␤'
+"let g:airline_symbols.linenr = '¶'
+"let g:airline_symbols.branch = '⎇'
+"let g:airline_symbols.paste = 'ρ'
+"let g:airline_symbols.paste = 'Þ'
+"let g:airline_symbols.paste = '∥'
+"let g:airline_symbols.whitespace = 'Ξ'
 
 " Color scheme
 colorscheme Tomorrow-Night-Eighties
@@ -80,15 +128,15 @@ endif
 " Unite
 let g:unite_source_history_yank_enable = 1
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
-nnoremap <leader>t :<C-u>Unite -no-split -buffer-name=files   -start-insert file_rec/async:!<cr>
-nnoremap <leader>f :<C-u>Unite -no-split -buffer-name=files   -start-insert file<cr>
-nnoremap <leader>r :<C-u>Unite -no-split -buffer-name=mru     -start-insert file_mru<cr>
-nnoremap <leader>o :<C-u>Unite -no-split -buffer-name=outline -start-insert outline<cr>
-nnoremap <leader>y :<C-u>Unite -no-split -buffer-name=yank    history/yank<cr>
-nnoremap <leader>e :<C-u>Unite -no-split -buffer-name=buffer  buffer<cr>
+nnoremap <leader>t :<C-u>Unite -auto-resize -no-split -buffer-name=files   -start-insert file_rec/async:!<cr>
+nnoremap <leader>f :<C-u>Unite -auto-resize -no-split -buffer-name=files   -start-insert file<cr>
+nnoremap <leader>r :<C-u>Unite -auto-resize -no-split -buffer-name=mru     -start-insert file_mru<cr>
+nnoremap <leader>o :<C-u>Unite -auto-resize -no-split -buffer-name=outline -start-insert outline<cr>
+nnoremap <leader>y :<C-u>Unite -auto-resize -no-split -buffer-name=yank    history/yank<cr>
+nnoremap <leader>e :<C-u>Unite -auto-resize -no-split -buffer-name=buffer  buffer<cr>
 
 " " Custom mappings for the unite buffer
-autocmd FileType unite call s:unite_settings()
+"autocmd FileType unite call s:unite_settings()
 function! s:unite_settings()
   " Play nice with supertab
   let b:SuperTabDisabled=1
