@@ -49,6 +49,7 @@ Bundle 'MarcWeber/vim-addon-mw-utils'
 Bundle 'tomtom/tlib_vim'
 Bundle 'garbas/vim-snipmate'
 Bundle 'honza/vim-snippets'
+Bundle 'itchyny/lightline.vim'
 " Bundle 'Lokaltog/powerline'
 " Using Airline instead of powerline
 " Bundle 'bling/vim-airline'
