@@ -1,0 +1,6 @@
+windows:
+  - name: sample-three-panes
+    root: ~/movingimages
+    layout: main-vertical
+    panes:
+      - vim

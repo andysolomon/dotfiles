@@ -92,5 +92,6 @@ export SSL_CERT_FILE=/usr/local/etc/openssl/certs/cert.pem
 export PATH=/usr/local/share/python:$PATH
 # . {/Users/andrewsolomon/dotfiles/vim/bundle}/powerline/bindings/zsh/powerline.zsh
 
-eval "$(rbenv init -)"
 # DO NOT EDIT BELOW THIS LINE
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
