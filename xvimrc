@@ -1,0 +1,62 @@
+let mapleader = " "
+let localmapleader = ","
+
+" Basic Settings ---------------------- {{{
+set textwidth=140
+set formatoptions=cqt
+" }}}
+
+" proper search
+set incsearch
+set ignorecase
+set smartcase
+set wrap
+set wrapscan
+set gdefault
+
+" no bells
+set noerrorbells
+
+" use system pasteboard
+set pasteboard
+
+" navigator
+nnoremap <C-n> :xccmd toggleNavigatorsVisibility<cr>
+
+" comments
+nnoremap gcc :xccmd commentAndUncommentCurrentLines<cr>
+vnoremap gc  :xccmd commentAndUncommentCurrentLines<cr>
+
+" quicker indentation
+nnoremap > >>
+nnoremap < <<
+
+" dont loose selection on indenting
+vnoremap > >gv
+vnoremap < <gv
+
+" Mappings ---------------------- {{{
+noremap - ddp
+inoremap <c-u> <esc>vwU
+nnoremap <leader>ev :vsplit ~/dotfiles/vimrc.local<cr>
+nnoremap <leader>sv :source $MYVIMRC<cr>
+inoremap <esc> <nop>
+inoremap jk <esc>
+vnoremap jk <esc>
+onoremap in( :<c-u>normal! f(vi(<cr>
+onoremap in( :<c-u>normal! f(vi(<cr>
+nnoremap H 0
+nnoremap L $
+
+"Open quick search : CMD+Shift+o
+map ,p :xccmd openQuickly<cr>
+
+"fold
+map zf :xccmd fold<cr>
+map zu :xccmd unfold<cr>
+
+" windows split
+nnoremap ,n <c-w>n
+nnoremap ,q <c-w>q
+nnoremap ,s <c-w>s
+nnoremap ,v <c-w>v

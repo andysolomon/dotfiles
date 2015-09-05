@@ -5,6 +5,8 @@ fpath=(~/.zsh/completion $fpath)
 autoload -U compinit
 compinit
 
+ZSH_THEME="random"
+
 ## case-insensitive (all),partial-word and then substring completion
 if [ "x$CASE_SENSITIVE" = "xtrue" ]; then
   zstyle ':completion:*' matcher-list 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
@@ -93,5 +95,12 @@ export PATH=/usr/local/share/python:$PATH
 # . {/Users/andrewsolomon/dotfiles/vim/bundle}/powerline/bindings/zsh/powerline.zsh
 
 # DO NOT EDIT BELOW THIS LINE
+export JAVA_HOME=$(/usr/libexec/java_home)
 export PATH="$HOME/.rbenv/bin:$PATH"
 eval "$(rbenv init -)"
+
+export PATH="$HOME/.bin:$PATH"
+eval "$(rbenv init - zsh --no-rehash)"
+
+export NVM_DIR="/Users/andrewsolomon/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm

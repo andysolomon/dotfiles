@@ -15,10 +15,10 @@ vmap <leader>/ :call NERDComment(0, "invert")<cr>
 let g:Powerline_symbols = 'fancy'
 
 " Rainbow Paraens
-au VimEnter * RainbowParenthesesToggle
-au Syntax * RainbowParenthesesLoadRound
-au Syntax * RainbowParenthesesLoadSquare
-au Syntax * RainbowParenthesesLoadBraces
+"au VimEnter * RainbowParenthesesToggle
+"au Syntax * RainbowParenthesesLoadRound
+"au Syntax * RainbowParenthesesLoadSquare
+"au Syntax * RainbowParenthesesLoadBraces
 
 " Vim Airline
 let g:airline_powerline_fonts = 1
@@ -78,7 +78,7 @@ let g:airline_right_sep = '«'
 "let g:airline_symbols.whitespace = 'Ξ'
 
 " Color scheme
-colorscheme Tomorrow-Night-Eighties
+"colorscheme Tomorrow-Night-Eighties
 highlight NonText guibg=#060606
 highlight Folded  guibg=#0A0A0A guifg=#9090D0
 hi IndentGuidesOdd  ctermbg=white

@@ -1,59 +1,55 @@
-set nocompatible
+if &compatible
+  set nocompatible
+end
 
-filetype off
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+" Shim command and function to allow migration from Vundle to vim-plug.
+function! VundleToPlug(vundle_command, arg, ...)
+  echom "You are using Vundle's `".a:vundle_command."` command to declare plugins. Dotfiles now uses vim-plug for plugin mangagement.  Please rename uses of `".a:vundle_command."` to `Plug`. Plugin was '".a:arg."'."
+  let vim_plug_options = {}
 
-" Let Vundle manage Vundle
-Bundle 'gmarik/vundle'
+  if a:0 > 0
+    if has_key(a:1, 'name')
+      let name = a:1.name
+      let vim_plug_options.dir = "$HOME/.vim/bundle/".a:1.name
+    endif
+
+    if has_key(a:1, 'rtp')
+      let vim_plug_options.rtp = a:1.rtp
+    endif
+  endif
+
+  Plug a:arg, vim_plug_options
+endfunction
+
+com! -nargs=+  -bar Plugin call VundleToPlug("Plugin", <args>)
+com! -nargs=+  -bar Bundle call VundleToPlug("Bundle", <args>)
+
+call plug#begin('~/.vim/bundle')
 
 " Define bundles via Github repos
-Bundle 'alfredodeza/jacinto.vim'
-Bundle 'croaky/vim-colors-github'
-Bundle 'danro/rename.vim'
-Bundle 'juvenn/mustache.vim'
-Bundle 'kchmck/vim-coffee-script'
-Bundle 'godlygeek/tabular'
-" Using Unite instead of CTRL-P
-" Bundle 'kien/ctrlp.vim'
-Bundle 'Shougo/unite.vim'
-" Unite Plugings
-Bundle 't9md/vim-unite-ack'
-" Bundle 'mileszs/ack.vim'
-Bundle 'rking/ag.vim'
-Bundle 'kien/rainbow_parentheses.vim'
-Bundle 'mattn/emmet-vim'
-Bundle 'scrooloose/syntastic'
-Bundle 'scrooloose/nerdtree'
-Bundle 'scrooloose/nerdcommenter'
-Bundle 'terryma/vim-multiple-cursors'
-Bundle 'thoughtbot/vim-rspec'
-Bundle 'tpope/vim-bundler'
-Bundle 'tpope/vim-cucumber'
-Bundle 'tpope/vim-endwise'
-Bundle 'tpope/vim-haml'
-Bundle 'tpope/vim-markdown'
-Bundle 'tpope/vim-fugitive'
-Bundle 'tpope/vim-rails'
-Bundle 'tpope/vim-surround'
-Bundle 'tsaleh/vim-matchit'
-Bundle 'rstacruz/sparkup'
-Bundle 'sjl/badwolf'
-Bundle 'spolu/dwm.vim'
-Bundle 'vim-scripts/ctags.vim'
-" Bundle 'vim-scripts/tComment'
-Bundle 'vim-scripts/Gundo'
-Bundle 'jelera/vim-javascript-syntax'
-" Bundle 'Valloric/YouCompleteMe'
-Bundle 'nathanaelkane/vim-indent-guides'
-Bundle 'MarcWeber/vim-addon-mw-utils'
-Bundle 'tomtom/tlib_vim'
-Bundle 'garbas/vim-snipmate'
-Bundle 'honza/vim-snippets'
-Bundle 'itchyny/lightline.vim'
-" Bundle 'Lokaltog/powerline'
-" Using Airline instead of powerline
-" Bundle 'bling/vim-airline'
-" Bundle 'mhinz/vim-startify'
+Plug 'christoomey/vim-run-interactive'
+Plug 'kchmck/vim-coffee-script'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'pbrisbin/vim-mkdir'
+Plug 'scrooloose/syntastic'
+Plug 'scrooloose/nerdtree'
+Plug 'slim-template/vim-slim'
+Plug 'thoughtbot/vim-rspec'
+Plug 'tpope/vim-bundler'
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'vim-ruby/vim-ruby'
+Plug 'vim-scripts/tComment'
+Plug 'hail2u/vim-css3-syntax'
+Plug 'sheerun/vim-polyglot'
+Plug 'yosiat/oceanic-next-vim'
 
-filetype on
+if filereadable(expand("~/.vimrc.bundles.local"))
+  source ~/.vimrc.bundles.local
+endif
+
+call plug#end()
