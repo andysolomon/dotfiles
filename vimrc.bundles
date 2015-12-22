@@ -48,6 +48,7 @@ Plug 'hail2u/vim-css3-syntax'
 Plug 'sheerun/vim-polyglot'
 Plug 'yosiat/oceanic-next-vim'
 Plug 'rizzatti/dash.vim'
+Plug 'lambdatoast/elm.vim'
 
 if filereadable(expand("~/.vimrc.bundles.local"))
   source ~/.vimrc.bundles.local
