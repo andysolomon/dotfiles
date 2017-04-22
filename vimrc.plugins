@@ -141,3 +141,10 @@ endif
 nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
 " bind \ (backward slash) to grep shortcut
 nnoremap \ :Ag<SPACE>
+
+" VIM JAVASCRIPT
+let g:javascript_ignore_javaScriptdoc = 1
+" VIM JSX
+let g:jsx_ext_required = 0
+" UTILSNIPS
+let g:UltiSnipsExpandTrigger='<C-l>'

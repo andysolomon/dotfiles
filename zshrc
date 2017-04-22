@@ -1,5 +1,6 @@
 # load our own completion functions
 fpath=(~/.zsh/completion $fpath)
+fpath=(~/.zsh/zsh-completions/src $fpath)
 
 # completion
 autoload -U compinit
@@ -46,6 +47,11 @@ bindkey "^Y" accept-and-hold
 bindkey "^N" insert-last-word
 bindkey -s "^T" "^[Isudo ^[A" # "t" for "toughguy"
 
+# use neovim
+if type nvim > /dev/null 2>&1; then
+  alias vim='nvim'
+fi
+
 # expand functions in the prompt
 setopt prompt_subst
 
@@ -56,7 +62,7 @@ export PS1='[${SSH_CONNECTION+"%n@%m:"}%~] '
 setopt histignoredups
 
 # keep TONS of history
-export HISTSIZE=4096
+# export HISTSIZE=4096
 
 # look for ey config in project dirs
 export EYRC=./.eyrc
@@ -92,6 +98,9 @@ export PATH=$PATH:$MONGO_PATH/bin
 export PATH=$PATH:/usr/local/mysql/bin
 export SSL_CERT_FILE=/usr/local/etc/openssl/certs/cert.pem
 export PATH=/usr/local/share/python:$PATH
+
+PYTHONPATH="${PYTHONPATH}:/lib/python3.4/site-packages/"
+export PYTHONPATH 
 # . {/Users/andrewsolomon/dotfiles/vim/bundle}/powerline/bindings/zsh/powerline.zsh
 
 # DO NOT EDIT BELOW THIS LINE
@@ -104,3 +113,7 @@ eval "$(rbenv init - zsh --no-rehash)"
 
 export NVM_DIR="/Users/andrewsolomon/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+export PATH="$PATH:$HOME/.yarn/bin"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

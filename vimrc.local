@@ -1,4 +1,3 @@
-let mapleader = " "
 let localmapleader = ","
 
 " Basic Settings ---------------------- {{{
@@ -8,7 +7,6 @@ set formatoptions=cqt
 
 " Mappings ---------------------- {{{
 noremap - ddp
-inoremap <c-u> <esc>vwU
 nnoremap <leader>ev :vsplit ~/dotfiles/vimrc.local<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 inoremap <esc> <nop>
@@ -42,6 +40,7 @@ augroup fileformating
     autocmd FileType html iabbrev <buffer> --m &mdash;
     autocmd FileType javascript onoremap b /return<cr>
     autocmd FileType javascipt nnoremap <buffer> <localleader>c I//<esc>
+    autocmd FileType javascript set formatprg=prettier\ --stdin
 augroup END
 
 augroup filetype_vim
