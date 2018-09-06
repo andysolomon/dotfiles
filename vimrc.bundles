@@ -2,66 +2,60 @@ if &compatible
   set nocompatible
 end
 
-" Shim command and function to allow migration from Vundle to vim-plug.
-function! VundleToPlug(vundle_command, arg, ...)
-  echom "You are using Vundle's `".a:vundle_command."` command to declare plugins. Dotfiles now uses vim-plug for plugin mangagement.  Please rename uses of `".a:vundle_command."` to `Plug`. Plugin was '".a:arg."'."
-  let vim_plug_options = {}
-
-  if a:0 > 0
-    if has_key(a:1, 'name')
-      let name = a:1.name
-      let vim_plug_options.dir = "$HOME/.vim/bundle/".a:1.name
-    endif
-
-    if has_key(a:1, 'rtp')
-      let vim_plug_options.rtp = a:1.rtp
-    endif
+" Remove declared plugins
+function! s:UnPlug(plug_name)
+  if has_key(g:plugs, a:plug_name)
+    call remove(g:plugs, a:plug_name)
   endif
-
-  Plug a:arg, vim_plug_options
 endfunction
+command!  -nargs=1 UnPlug call s:UnPlug(<args>)
 
-com! -nargs=+  -bar Plugin call VundleToPlug("Plugin", <args>)
-com! -nargs=+  -bar Bundle call VundleToPlug("Bundle", <args>)
+let g:has_async = v:version >= 800 || has('nvim')
 
 call plug#begin('~/.vim/bundle')
 
 " Define bundles via Github repos
 Plug 'christoomey/vim-run-interactive'
-Plug 'kchmck/vim-coffee-script'
+Plug 'https://github.com/adelarsq/vim-matchit'
+"Plug 'kchmck/vim-coffee-script'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'pbrisbin/vim-mkdir'
 Plug 'scrooloose/nerdtree'
-Plug 'slim-template/vim-slim'
-Plug 'thoughtbot/vim-rspec'
-Plug 'tpope/vim-bundler'
-Plug 'tpope/vim-endwise'
-Plug 'tpope/vim-eunuch'
+"Plug 'slim-template/vim-slim'
+"Plug 'thoughtbot/vim-rspec'
+"Plug 'tpope/vim-bundler'
+"Plug 'tpope/vim-endwise'
+"Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-rails'
-Plug 'tpope/vim-repeat'
+"Plug 'tpope/vim-rails'
+"Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
-Plug 'vim-ruby/vim-ruby'
+"Plug 'vim-ruby/vim-ruby'
 Plug 'vim-scripts/tComment'
 Plug 'hail2u/vim-css3-syntax'
 Plug 'sheerun/vim-polyglot'
-Plug 'yosiat/oceanic-next-vim'
-Plug 'rizzatti/dash.vim'
-Plug 'lambdatoast/elm.vim'
-Plug 'pangloss/vim-javascript'
-Plug 'gavocanov/vim-js-indent'
+"Plug 'rizzatti/dash.vim'
+"Plug 'lambdatoast/elm.vim'
+"Plug 'pangloss/vim-javascript'
+"Plug 'gavocanov/vim-js-indent'
 Plug 'itchyny/lightline.vim'
 Plug 'airblade/vim-gitgutter'
 " == JavaScript syntax highlighting ==
+Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
+Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
 Plug 'othree/yajs.vim', { 'for': ['javascript', 'javascript.jsx'] }
 Plug 'othree/es.next.syntax.vim', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
 Plug 'othree/javascript-libraries-syntax.vim', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'flowtype/vim-flow', { 'for': ['javascript', 'javascript.jsx'] }
+"Plug 'flowtype/vim-flow', { 'for': ['javascript', 'javascript.jsx'] }
 Plug 'epilande/vim-es2015-snippets'
 Plug 'epilande/vim-react-snippets'
 Plug 'SirVer/ultisnips'
-Plug 'w0rp/ale'
+Plug 'heavenshell/vim-jsdoc'
+Plug 'chooh/brightscript.vim'
+
+if g:has_async
+  Plug 'w0rp/ale'
+endif
 
 if filereadable(expand("~/.vimrc.bundles.local"))
   source ~/.vimrc.bundles.local
