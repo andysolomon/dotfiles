@@ -52,8 +52,8 @@ _load_settings "$HOME/.zsh/configs"
 #fpath=(~/.zsh/zsh-completions/src $fpath)
 
 # completion
-#autoload -U compinit
-#compinit
+autoload -U compinit
+compinit
 
 #ZSH_THEME="random"
 
@@ -72,7 +72,7 @@ _load_settings "$HOME/.zsh/configs"
 #done
 
 # automatically enter directories without cd
-setopt AUTO_CD
+setopt auto_cd
 
 # use vim as the visual editor
 #export VISUAL=vim
@@ -148,7 +148,7 @@ export SAVEHIST=$HISTSIZE
 #  }
 
 # look for ey config in project dirs
-export EYRC=./.eyrc
+# export EYRC=./.eyrc
 
 # automatically pushd
 #setopt auto_pushd
@@ -156,14 +156,14 @@ export EYRC=./.eyrc
 
 # awesome cd movements from zshkit
 #setopt AUTOCD
-setopt AUTOPUSHD PUSHDMINUS PUSHDSILENT PUSHDTOHOME
-setopt cdablevars
+#setopt AUTOPUSHD PUSHDMINUS PUSHDSILENT PUSHDTOHOME
+#setopt cdablevars
 
 # Try to correct command line spelling
-setopt CORRECT CORRECT_ALL
+# setopt CORRECT CORRECT_ALL
 
 # Enable extended globbing
-setopt EXTENDED_GLOB
+#setopt EXTENDED_GLOB
 
 # aliases
 [[ -f ~/.aliases ]] && source ~/.aliases
@@ -172,9 +172,10 @@ setopt EXTENDED_GLOB
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 # recommended by brew doctor
- export PATH='/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin:/Users/andrewsolomon/.bin:/Users/andrewsolomon/lynxapp/yeoman/yeoman-custom/cli/bin:/usr/local/share/npm/bin'
+export PATH='/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin:/Users/andrewsolomon/.bin:/Users/andrewsolomon/lynxapp/yeoman/yeoman-custom/cli/bin:/usr/local/share/npm/bin'
 export PATH=$HOME/local/bin:$PATH
 export NODE_PATH=/usr/local/bin/node:/usr/local/lib/node_modules:$NODE_PATH
+export PATH="/usr/local/share/npm/bin:$PATH"
 export SSL_CERT_FILE=/usr/local/etc/openssl/certs/cacert.pem
 export MONGO_PATH=/usr/local/mongodb
 export PATH=$PATH:$MONGO_PATH/bin
@@ -184,7 +185,7 @@ export PATH=/usr/local/share/python:$PATH
 
 #PYTHONPATH="${PYTHONPATH}:/lib/python3.4/site-packages/"
 export PYTHONPATH 
-. {/Users/andrewsolomon/dotfiles/vim/bundle}/powerline/bindings/zsh/powerline.zsh
+#. {/Users/andrewsolomon/dotfiles/vim/bundle}/powerline/bindings/zsh/powerline.zsh
 
 # DO NOT EDIT BELOW THIS LINE
 export JAVA_HOME=$(/usr/libexec/java_home)
@@ -200,9 +201,16 @@ eval "$(rbenv init - zsh --no-rehash)"
 export PATH="$PATH:$HOME/.yarn/bin"
 
 # React Native Android
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/tools/bin
-export PATH=$PATH:$ANDROID_HOME/platform-tools
+# export ANDROID_HOME=$HOME/Library/Android/sdk
+# export PATH=$PATH:$ANDROID_HOME/tools
+# export PATH=$PATH:$ANDROID_HOME/tools/bin
+# export PATH=$PATH:$ANDROID_HOME/platform-tools
+#
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# tabtab source for serverless package
+# uninstall by removing these lines or running `tabtab uninstall serverless`
+[[ -f /Users/administrator/cnn-modules/node_modules/tabtab/.completions/serverless.zsh ]] && . /Users/administrator/cnn-modules/node_modules/tabtab/.completions/serverless.zsh
+# tabtab source for sls package
+# uninstall by removing these lines or running `tabtab uninstall sls`
+[[ -f /Users/administrator/cnn-modules/node_modules/tabtab/.completions/sls.zsh ]] && . /Users/administrator/cnn-modules/node_modules/tabtab/.completions/sls.zsh
