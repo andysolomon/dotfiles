@@ -54,6 +54,15 @@ Plug 'epilande/vim-react-snippets'
 Plug 'SirVer/ultisnips'
 Plug 'heavenshell/vim-jsdoc'
 Plug 'chooh/brightscript.vim'
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
+Plug 'elzr/vim-json'
+Plug 'junegunn/limelight.vim'
+Plug 'junegunn/goyo.vim'
+Plug 'dracula/vim'
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
+Plug 'scrooloose/nerdcommenter'
+Plug 'terryma/vim-multiple-cursors'
 
 "if g:has_async
 "  Plug 'w0rp/ale'
