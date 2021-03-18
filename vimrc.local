@@ -1,6 +1,8 @@
 let localmapleader = ","
 let NERDTreeShowHidden=1
 
+" colorscheme forest-night
+
 " Load matchit.vim, but only if the user hasn't installed a newer version.
 if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
   runtime! macros/matchit.vim
@@ -31,6 +33,8 @@ onoremap in( :<c-u>normal! f(vi(<cr>
 onoremap in( :<c-u>normal! f(vi(<cr>
 nnoremap H 0
 nnoremap L $
+xnoremap <  <gv
+xnoremap >  >gv
 
 " Automatic Bracket Setting
 inoremap ( ()<Esc>:let leavechar=")"<CR>i
@@ -71,12 +75,12 @@ autocmd FileType scss set omnifunc=csscomplete#CompleteCSS
 autocmd FileType sass set omnifunc=csscomplete#CompleteCSS
 
 " Status Line ---------------------- {{{
-set statusline=%F        " Path to the file
-set statusline+=\ —\     " Separator
-set statusline+=%Y       " Path to the file
-set statusline+=%h       " Help file flag
-set statusline+=%m       " Modified flag
-set statusline+=%=       " Switch to the right side
-set statusline+=%l       " Current line
-set statusline+=/        " Separator
-set statusline+=%L       " Total Lines
+"set statusline=%F        " Path to the file
+"set statusline+=\ —\     " Separator
+"set statusline+=%Y       " Path to the file
+"set statusline+=%h       " Help file flag
+"set statusline+=%m       " Modified flag
+"set statusline+=%=       " Switch to the right side
+"set statusline+=%l       " Current line
+"set statusline+=/        " Separator
+"set statusline+=%L       " Total Lines

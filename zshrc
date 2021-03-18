@@ -166,12 +166,12 @@ export SAVEHIST=$HISTSIZE
 #export dirstacksize=5
 
 # awesome cd movements from zshkit
-#setopt AUTOCD
-#setopt AUTOPUSHD PUSHDMINUS PUSHDSILENT PUSHDTOHOME
-#setopt cdablevars
+setopt AUTOCD
+setopt AUTOPUSHD PUSHDMINUS PUSHDSILENT PUSHDTOHOME
+setopt cdablevars
 
 # Try to correct command line spelling
-# setopt CORRECT CORRECT_ALL
+setopt CORRECT CORRECT_ALL
 
 # Enable extended globbing
 #setopt EXTENDED_GLOB
@@ -207,7 +207,8 @@ eval "$(rbenv init -)"
 eval "$(rbenv init - zsh --no-rehash)"
 
 #export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 export PATH="$PATH:$HOME/.yarn/bin"
 
@@ -218,10 +219,3 @@ export PATH="$PATH:$HOME/.yarn/bin"
 # export PATH=$PATH:$ANDROID_HOME/platform-tools
 #
 # [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# tabtab source for serverless package
-# uninstall by removing these lines or running `tabtab uninstall serverless`
-[[ -f /Users/administrator/cnn-modules/node_modules/tabtab/.completions/serverless.zsh ]] && . /Users/administrator/cnn-modules/node_modules/tabtab/.completions/serverless.zsh
-# tabtab source for sls package
-# uninstall by removing these lines or running `tabtab uninstall sls`
-[[ -f /Users/administrator/cnn-modules/node_modules/tabtab/.completions/sls.zsh ]] && . /Users/administrator/cnn-modules/node_modules/tabtab/.completions/sls.zsh

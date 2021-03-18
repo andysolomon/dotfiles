@@ -63,9 +63,16 @@ Plug 'dracula/vim'
 Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 Plug 'scrooloose/nerdcommenter'
 Plug 'terryma/vim-multiple-cursors'
+Plug 'sainnhe/vim-color-forest-night'
+
+Plug 'leafgarland/vim-jsx-pretty'
+Plug 'leafgarland/typescript-vim'
+Plug 'peitalin/vim-jsx-typescript'
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
+Plug 'jparise/vim-graphql'
 
 "if g:has_async
-"  Plug 'w0rp/ale'
+Plug 'w0rp/ale'
 "endif
 
 if filereadable(expand("~/.vimrc.bundles.local"))

@@ -33,8 +33,6 @@ let NERDChristmasTree = 1
 nmap <leader>/ :call NERDComment(0, "invert")<cr>
 vmap <leader>/ :call NERDComment(0, "invert")<cr>
 
-" Color scheme
-"colorscheme Tomorrow-Night-Eighties
 
 " Remap multiple cursors
 let g:multi_cursor_use_default_mapping=0
@@ -52,11 +50,6 @@ if exists(":Tabularize")
   nmap <Leader>l: :Tabularize /:\zs<CR>
   vmap <Leader>l: :Tabularize /:\zs<CR>
 endif
-
-" bind K to grep word under cursor
-nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
-" bind \ (backward slash) to grep shortcut
-nnoremap \ :Ag<SPACE>
 
 " LimeLight "
 nmap <C-l> <Plug>(Limelight)
@@ -79,3 +72,10 @@ let g:limelight_eop = '\ze\n^\s'
 " Highlighting priority (default: 10)
 "   Set it to -1 not to overrule hlsearch
 let g:limelight_priority = -1
+
+let g:ale_fixers = {
+ \ 'javascript': ['eslint']
+ \ }
+
+let g:ale_sign_error = '❌'
+let g:ale_sign_warning = '⚠️'
