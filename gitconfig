@@ -22,8 +22,8 @@
 [include]
   path = .gitconfig.local
 [user]
-	name = andy-solomon
-	email = andrew.solomon@turner.com
+	name = andysolomon
+	email = andrewsolomon.edu@gmail.com
 [mergetool]
 	keepBackup = true
 [filter "hawser"]

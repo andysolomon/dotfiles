@@ -30,30 +30,22 @@ let NERDChristmasTree = 1
 
 " Nerdcommenter
 " ,/ to invert comment on the current line/selection
-nmap <leader>/ :call NERDComment(0, "invert")<cr>
-vmap <leader>/ :call NERDComment(0, "invert")<cr>
-
-
-" Remap multiple cursors
-let g:multi_cursor_use_default_mapping=0
-" Default mapping Multiple Cursors
-let g:multi_cursor_next_key='<C-f>'
-let g:multi_cursor_prev_key='<C-b>'
-let g:multi_cursor_skip_key='<C-x>'
-let g:multi_cursor_quit_key='<Esc>'
+nnoremap <leader>/ :call NERDComment(0, "invert")<cr>
+vnoremap <leader>/ :call NERDComment(0, "invert")<cr>
 
 " Tabularize
-let mapleader=','
 if exists(":Tabularize")
-  nmap <Leader>l= :Tabularize /=<CR>
-  vmap <Leader>l= :Tabularize /=<CR>
-  nmap <Leader>l: :Tabularize /:\zs<CR>
-  vmap <Leader>l: :Tabularize /:\zs<CR>
+  nnoremap <Leader>l= :Tabularize /=<CR>
+  vnoremap <Leader>l= :Tabularize /=<CR>
+  nnoremap <Leader>l: :Tabularize /:\zs<CR>
+  vnoremap <Leader>l: :Tabularize /:\zs<CR>
 endif
 
 " LimeLight "
 nmap <C-l> <Plug>(Limelight)
+nmap <C-l>l :Limelight!!<CR>
 xmap <C-l> <Plug>(Limelight)
+xmap <C-l>l :Limelight!!<CR>
 " Color name (:help cterm-colors) or ANSI code
 let g:limelight_conceal_ctermfg = 'gray'
 let g:limelight_conceal_ctermfg = 240

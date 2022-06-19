@@ -14,14 +14,12 @@ set autowrite     " Automatically :write before running commands
 set wildmenu
 set lazyredraw
 set showmatch
-set incsearch
 set hlsearch
 
-" Softtabs, 2 spaces
-set tabstop=2
-set shiftwidth=2
 set shiftround
 set expandtab
+set smartindent
+set autoindent
 
 " Make it obvious where 80 characters is
 set textwidth=80
