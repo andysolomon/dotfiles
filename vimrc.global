@@ -17,7 +17,6 @@ set hidden
 set wildmenu
 set backupdir=~/dotfiles/backup
 set undodir=~/dotfiles/undo
-"hellodir"
 " will use completion if not at beginning
 set wildmode=list:longest,list:full
 
