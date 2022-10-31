@@ -16,6 +16,7 @@ set showcmd       " display incomplete commands
 set hidden
 set wildmenu
 set undofile
+set backupdir=~/dotfiles/backup
 " will use completion if not at beginning
 set wildmode=list:longest,list:full
 
