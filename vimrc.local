@@ -67,18 +67,21 @@ nnoremap <leader>f :%s/
 " Autocomplete for css,scss,sass https://vimeo.com/118896316
 augroup ominfuncs
   autocmd!
-  autocmd FileType css set omnifunc=csscomplete#CompleteCSS
-  autocmd FileType scss set omnifunc=csscomplete#CompleteCSS
-  autocmd FileType sass set omnifunc=csscomplete#CompleteCSS
-  autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+  autocmd FileType html setlocal omnifunc=htmlcomplete#CompleteTags
+  autocmd FileType css,scss,sass set omnifunc=csscomplete#CompleteCSS
+  autocmd FileType javascript,jsx setlocal omnifunc=javascriptcomplete#CompleteJS
+  autocmd FileType typescript,tx,tsx setlocal omnifunc=typescriptcomplete#Complete
 augroup END
 "}}}
+
+"Autocomplete using Omnifunc
+inoremap <tab> <nop>
+inoremap <tab> <c-x><c-o>
 
 " Status Line ---------------------- {{{
 set statusline=%F
 set statusline+=\ %y
-set statusline+=%=
-set statusline+=L:%04l
-set statusline+=\ –
-set statusline+=\ T:%04L
+highlight StatusLine guibg=#ffffff guifg=#006086 
 "}}}
+
+

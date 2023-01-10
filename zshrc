@@ -225,3 +225,6 @@ export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/14/bin
 # export PATH=$PATH:$ANDROID_HOME/platform-tools
 #
 # [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Created by `pipx` on 2022-11-01 17:54:05
+export PATH="$PATH:/Users/andrewsolomon/.local/bin"
