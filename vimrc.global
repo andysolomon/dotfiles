@@ -53,6 +53,7 @@ set list listchars=tab:»·,trail:·,nbsp:·
 " Use one space, not two, after punctuation.
 set nojoinspaces
 " }}}
+set guifont=Hack_Nerd_Font:h11
 
 " Status/Colors/Highlights Settings {{{
 if exists('+termguicolors')
@@ -61,10 +62,11 @@ if exists('+termguicolors')
   set termguicolors
 endif
 " Pmenu settings
-highlight Pmenu guibg=#ff0000 gui=bold
-highlight PmenuSel guibg=#00ff00 gui=bold
-highlight PmenuSbar guibg=#0000ff gui=bold
-highlight PmenuThumb guibg=#ffff00 gui=bold
+highlight Pmenu guibg=#3D364D gui=bold
+highlight PmenuSel guibg=#8373A9 gui=bold
+highlight PmenuSbar guibg=#3D364D gui=bold
+highlight PmenuThumb guibg=#8373A9 gui=bold
+
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")

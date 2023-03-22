@@ -228,3 +228,4 @@ export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/14/bin
 
 # Created by `pipx` on 2022-11-01 17:54:05
 export PATH="$PATH:/Users/andrewsolomon/.local/bin"
+eval "$(fnm env --use-on-cd)"

@@ -73,6 +73,8 @@ augroup ominfuncs
   autocmd FileType typescript,tx,tsx setlocal omnifunc=typescriptcomplete#Complete
 augroup END
 "}}}
+autocmd bufread *.cls set ft=apex syntax=apex
+autocmd bufread *.trigger set ft=apex syntax=java
 
 "Autocomplete using Omnifunc
 inoremap <tab> <nop>
