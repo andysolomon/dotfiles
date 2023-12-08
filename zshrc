@@ -229,3 +229,19 @@ export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/14/bin
 # Created by `pipx` on 2022-11-01 17:54:05
 export PATH="$PATH:/Users/andrewsolomon/.local/bin"
 eval "$(fnm env --use-on-cd)"
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/Users/andrewsolomon/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/Users/andrewsolomon/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/Users/andrewsolomon/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/Users/andrewsolomon/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+

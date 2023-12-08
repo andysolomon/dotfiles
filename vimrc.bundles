@@ -83,7 +83,7 @@ Plug 'ryanoasis/vim-devicons'
 Plug 'ejholmes/vim-forcedotcom'
 
 "if g:has_async
-Plug 'dense-analysis/ale'
+" Plug 'dense-analysis/ale'
 "endif
 
 if filereadable(expand("~/.vimrc.bundles.local"))

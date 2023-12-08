@@ -77,8 +77,8 @@ autocmd bufread *.cls set ft=apex syntax=apex
 autocmd bufread *.trigger set ft=apex syntax=java
 
 "Autocomplete using Omnifunc
-inoremap <tab> <nop>
-inoremap <tab> <c-x><c-o>
+"inoremap <tab> <nop>
+"inoremap <tab> <c-x><c-o>
 
 " Status Line ---------------------- {{{
 set statusline=%F
