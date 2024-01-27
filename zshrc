@@ -41,207 +41,46 @@ _load_settings() {
 }
 _load_settings "$HOME/.zsh/configs"
 
-# Local config
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
-
-# aliases
-[[ -f ~/.aliases ]] && source ~/.aliases
-
-# load our own completion functions
-#fpath=(~/.zsh/completion $fpath)
-#fpath=(~/.zsh/zsh-completions/src $fpath)
-
 # completion
 autoload -U compinit
 compinit
 
-#ZSH_THEME="random"
-
-## case-insensitive (all),partial-word and then substring completion
-#if [ "x$CASE_SENSITIVE" = "xtrue" ]; then
-#  zstyle ':completion:*' matcher-list 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
-#  unset CASE_SENSITIVE
-#else
-#  zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
-#fi
-
-#zstyle ':completion:*' list-colors ''
-
-#for function in ~/.zsh/functions/*; do
-#  source $function
-#done
-
 # automatically enter directories without cd
 setopt auto_cd
 
-# use vim as the visual editor
-#export VISUAL=vim
-#export EDITOR=$VISUAL
-
-# vi mode
-#bindkey -v
-#bindkey "^F" vi-cmd-mode
-#bindkey jj vi-cmd-mode
-
-# use incremental search
-#bindkey "^R" history-incremental-search-backward
-
-# add some readline keys back
-#bindkey "^A" beginning-of-line
-#bindkey "^E" end-of-line
-
-# handy keybindings
-#bindkey "^P" history-search-backward
-#bindkey "^Y" accept-and-hold
-#bindkey "^N" insert-last-word
-#bindkey -s "^T" "^[Isudo ^[A" # "t" for "toughguy"
-
-# use neovim
-#if type nvim > /dev/null 2>&1; then
-#  alias vim='nvim'
-#fi
-
-# AutoStart Tmux
-_not_inside_tmux() { [[ -z "$TMUX" ]] }
-
-ensure_tmux_is_running() {
-  if _not_inside_tmux; then
-    tat
-  fi
-}
-
-ensure_tmux_is_running
-
-# Highlight search results in ack.
-export ACK_COLOR_MATCH='red'
-
-# expand functions in the prompt
-setopt prompt_subst
-
-# prompt
-export PS1='[${SSH_CONNECTION+"%n@%m:"}%~] '
-
-# ignore duplicate history entries
-#setopt histignoredups
-
-# Nicer history
-export HISTSIZE=100000
-export HISTFILE="$HOME/.history"
-export SAVEHIST=$HISTSIZE
-
-#setopt APPEND_HISTORY # adds history
-#setopt INC_APPEND_HISTORY SHARE_HISTORY  # adds history incrementally and share it across sessions
-#setopt HIST_IGNORE_ALL_DUPS  # dont record dupes in history
-#setopt HIST_REDUCE_BLANKS
-
-# By @ieure; copied from https://gist.github.com/1474072
 #
-# It finds a file, looking up through parent directories until it finds one.
-# Use it like this:
+# PATH Configurations
 #
-#   $ ls .tmux.conf
-#   ls: .tmux.conf: No such file or directory
-#
-#   $ ls `up .tmux.conf`
-#   /Users/grb/.tmux.conf
-#
-#   $ cat `up .tmux.conf`
-#   set -g default-terminal "screen-256color"
-#
-#function up()
-#{
-#    local DIR=$PWD
-#    local TARGET=$1
-#    while [ ! -e $DIR/$TARGET -a $DIR != "/" ]; do
-#        DIR=$(dirname $DIR)
-#    done
-#    test $DIR != "/" && echo $DIR/$TARGET
-#  }
 
-# look for ey config in project dirs
-# export EYRC=./.eyrc
+# Default Unix Binaries
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
-# automatically pushd
-#setopt auto_pushd
-#export dirstacksize=5
+# Homebrew
+# Adds Homebrew's binary directory to PATH
+export PATH="/opt/homebrew/bin:$PATH"
 
-# awesome cd movements from zshkit
-setopt AUTOCD
-setopt AUTOPUSHD PUSHDMINUS PUSHDSILENT PUSHDTOHOME
-setopt cdablevars
-
-# Try to correct command line spelling
-setopt CORRECT CORRECT_ALL
-
-# Enable extended globbing
-#setopt EXTENDED_GLOB
-
-# aliases
-[[ -f ~/.aliases ]] && source ~/.aliases
-
-# Local config
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
-
-# recommended by brew doctor
-export PATH='/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/git/bin:/Users/andrewsolomon/.bin:/Users/andrewsolomon/lynxapp/yeoman/yeoman-custom/cli/bin:/usr/local/share/npm/bin'
-export PATH=$HOME/local/bin:$PATH
-export NODE_PATH=/usr/local/bin/node:/usr/local/lib/node_modules:$NODE_PATH
-export PATH="/usr/local/share/npm/bin:$PATH"
-export SSL_CERT_FILE=/usr/local/etc/openssl/certs/cacert.pem
-export MONGO_PATH=/usr/local/mongodb
-export PATH=$PATH:$MONGO_PATH/bin
-export PATH=$PATH:/usr/local/mysql/bin
-export SSL_CERT_FILE=/usr/local/etc/openssl/certs/cert.pem
-export PATH=/usr/local/share/python:$PATH
-
-#PYTHONPATH="${PYTHONPATH}:/lib/python3.4/site-packages/"
-export PYTHONPATH 
-#. {/Users/andrewsolomon/dotfiles/vim/bundle}/powerline/bindings/zsh/powerline.zsh
-
-# DO NOT EDIT BELOW THIS LINE
-export JAVA_HOME=$(/usr/libexec/java_home)
-export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
-
-#export PATH="$HOME/.bin:$PATH"
-eval "$(rbenv init - zsh --no-rehash)"
-
-#export NVM_DIR="$HOME/.nvm"
-#export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-
+# Node.js setup
+# Setting up NVM (Node Version Manager) and adding Node to PATH
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion""""]""""]""
-
-export PATH="$PATH:$HOME/.yarn/bin"
-
-export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/14/bin
-
-# React Native Android
-# export ANDROID_HOME=$HOME/Library/Android/sdk
-# export PATH=$PATH:$ANDROID_HOME/tools
-# export PATH=$PATH:$ANDROID_HOME/tools/bin
-# export PATH=$PATH:$ANDROID_HOME/platform-tools
-#
-# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# Created by `pipx` on 2022-11-01 17:54:05
-export PATH="$PATH:/Users/andrewsolomon/.local/bin"
-eval "$(fnm env --use-on-cd)"
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/andrewsolomon/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/Users/andrewsolomon/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/Users/andrewsolomon/anaconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/Users/andrewsolomon/anaconda3/bin:$PATH"
-    fi
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+    . "$NVM_DIR/nvm.sh"  # Load NVM
+    nvm use default  # Use the default (usually the latest) version of Node
+    # Alternatively, to always use the latest installed version, uncomment the next line:
+    # nvm use `nvm ls-remote --lts | tail -1 | awk '{print $1}'`
 fi
-unset __conda_setup
-# <<< conda initialize <<<
 
+# Racket
+# Adding Racket binaries to PATH
+export PATH="/Applications/Racket v8.10/bin:$PATH"
+
+# Java
+# Setting JAVA_HOME to the preferred version and adding Java binaries to PATH
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+
+# Python
+# Adding Python binaries to PATH, set by pipx
+export PATH="$PATH:$HOME/Library/Python/3.9/bin"
+export PATH="$PATH:$HOME/.local/bin"
+
+# End of .zshrc configuration
