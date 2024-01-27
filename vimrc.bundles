@@ -15,64 +15,75 @@ let g:has_async = v:version >= 800 || has('nvim')
 call plug#begin('~/.vim/bundle')
 
 " Define bundles via Github repos
-Plug 'christoomey/vim-run-interactive'
-Plug 'https://github.com/adelarsq/vim-matchit'
+"Plug 'christoomey/vim-run-interactive'
+"Plug 'https://github.com/adelarsq/vim-matchit'
 "Plug 'kchmck/vim-coffee-script'
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'pbrisbin/vim-mkdir'
+"Plug 'ctrlpvim/ctrlp.vim'
+"Plug 'pbrisbin/vim-mkdir'
 Plug 'scrooloose/nerdtree'
 "Plug 'slim-template/vim-slim'
 "Plug 'thoughtbot/vim-rspec'
 "Plug 'tpope/vim-bundler'
 "Plug 'tpope/vim-endwise'
 "Plug 'tpope/vim-eunuch'
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-obsession'
+"Plug 'tpope/vim-fugitive'
+"Plug 'tpope/vim-obsession'
 Plug 'luochen1990/rainbow'
 "Plug 'tpope/vim-rails'
 "Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-surround'
+"Plug 'tpope/vim-surround'
 "Plug 'vim-ruby/vim-ruby'
-Plug 'vim-scripts/tComment'
-Plug 'hail2u/vim-css3-syntax'
-Plug 'sheerun/vim-polyglot'
+"Plug 'vim-scripts/tComment'
+"Plug 'hail2u/vim-css3-syntax'
+"Plug 'sheerun/vim-polyglot'
 "Plug 'rizzatti/dash.vim'
 "Plug 'lambdatoast/elm.vim'
-"Plug 'pangloss/vim-javascript'
+Plug 'pangloss/vim-javascript'
 "Plug 'gavocanov/vim-js-indent'
 Plug 'itchyny/lightline.vim'
 Plug 'airblade/vim-gitgutter'
 " == JavaScript syntax highlighting ==
 Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'othree/yajs.vim', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'othree/es.next.syntax.vim', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'othree/javascript-libraries-syntax.vim', { 'for': ['javascript', 'javascript.jsx'] }
+"Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
+"Plug 'othree/yajs.vim', { 'for': ['javascript'] }
+"Plug 'othree/es.next.syntax.vim', { 'for': ['javascript'] }
+"Plug 'othree/javascript-libraries-syntax.vim', { 'for': ['javascript', 'javascript.jsx'] }
 "Plug 'flowtype/vim-flow', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'epilande/vim-es2015-snippets'
-Plug 'epilande/vim-react-snippets'
-Plug 'SirVer/ultisnips'
-Plug 'heavenshell/vim-jsdoc'
-Plug 'chooh/brightscript.vim'
-Plug 'godlygeek/tabular'
-Plug 'plasticboy/vim-markdown'
+"Plug 'epilande/vim-es2015-snippets'
+"Plug 'epilande/vim-react-snippets'
+"Plug 'SirVer/ultisnips'
+"Plug 'heavenshell/vim-jsdoc'
+"Plug 'godlygeek/tabular'
+"Plug 'plasticboy/vim-markdown'
 Plug 'elzr/vim-json'
 Plug 'junegunn/limelight.vim'
-Plug 'junegunn/goyo.vim'
-Plug 'dracula/vim'
-Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
+"Plug 'junegunn/goyo.vim'
+"Plug 'dracula/vim'
+"Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 Plug 'scrooloose/nerdcommenter'
-Plug 'terryma/vim-multiple-cursors'
+"Plug 'terryma/vim-multiple-cursors'
 Plug 'sainnhe/vim-color-forest-night'
 
-Plug 'leafgarland/vim-jsx-pretty'
 Plug 'leafgarland/typescript-vim'
-Plug 'peitalin/vim-jsx-typescript'
-Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
-Plug 'jparise/vim-graphql'
+"Plug 'peitalin/vim-jsx-typescript'
+"Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
+"Plug 'jparise/vim-graphql'
+Plug 'neovim/nvim-lspconfig'
+Plug 'kabouzeid/nvim-lspinstall'
+Plug 'neovim/nvim-lsp'
+Plug 'williamboman/nvim-lsp-installer'
+Plug 'neovim/nvim-lspconfig'
+Plug 'github/copilot.vim'
+"Plug 'nvim-lua/plenary.nvim'
+"Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.1' }
+"Plug 'BurntSushi/ripgrep'
+"Plug 'sharkdp/fd'
+"Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'ryanoasis/vim-devicons'
+Plug 'ejholmes/vim-forcedotcom'
 
 "if g:has_async
-Plug 'w0rp/ale'
+" Plug 'dense-analysis/ale'
 "endif
 
 if filereadable(expand("~/.vimrc.bundles.local"))

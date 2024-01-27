@@ -1,7 +1,4 @@
-let localmapleader = ","
 let NERDTreeShowHidden=1
-
-" colorscheme forest-night
 
 " Load matchit.vim, but only if the user hasn't installed a newer version.
 if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
@@ -19,13 +16,15 @@ let g:ycm_path_to_python_interpreter="/usr/bin/python"
 
 " Mappings ---------------------- {{{
 noremap - ddp
-nnoremap <leader>ev :vsplit ~/dotfiles/vimrc.local<cr>
+noremap _ ddkP
+nnoremap <leader>ev :vsplit ~/dotfiles/vimrc.global<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 nnoremap <leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>s :split
 nnoremap <leader>S :split <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>v :vsplit
 nnoremap <leader>V :vsplit <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <leader>y V`]
 inoremap <esc> <nop>
 inoremap jk <esc>
 vnoremap jk <esc>
@@ -33,8 +32,8 @@ onoremap in( :<c-u>normal! f(vi(<cr>
 onoremap in( :<c-u>normal! f(vi(<cr>
 nnoremap H 0
 nnoremap L $
-xnoremap <  <gv
-xnoremap >  >gv
+""xnoremap <  <gv
+""xnoremap >  >gv
 
 " Automatic Bracket Setting
 inoremap ( ()<Esc>:let leavechar=")"<CR>i
@@ -42,45 +41,47 @@ inoremap [ []<Esc>:let leavechar="]"<CR>i
 inoremap { {}<Esc>:let leavechar="}"<CR>i
 inoremap " ""<Esc>:let leavechar="""<CR>i
 inoremap ' ''<Esc>:let leavechar="'"<CR>i
+inoremap <c-d> <esc>ddi
+inoremap <c-u> <esc>bveU<esc>ea
+
+" Manual Surrounds"
+nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
+nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
+nnoremap <leader>` viw<esc>a`<esc>bi`<esc>lel
 
 " bind \ (backward slash) to grep shortcut
 command! -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
-" Rename
-map <Leader>r :RenameFile<CR>
 " Save
-map <Leader>w :w<CR>
+nnoremap <Leader>w :w<CR>
 " Save and Quit
-map <Leader>x :x<CR>
+nnoremap <Leader>x :x<CR>
 " Quit
-map <Leader>q :q<CR>
+nnoremap <Leader>q :q<CR>
 " Search
-map <leader>f :%s/
-" }}}
+nnoremap <leader>f :%s/
+"}}}
 
 " File-type Specific Settings ---------------------- {{{
-augroup VimCSS3Syntax
-  autocmd!
-
-  autocmd FileType css setlocal iskeyword+=-
-augroup END
-
-augroup filetype_vim
-  autocmd!
-  autocmd FileType vim setlocal foldmethod=marker
-augroup END
-
 " Autocomplete for css,scss,sass https://vimeo.com/118896316
-autocmd FileType css set omnifunc=csscomplete#CompleteCSS
-autocmd FileType scss set omnifunc=csscomplete#CompleteCSS
-autocmd FileType sass set omnifunc=csscomplete#CompleteCSS
+augroup ominfuncs
+  autocmd!
+  autocmd FileType html setlocal omnifunc=htmlcomplete#CompleteTags
+  autocmd FileType css,scss,sass set omnifunc=csscomplete#CompleteCSS
+  autocmd FileType javascript,jsx setlocal omnifunc=javascriptcomplete#CompleteJS
+  autocmd FileType typescript,tx,tsx setlocal omnifunc=typescriptcomplete#Complete
+augroup END
+"}}}
+autocmd bufread *.cls set ft=apex syntax=apex
+autocmd bufread *.trigger set ft=apex syntax=java
+
+"Autocomplete using Omnifunc
+"inoremap <tab> <nop>
+"inoremap <tab> <c-x><c-o>
 
 " Status Line ---------------------- {{{
-"set statusline=%F        " Path to the file
-"set statusline+=\ —\     " Separator
-"set statusline+=%Y       " Path to the file
-"set statusline+=%h       " Help file flag
-"set statusline+=%m       " Modified flag
-"set statusline+=%=       " Switch to the right side
-"set statusline+=%l       " Current line
-"set statusline+=/        " Separator
-"set statusline+=%L       " Total Lines
+set statusline=%F
+set statusline+=\ %y
+highlight StatusLine guibg=#ffffff guifg=#006086 
+"}}}
+
+
