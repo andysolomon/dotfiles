@@ -1,3 +1,5 @@
+vim.g.mapleader = ','
+vim.keymap.set('n', '<Leader>pv', vim.cmd.Ex)
 vim.keymap.set("n", "<Leader>o", "o<Esc>^Da")
 vim.keymap.set("n", "te", ":tabedit")
 vim.keymap.set('i', 'jk', '<Esc>')

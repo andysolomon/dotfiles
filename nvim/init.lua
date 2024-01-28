@@ -1,6 +1,6 @@
 require('andysolomon')
 --[[
-
+ 
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
 =====================================================================
@@ -73,6 +73,7 @@ require('lazy').setup({
   -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
+  'theprimeagen/harpoon',
 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
