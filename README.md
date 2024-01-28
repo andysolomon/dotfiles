@@ -1,4 +1,4 @@
-thoughtbot dotfiles
+andysolomon dotfiles
 ===================
 
 Requirements
