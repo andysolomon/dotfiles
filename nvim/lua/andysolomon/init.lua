@@ -6,3 +6,7 @@ vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
     pattern = "*.cls",
     command = "set filetype=java"
 })
+
+vim.api.nvim_create_user_command('DeployCurrentFile', function()
+  vim.cmd('!sf project deploy start --source-path ' .. vim.fn.expand('%:p'))
+end, {})
