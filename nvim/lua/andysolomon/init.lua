@@ -3,7 +3,7 @@ print('hello from andy')
 require('andysolomon.set')
 
 vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
-    pattern = "*.cls",
+    pattern = {"*.cls", "*.trigger"},
     command = "set filetype=java"
 })
 

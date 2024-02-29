@@ -1,8 +1,6 @@
+local harpoon = require("harpoon")
 local mark = require("harpoon.mark")
 local ui = require("harpoon.ui")
-local harpoon = require("harpoon")
-local log = require("harpoon.dev").log
-require("telescope").load_extension('harpoon')
 
 -- Define the reorder function
 local function remove_first_empty_mark()
