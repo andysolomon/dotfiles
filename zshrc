@@ -83,4 +83,7 @@ export PATH="$JAVA_HOME/bin:$PATH"
 export PATH="$PATH:$HOME/Library/Python/3.9/bin"
 export PATH="$PATH:$HOME/.local/bin"
 
+# Setup Instructions for SF CLI Autocomplete ---
+eval "$(sf autocomplete script zsh)"
+
 # End of .zshrc configuration
