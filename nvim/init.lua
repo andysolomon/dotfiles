@@ -573,7 +573,7 @@ local servers = {
 			-- NOTE: toggle below to ignore Apex_LS's noisy `missing-fields` warnings
 			-- diagnostics = { disable = { 'missing-fields' } },
 		},
-		filetypes = { "java" },
+		filetypes = { "java", "apex", "apexcode" },
 	},
 	lua_ls = {
 		Lua = {

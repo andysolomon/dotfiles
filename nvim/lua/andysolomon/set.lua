@@ -6,13 +6,17 @@ vim.opt.binary = true
 vim.opt.eol = false
 
 vim.opt.tabstop = 2
-vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
 vim.opt.autoindent = true
 vim.opt.smartindent = true
-vim.cmd 'filetype plugin indent on'
+vim.opt.cindent = true
+vim.cmd [[
+  filetype plugin indent on
+]]
+
 vim.opt.swapfile = false
 
 vim.opt.wrap = false

@@ -86,4 +86,16 @@ export PATH="$PATH:$HOME/.local/bin"
 # Setup Instructions for SF CLI Autocomplete ---
 eval "$(sf autocomplete script zsh)"
 
+export VISUAL=nvim
+
+function _sf_org_list() {
+    local -a orgs
+    orgs=($(sf org list | awk '/Connected/ {print $3}')) # This assumes that the third column contains the alias.
+    _describe 'sf orgs' orgs
+}
+
+compdef _sf_org_list DeployCurrentFile
+
+eval "$(zoxide init zsh)"
+
 # End of .zshrc configuration
