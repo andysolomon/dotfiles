@@ -99,3 +99,10 @@ compdef _sf_org_list DeployCurrentFile
 eval "$(zoxide init zsh)"
 
 # End of .zshrc configuration
+
+# Added by Windsurf
+export PATH="/Users/andrewsolomon/.codeium/windsurf/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+# Amp CLI
+export PATH="/Users/andrewsolomon/.amp/bin:$PATH"
