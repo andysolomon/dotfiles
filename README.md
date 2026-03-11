@@ -59,3 +59,26 @@ The `mac` script is a larger machine bootstrap for Homebrew + common dev tools:
 ```
 
 Use it only if you want those opinionated system-level changes.
+
+## Troubleshooting
+
+### tmux keybindings not working
+
+If tmux starts with default bindings, make sure your config is linked:
+
+```sh
+ln -s ~/dotfiles/tmux.conf ~/.tmux.conf
+```
+
+Then reload tmux config in a running session:
+
+```sh
+tmux source-file ~/.tmux.conf
+```
+
+This config uses prefix `Ctrl-a` (not default `Ctrl-b`).
+
+If copy or resurrect commands fail, install dependencies/plugins:
+
+- `reattach-to-user-namespace`
+- TPM + configured tmux plugins under `~/.tmux/plugins`
