@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BUNDLES_FILE="$ROOT_DIR/vimrc.bundles"
+OUT_FILE="$ROOT_DIR/PLUGIN_INVENTORY.md"
+
+if [[ ! -f "$BUNDLES_FILE" ]]; then
+  echo "Missing $BUNDLES_FILE" >&2
+  exit 1
+fi
+
+awk '
+  function desc(p) {
+    d["christoomey/vim-run-interactive"] = "Run code interactively from Vim"
+    d["adelarsq/vim-matchit"] = "Extended `%` matching for pairs/tags"
+    d["kchmck/vim-coffee-script"] = "CoffeeScript syntax and indent support"
+    d["ctrlpvim/ctrlp.vim"] = "Fuzzy file and buffer finder"
+    d["pbrisbin/vim-mkdir"] = "Auto-create missing directories on save"
+    d["scrooloose/nerdtree"] = "File explorer tree sidebar"
+    d["preservim/nerdtree"] = "File explorer tree sidebar"
+    d["slim-template/vim-slim"] = "Slim template syntax support"
+    d["thoughtbot/vim-rspec"] = "RSpec test runner helpers"
+    d["tpope/vim-bundler"] = "Bundler-aware commands"
+    d["tpope/vim-endwise"] = "Auto-add `end` in Ruby-like languages"
+    d["tpope/vim-eunuch"] = "Shell and file operations from Vim commands"
+    d["tpope/vim-fugitive"] = "Git integration for Vim"
+    d["tpope/vim-obsession"] = "Session management"
+    d["luochen1990/rainbow"] = "Rainbow bracket and parenthesis colors"
+    d["tpope/vim-rails"] = "Rails navigation and helpers"
+    d["tpope/vim-repeat"] = "Better repeat support for plugin commands"
+    d["tpope/vim-surround"] = "Add/change/delete surroundings"
+    d["vim-ruby/vim-ruby"] = "Ruby syntax and filetype support"
+    d["vim-scripts/tComment"] = "Comment toggling plugin"
+    d["hail2u/vim-css3-syntax"] = "CSS3 syntax highlighting"
+    d["sheerun/vim-polyglot"] = "Language pack with many syntax files"
+    d["rizzatti/dash.vim"] = "Dash.app documentation lookup"
+    d["lambdatoast/elm.vim"] = "Elm language support"
+    d["pangloss/vim-javascript"] = "JavaScript syntax and highlighting"
+    d["gavocanov/vim-js-indent"] = "JavaScript indentation tweaks"
+    d["itchyny/lightline.vim"] = "Lightweight statusline"
+    d["airblade/vim-gitgutter"] = "Git diff signs in the gutter"
+    d["mxw/vim-jsx"] = "JSX syntax support"
+    d["othree/yajs.vim"] = "Improved JavaScript syntax"
+    d["othree/es.next.syntax.vim"] = "ESNext syntax support"
+    d["othree/javascript-libraries-syntax.vim"] = "JavaScript library and framework syntax add-ons"
+    d["flowtype/vim-flow"] = "Flow type syntax support"
+    d["epilande/vim-es2015-snippets"] = "ES2015 snippets"
+    d["epilande/vim-react-snippets"] = "React snippets"
+    d["SirVer/ultisnips"] = "Snippet engine"
+    d["heavenshell/vim-jsdoc"] = "Generate JSDoc comments"
+    d["godlygeek/tabular"] = "Align text into columns by pattern"
+    d["plasticboy/vim-markdown"] = "Markdown editing and syntax support"
+    d["elzr/vim-json"] = "Improved JSON syntax support"
+    d["junegunn/limelight.vim"] = "Focus mode that dims surrounding text"
+    d["junegunn/goyo.vim"] = "Distraction-free writing mode"
+    d["dracula/vim"] = "Dracula colorscheme"
+    d["prettier/vim-prettier"] = "Prettier formatter integration"
+    d["scrooloose/nerdcommenter"] = "Comment/uncomment utilities"
+    d["preservim/nerdcommenter"] = "Comment/uncomment utilities"
+    d["terryma/vim-multiple-cursors"] = "Multiple cursors editing"
+    d["sainnhe/vim-color-forest-night"] = "Forest Night colorscheme"
+    d["leafgarland/typescript-vim"] = "TypeScript syntax and filetype support"
+    d["peitalin/vim-jsx-typescript"] = "TypeScript JSX (TSX) syntax support"
+    d["styled-components/vim-styled-components"] = "styled-components syntax support"
+    d["jparise/vim-graphql"] = "GraphQL syntax support"
+    d["neovim/nvim-lspconfig"] = "LSP server configurations for Neovim"
+    d["kabouzeid/nvim-lspinstall"] = "Legacy Neovim LSP installer"
+    d["neovim/nvim-lsp"] = "Legacy Neovim LSP plugin"
+    d["williamboman/nvim-lsp-installer"] = "Legacy LSP installer plugin"
+    d["github/copilot.vim"] = "GitHub Copilot integration"
+    d["nvim-lua/plenary.nvim"] = "Lua utility library used by Neovim plugins"
+    d["nvim-telescope/telescope.nvim"] = "Fuzzy finder and picker UI"
+    d["BurntSushi/ripgrep"] = "External search tool (not a Vim plugin)"
+    d["sharkdp/fd"] = "External `find` alternative (not a Vim plugin)"
+    d["nvim-treesitter/nvim-treesitter"] = "Tree-sitter parsing and highlighting"
+    d["ryanoasis/vim-devicons"] = "Filetype icons for plugin UIs"
+    d["ejholmes/vim-forcedotcom"] = "Salesforce/Apex support for Vim"
+    d["dense-analysis/ale"] = "Asynchronous linting and fixing"
+
+    if (p in d) return d[p]
+    return "Vim/Neovim plugin or external tooling dependency"
+  }
+
+  function state_for(p) {
+    if (active[p] && inactive[p]) return "Both"
+    if (active[p]) return "Active"
+    return "Inactive"
+  }
+
+  function normalize(plugin) {
+    gsub(/^https?:\/\/github\.com\//, "", plugin)
+    gsub(/\.git$/, "", plugin)
+    return plugin
+  }
+
+  {
+    line = $0
+    is_inactive = (line ~ /^[[:space:]]*"/)
+    plug_start = index(line, "Plug '\''")
+    if (plug_start > 0) {
+      rest = substr(line, plug_start + 6)
+      quote_end = index(rest, "'\''")
+      if (quote_end <= 0) next
+      p = normalize(substr(rest, 1, quote_end - 1))
+      seen[p] = 1
+      if (is_inactive) inactive[p] = 1
+      else active[p] = 1
+    }
+  }
+
+  END {
+    print "# Vim Plugin Inventory"
+    print ""
+    print "Generated from `vimrc.bundles` by `bin/generate-vim-plugin-inventory`."
+    print ""
+    print "| Plugin | State | What it is | Repo |"
+    print "|---|---|---|---|"
+
+    for (p in seen) {
+      print p "\t" state_for(p) "\t" desc(p) "\t" "https://github.com/" p
+    }
+  }
+' "$BUNDLES_FILE" | {
+  # Preserve header lines as-is, sort only table body rows.
+  IFS= read -r l1
+  IFS= read -r l2
+  IFS= read -r l3
+  IFS= read -r l4
+  IFS= read -r l5
+  IFS= read -r l6
+  printf '%s\n' "$l1" "$l2" "$l3" "$l4" "$l5" "$l6"
+  sort -f
+} | awk -F '\t' '
+  BEGIN { OFS = "" }
+  /^[#|]/ || /^Generated from/ || /^$/ { print; next }
+  { print "| `", $1, "` | ", $2, " | ", $3, " | ", $4, " |" }
+' > "$OUT_FILE"
+
+echo "Wrote $OUT_FILE"
