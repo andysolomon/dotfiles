@@ -3,6 +3,21 @@ noremap <C-T> :NERDTreeToggle<CR>
 nmap <leader>n :NERDTreeFind<CR>R
 autocmd vimenter * NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+" Nerd Font fallback:
+" - Use Nerd Font icons by default.
+" - Set DOTFILES_NERD_FONT=0 to force ASCII-safe rendering on machines without Nerd Fonts.
+" - This avoids tofu/square glyphs when terminal font lacks Nerd glyphs.
+if !exists('g:dotfiles_use_nerd_font')
+  let g:dotfiles_use_nerd_font = !(exists('$DOTFILES_NERD_FONT') && $DOTFILES_NERD_FONT ==# '0')
+endif
+if g:dotfiles_use_nerd_font
+  let g:NERDTreeDirArrowExpandable = '👉'
+  let g:NERDTreeDirArrowCollapsible = '👇'
+else
+  let g:webdevicons_enable = 0
+  let g:NERDTreeDirArrowExpandable = '+'
+  let g:NERDTreeDirArrowCollapsible = '~'
+endif
 " NERDTress File highlighting
 function! NERDTreeHighlightFile(extension, guifg)
  exec 'autocmd filetype nerdtree highlight ' . a:extension .' guifg='. a:guifg
@@ -20,8 +35,6 @@ call NERDTreeHighlightFile('js','#CACB42')
 call NERDTreeHighlightFile('ts', '#3078C6')
 call NERDTreeHighlightFile('tsx','#3078C6')
 call NERDTreeHighlightFile('php','#ff00ff')
-let g:NERDTreeDirArrowExpandable = '👉'
-let g:NERDTreeDirArrowCollapsible = '👇'
 " Make bookmarks Visible
 let NERDTreeShowBookmarks = 1
 "Enable Colors
@@ -29,16 +42,8 @@ let NERDChristmasTree = 1
 
 " Nerdcommenter
 " ,/ to invert comment on the current line/selection
-nnoremap <leader>/ :call NERDComment(0, "invert")<cr>
-vnoremap <leader>/ :call NERDComment(0, "invert")<cr>
-
-" Tabularize
-if exists(":Tabularize")
-  nnoremap <Leader>l= :Tabularize /=<CR>
-  vnoremap <Leader>l= :Tabularize /=<CR>
-  nnoremap <Leader>l: :Tabularize /:\zs<CR>
-  vnoremap <Leader>l: :Tabularize /:\zs<CR>
-endif
+nnoremap <leader>/ :call nerdcommenter#Comment('n', 'toggle')<cr>
+vnoremap <leader>/ :call nerdcommenter#Comment('x', 'toggle')<cr>
 
 " LimeLight "
 nmap <C-l> <Plug>(Limelight)
