@@ -6,7 +6,7 @@ done
 # extra files in ~/.zsh/configs/pre , ~/.zsh/configs , and ~/.zsh/configs/post
 # these are loaded first, second, and third, respectively.
 _load_settings() {
-  _dir="$2"
+  _dir="$1"
   if [ -d "$_dir" ]; then
     if [ -d "$_dir/pre" ]; then
       for config in "$_dir"/pre/**/*(N-.); do
@@ -74,13 +74,20 @@ fi
 export PATH="/Applications/Racket v8.10/bin:$PATH"
 
 # Java
-# Setting JAVA_HOME to the preferred version and adding Java binaries to PATH
-export JAVA_HOME=$(/usr/libexec/java_home -v 21)
-export PATH="$JAVA_HOME/bin:$PATH"
+# Setting JAVA_HOME to the preferred version and adding Java binaries to PATH.
+# Guard on availability so shells don't error when JDK 21 isn't installed.
+if /usr/libexec/java_home -v 21 >/dev/null 2>&1; then
+  export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
+  export PATH="$JAVA_HOME/bin:$PATH"
+fi
 
 # Python
 # Adding Python binaries to PATH, set by pipx
 export PATH="$PATH:$HOME/Library/Python/3.9/bin"
 export PATH="$PATH:$HOME/.local/bin"
+
+# Machine-specific overrides (secrets, tool completions, per-host tweaks).
+# Kept out of the repo; sourced last so it can override anything above.
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 # End of .zshrc configuration
