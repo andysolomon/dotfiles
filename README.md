@@ -13,6 +13,7 @@ Personal shell, editor, and tmux configuration with a bootstrap installer.
 - [Key mappings and usage](#key-mappings-and-usage)
 - [tmux](#tmux)
 - [Local machine overrides](#local-machine-overrides)
+- [Releases](#releases)
 - [Troubleshooting](#troubleshooting)
 - [Optional macOS bootstrap](#optional-macos-bootstrap)
 
@@ -197,6 +198,27 @@ Shell config under `zsh/configs/` (prompt, keybindings, history, aliases, …) i
 automatically by `zshrc` via `_load_settings`; drop a new `*.zsh` file in the right
 subdirectory rather than editing `zshrc`. The top-level `aliases` file is loaded through
 `zsh/configs/aliases.zsh`.
+
+## Releases
+
+This repo uses Conventional Commits + `semantic-release` for automated semantic versioning.
+
+### Commit format
+
+Use Conventional Commit types in commit subjects:
+
+- `feat:` -> minor release
+- `fix:` -> patch release
+- `BREAKING CHANGE:` in body/footer (or `!`) -> major release
+- `chore:`, `docs:`, `refactor:`, etc. -> usually no release unless configured otherwise
+
+Local commits are validated by a Husky `commit-msg` hook with commitlint.
+
+### Release flow
+
+- Releases run automatically on pushes to `master` via GitHub Actions.
+- `semantic-release` calculates the next version from commit history.
+- It creates/updates `CHANGELOG.md`, creates a Git tag, and publishes a GitHub Release.
 
 ## Troubleshooting
 
