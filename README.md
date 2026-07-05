@@ -73,6 +73,17 @@ This repo uses a classic Vim-style config layout:
 
 Neovim compatibility is handled via `~/.config/nvim/init.vim` sourcing `~/.vimrc`.
 
+### Neovim-first
+
+This config targets **Neovim**. It declares Neovim-only plugins (`nvim-lspconfig`,
+`nvim-lspinstall`, and friends), and `install.sh` bootstraps `vim-plug` only into
+Neovim's autoload path. Plain `vim` therefore errors on the `Plug` declarations and
+NERDTree never loads.
+
+To avoid that, `vim` and `vi` are aliased to `nvim` (see [`aliases`](aliases)). If you
+deliberately want plain Vim to work too, install `vim-plug` into `~/.vim/autoload/plug.vim`
+as well.
+
 ### Leader key
 
 Leader is comma:
@@ -177,9 +188,15 @@ Use local files for machine-specific customization:
 - `~/.aliases.local`
 - `~/.vimrc.bundles.local`
 - `~/.vimrc.local`
-- `~/.zshrc.local`
+- `~/.zshrc.local` — sourced last by `zshrc`, so it can override anything above; put
+  secrets and per-host tool setup here.
 
 These are sourced conditionally if present.
+
+Shell config under `zsh/configs/` (prompt, keybindings, history, aliases, …) is loaded
+automatically by `zshrc` via `_load_settings`; drop a new `*.zsh` file in the right
+subdirectory rather than editing `zshrc`. The top-level `aliases` file is loaded through
+`zsh/configs/aliases.zsh`.
 
 ## Troubleshooting
 
