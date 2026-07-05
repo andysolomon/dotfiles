@@ -1,3 +1,9 @@
+# Editor
+# This config is Neovim-first (nvim-lspconfig, telescope, etc. and vim-plug is
+# only bootstrapped for nvim), so route vim/vi to nvim.
+alias vim="nvim"
+alias vi="nvim"
+
 # Unix
 alias tlf="tail -f"
 alias ln='ln -v'
