@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/andysolomon/dotfiles/compare/v1.1.0...v1.1.1) (2026-07-09)
+
+### Bug Fixes
+
+* point npxt3 at T3 Code package ([02438b2](https://github.com/andysolomon/dotfiles/commit/02438b24e12c8592fc734d430638bcd44e848b51))
+
 ## [1.1.0](https://github.com/andysolomon/dotfiles/compare/v1.0.0...v1.1.0) (2026-07-09)
 
 ### Features
