@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/andysolomon/dotfiles/compare/v1.0.0...v1.1.0) (2026-07-09)
+
+### Features
+
+* add Tailscale tmux machine workflow ([fe608a5](https://github.com/andysolomon/dotfiles/commit/fe608a55ba6554d3a143feb889582fa2a45ba61a))
+
 ## 1.0.0 (2026-07-05)
 
 ### Bug Fixes
