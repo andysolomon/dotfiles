@@ -60,7 +60,7 @@ brew install tmux
 Use `npxt3` to run the T3 Code npm package on either machine. It defaults to:
 
 ```sh
-npx -y t3-code@latest
+npx -y t3@latest
 ```
 
 If the package name changes, set `T3_CODE_NPX_PACKAGE` before invoking:

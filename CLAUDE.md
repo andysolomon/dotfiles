@@ -102,7 +102,7 @@ and unknown hosts are yellow.
 ### bin/ utilities (on PATH)
 
 - `generate-vim-plugin-inventory` — see above.
-- `npxt3` — run T3 Code through `npx -y ${T3_CODE_NPX_PACKAGE:-t3-code@latest}`.
+- `npxt3` — run T3 Code through `npx -y ${T3_CODE_NPX_PACKAGE:-t3@latest}`.
 - `tat` — attach/create a tmux session named after the current directory.
 - `git-churn` — rank files by commit frequency.
 - `replace` — project-wide find/replace helper.

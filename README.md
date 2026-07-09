@@ -230,6 +230,12 @@ Run T3 Code through:
 npxt3
 ```
 
+This wraps the T3 Code no-install command:
+
+```sh
+npx -y t3@latest
+```
+
 Override the npm package if needed:
 
 ```sh

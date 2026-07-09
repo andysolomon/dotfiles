@@ -1,5 +1,5 @@
 #!/bin/sh
 set -eu
 
-package="${T3_CODE_NPX_PACKAGE:-t3-code@latest}"
+package="${T3_CODE_NPX_PACKAGE:-t3@latest}"
 exec npx -y "$package" "$@"
