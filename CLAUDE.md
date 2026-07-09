@@ -94,12 +94,26 @@ bin/generate-vim-plugin-inventory
 and TPM-managed plugins (`tpm`, `tmux-sensible`, `tmux-resurrect`, `tmux-battery`).
 `.tmux/` holds TPM itself.
 
+SSH shells auto-attach to tmux through `zsh/configs/ssh-tmux.zsh` unless `NO_AUTO_TMUX=1`
+is set. The tmux status bar is host-color-coded for known Tailscale Macs:
+`andrews-mac-mini-1` / `Andrews-Mac-mini` is green, `qianas-macbook-pro-1` is blue,
+and unknown hosts are yellow.
+
 ### bin/ utilities (on PATH)
 
 - `generate-vim-plugin-inventory` — see above.
+- `npxt3` — run T3 Code through `npx -y ${T3_CODE_NPX_PACKAGE:-t3-code@latest}`.
 - `tat` — attach/create a tmux session named after the current directory.
 - `git-churn` — rank files by commit frequency.
 - `replace` — project-wide find/replace helper.
+
+### Tailscale machine ops
+
+Use `.agents/skills/tailscale-machine-ops/SKILL.md` as the shared machine inventory for
+Codex and Claude Code. Current known devices:
+
+- `andrews-mac-mini-1` / `Andrews-Mac-mini` / `100.86.225.105` / macOS / current Mac mini.
+- `qianas-macbook-pro-1` / `qianas-macbook-pro` / `100.85.162.117` / macOS / other MacBook Pro.
 
 ## Conventions
 
