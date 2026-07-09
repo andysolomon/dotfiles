@@ -12,6 +12,7 @@ Personal shell, editor, and tmux configuration with a bootstrap installer.
 - [Plugin management](#plugin-management)
 - [Key mappings and usage](#key-mappings-and-usage)
 - [tmux](#tmux)
+- [Tailscale machine workflow](#tailscale-machine-workflow)
 - [Local machine overrides](#local-machine-overrides)
 - [Releases](#releases)
 - [Troubleshooting](#troubleshooting)
@@ -181,6 +182,59 @@ Configured with TPM:
 - `tmux-plugins/tmux-sensible`
 - `tmux-plugins/tmux-resurrect`
 - `tmux-plugins/tmux-battery`
+
+### Host colors and SSH auto-attach
+
+Known Tailscale Macs get host-specific tmux status colors:
+
+- `andrews-mac-mini-1` / `Andrews-Mac-mini`: green
+- `qianas-macbook-pro-1` / `qianas-macbook-pro`: blue
+- Unknown hosts: yellow
+
+Interactive SSH shells auto-attach to a tmux session named `ssh-$HOST` via
+[`zsh/configs/ssh-tmux.zsh`](zsh/configs/ssh-tmux.zsh). Bypass this for one session with:
+
+```sh
+NO_AUTO_TMUX=1 ssh andrewsolomon@andrews-mac-mini-1
+```
+
+## Tailscale machine workflow
+
+Shared machine details for Codex and Claude Code live in
+[`.agents/skills/tailscale-machine-ops/SKILL.md`](.agents/skills/tailscale-machine-ops/SKILL.md).
+
+Current devices:
+
+- `andrews-mac-mini-1` / `100.86.225.105`
+- `qianas-macbook-pro-1` / `100.85.162.117`
+
+Common SSH targets:
+
+```sh
+ssh andrewsolomon@andrews-mac-mini-1
+ssh andrewsolomon@qianas-macbook-pro-1
+```
+
+To apply these dotfiles on another Mac:
+
+```sh
+cd ~/dotfiles
+git pull --ff-only
+./install.sh
+tmux source-file ~/.tmux.conf
+```
+
+Run T3 Code through:
+
+```sh
+npxt3
+```
+
+Override the npm package if needed:
+
+```sh
+T3_CODE_NPX_PACKAGE='actual-package@latest' npxt3
+```
 
 ## Local machine overrides
 
