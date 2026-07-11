@@ -1,4 +1,0 @@
-interface:
-  display_name: "Tailscale Machine Ops"
-  short_description: "SSH and tmux workflow for Andrew’s Tailscale machines."
-  default_prompt: "Use the Tailscale machine inventory and SSH/tmux conventions to operate between Andrew’s Macs."
