@@ -23,7 +23,7 @@ function! NERDTreeHighlightFile(extension, guifg)
  exec 'autocmd filetype nerdtree highlight ' . a:extension .' guifg='. a:guifg
  exec 'autocmd filetype nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
 endfunction
-call NERDTreeHighlightFile('md', 'blue')
+call NERDTreeHighlightFile('md', '#7FBBB3')
 call NERDTreeHighlightFile('yml', 'yellow')
 call NERDTreeHighlightFile('config', 'yellow')
 call NERDTreeHighlightFile('conf', 'yellow')
