@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/andysolomon/dotfiles/compare/v1.1.1...v1.1.2) (2026-07-11)
+
+### Bug Fixes
+
+* improve NERDTree markdown file contrast ([44e067b](https://github.com/andysolomon/dotfiles/commit/44e067b25f44208c47359bed3fcf50095bf33727)), closes [#7FBBB3](https://github.com/andysolomon/dotfiles/issues/7FBBB3)
+
 ## [1.1.1](https://github.com/andysolomon/dotfiles/compare/v1.1.0...v1.1.1) (2026-07-09)
 
 ### Bug Fixes
