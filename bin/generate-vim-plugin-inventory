@@ -60,6 +60,7 @@ awk '
     d["preservim/nerdcommenter"] = "Comment/uncomment utilities"
     d["terryma/vim-multiple-cursors"] = "Multiple cursors editing"
     d["sainnhe/vim-color-forest-night"] = "Forest Night colorscheme"
+    d["rebelot/kanagawa.nvim"] = "Kanagawa colorscheme inspired by Hokusai"
     d["leafgarland/typescript-vim"] = "TypeScript syntax and filetype support"
     d["peitalin/vim-jsx-typescript"] = "TypeScript JSX (TSX) syntax support"
     d["styled-components/vim-styled-components"] = "styled-components syntax support"

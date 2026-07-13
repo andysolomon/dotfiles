@@ -44,9 +44,10 @@ Generated from `vimrc.bundles` by `bin/generate-vim-plugin-inventory`.
 | `peitalin/vim-jsx-typescript` | Inactive | TypeScript JSX (TSX) syntax support | https://github.com/peitalin/vim-jsx-typescript |
 | `plasticboy/vim-markdown` | Inactive | Markdown editing and syntax support | https://github.com/plasticboy/vim-markdown |
 | `prettier/vim-prettier` | Inactive | Prettier formatter integration | https://github.com/prettier/vim-prettier |
+| `rebelot/kanagawa.nvim` | Active | Kanagawa colorscheme inspired by Hokusai | https://github.com/rebelot/kanagawa.nvim |
 | `rizzatti/dash.vim` | Inactive | Dash.app documentation lookup | https://github.com/rizzatti/dash.vim |
 | `ryanoasis/vim-devicons` | Active | Filetype icons for plugin UIs | https://github.com/ryanoasis/vim-devicons |
-| `sainnhe/vim-color-forest-night` | Active | Forest Night colorscheme | https://github.com/sainnhe/vim-color-forest-night |
+| `sainnhe/vim-color-forest-night` | Inactive | Forest Night colorscheme | https://github.com/sainnhe/vim-color-forest-night |
 | `scrooloose/nerdcommenter` | Active | Comment/uncomment utilities | https://github.com/scrooloose/nerdcommenter |
 | `scrooloose/nerdtree` | Active | File explorer tree sidebar | https://github.com/scrooloose/nerdtree |
 | `sharkdp/fd` | Inactive | External `find` alternative (not a Vim plugin) | https://github.com/sharkdp/fd |

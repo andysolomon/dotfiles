@@ -272,8 +272,6 @@ Use Conventional Commit types in commit subjects:
 - `BREAKING CHANGE:` in body/footer (or `!`) -> major release
 - `chore:`, `docs:`, `refactor:`, etc. -> usually no release unless configured otherwise
 
-Local commits are validated by a Husky `commit-msg` hook with commitlint.
-
 ### Release flow
 
 - Releases run automatically on pushes to `master` via GitHub Actions.
