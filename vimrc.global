@@ -2,7 +2,7 @@
 " Leader
 let mapleader = ","
 
-" colorscheme forest-night
+" colorscheme kanagawa
 
 " Tabs
 set tabstop=4
@@ -63,13 +63,7 @@ if exists('+termguicolors')
   let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
   set termguicolors
 endif
-" Pmenu settings
-highlight Pmenu guibg=#3D364D gui=bold
-highlight PmenuSel guibg=#8373A9 gui=bold
-highlight PmenuSbar guibg=#3D364D gui=bold
-highlight PmenuThumb guibg=#8373A9 gui=bold
-
-" Switch syntax highlighting on, when the terminal has colors
+" }}}
 " Also switch on highlighting the last used search pattern.
 if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
   syntax on
@@ -123,4 +117,29 @@ nnoremap \ :Ag<SPACE>
 " Local config
 if filereadable($HOME . "/.vimrc.local")
   source ~/.vimrc.local
+endif
+
+set background=dark
+
+if has('nvim')
+  lua << EOF
+require('kanagawa').setup({
+  compile = false,
+  undercurl = true,
+  commentStyle = { italic = true },
+  keywordStyle = { italic = true },
+  statementStyle = { bold = true },
+  transparent = false,
+  dimInactive = false,
+  terminalColors = true,
+  theme = 'wave',
+  background = {
+    dark = 'wave',
+    light = 'lotus',
+  },
+})
+EOF
+  colorscheme kanagawa
+else
+  colorscheme desert
 endif
