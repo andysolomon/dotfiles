@@ -180,7 +180,7 @@ Configured with TPM:
 
 - `tmux-plugins/tpm`
 - `tmux-plugins/tmux-sensible`
-- `tmux-plugins/tmux-resurrect`
+- `tmux-plugins/tmux-resurrect` (save hook records pi/claude/agent session IDs for resume)
 - `tmux-plugins/tmux-battery`
 
 ### Host colors and SSH auto-attach

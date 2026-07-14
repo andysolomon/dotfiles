@@ -64,6 +64,7 @@ Generated from `vimrc.bundles` by `bin/generate-vim-plugin-inventory`.
 | `tpope/vim-obsession` | Inactive | Session management | https://github.com/tpope/vim-obsession |
 | `tpope/vim-rails` | Inactive | Rails navigation and helpers | https://github.com/tpope/vim-rails |
 | `tpope/vim-repeat` | Inactive | Better repeat support for plugin commands | https://github.com/tpope/vim-repeat |
+| `tpope/vim-sleuth` | Active | Detect shiftwidth/expandtab from buffer indentation | https://github.com/tpope/vim-sleuth |
 | `tpope/vim-surround` | Inactive | Add/change/delete surroundings | https://github.com/tpope/vim-surround |
 | `vim-ruby/vim-ruby` | Inactive | Ruby syntax and filetype support | https://github.com/vim-ruby/vim-ruby |
 | `vim-scripts/tComment` | Inactive | Comment toggling plugin | https://github.com/vim-scripts/tComment |

@@ -61,6 +61,7 @@ Plug 'junegunn/limelight.vim'
 "Plug 'dracula/vim'
 "Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 Plug 'scrooloose/nerdcommenter'
+Plug 'tpope/vim-sleuth'
 "Plug 'terryma/vim-multiple-cursors'
 "Plug 'sainnhe/vim-color-forest-night'
 Plug 'rebelot/kanagawa.nvim'

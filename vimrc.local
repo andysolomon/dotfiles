@@ -18,7 +18,8 @@ let g:ycm_path_to_python_interpreter="/usr/bin/python"
 noremap - ddp
 noremap _ ddkP
 nnoremap <leader>ev :vsplit ~/dotfiles/vimrc.global<cr>
-nnoremap <leader>sv :source $MYVIMRC<cr>
+" Re-detect indent for the current buffer (sleuth only runs on BufReadPost)
+nnoremap <leader>sv :source $MYVIMRC<Bar>Sleuth<CR>
 nnoremap <leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>s :split
 nnoremap <leader>S :split <C-R>=expand("%:p:h") . "/" <CR>

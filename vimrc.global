@@ -4,10 +4,10 @@ let mapleader = ","
 
 " colorscheme kanagawa
 
-" Tabs
+" Tabs (shiftwidth/softtabstop follow buffer indent; vim-sleuth detects width)
 set tabstop=4
-set shiftwidth=4
-set softtabstop=4
+set shiftwidth=0
+set softtabstop=-1
 set expandtab
 
 set encoding=utf-8

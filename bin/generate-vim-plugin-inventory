@@ -57,6 +57,7 @@ awk '
     d["dracula/vim"] = "Dracula colorscheme"
     d["prettier/vim-prettier"] = "Prettier formatter integration"
     d["scrooloose/nerdcommenter"] = "Comment/uncomment utilities"
+    d["tpope/vim-sleuth"] = "Detect shiftwidth/expandtab from buffer indentation"
     d["preservim/nerdcommenter"] = "Comment/uncomment utilities"
     d["terryma/vim-multiple-cursors"] = "Multiple cursors editing"
     d["sainnhe/vim-color-forest-night"] = "Forest Night colorscheme"

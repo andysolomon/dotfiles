@@ -298,12 +298,17 @@ Windows are 1-indexed and renumber after closes.
 | `Ctrl+a` `M` | Mouse off |
 | `Ctrl+a` `a` | Send literal `Ctrl+a` to app |
 
-### tmux-resurrect (installed)
+### tmux-resurrect + continuum (installed)
 
 | Keys | Action |
 |------|--------|
 | `Ctrl+a` `Ctrl+s` | Save session |
 | `Ctrl+a` `Ctrl+r` | Restore session |
+
+Continuum autosaves about every **60 minutes** and restores the last save when the
+tmux server starts. Save also records pi / Claude / Cursor agent session IDs so
+restore relaunches with `--session` or `--resume`. Debug mapping:
+`tmux-agent-sessions status` (writes `~/.tmux/resurrect/agent-sessions.tsv` on save).
 
 ### Host status bar colors (Tailscale SSH)
 
@@ -418,7 +423,19 @@ Colorscheme: **Kanagawa** (`wave` dark). `vim`/`vi` both launch nvim.
 | Key | Action |
 |-----|--------|
 | `,ev` | Edit `~/dotfiles/vimrc.global` |
-| `,sv` | Reload vimrc |
+| `,sv` | Reload vimrc and re-detect indent (`:Sleuth`) |
+
+### Plugins — install (headless)
+
+After uncommenting or adding a `Plug` line in `vimrc.bundles`:
+
+```sh
+nvim --headless -u ~/.vimrc.bundles "+PlugInstall --sync" +qa   # install/update
+nvim --headless -u ~/.vimrc.bundles "+PlugClean!" +qa          # remove disabled plugins
+bin/generate-vim-plugin-inventory                              # refresh PLUGIN_INVENTORY.md
+```
+
+`./install.sh` runs the install step too. Re-open files or run `,sv` / `:Sleuth` so new plugins apply to already-open buffers.
 
 ### Plugins — your mappings
 
@@ -508,7 +525,7 @@ Colorscheme: **Kanagawa** (`wave` dark). `vim`/`vi` both launch nvim.
 
 | Command | Action |
 |---------|--------|
-| `:PlugInstall` | Install vim-plug plugins |
+| `:PlugInstall` | Install vim-plug plugins (interactive) |
 | `:PlugUpdate` | Update plugins |
 | `:PlugClean` | Remove unlisted plugins |
 | `:source ~/.vimrc` | Reload config |
@@ -544,7 +561,7 @@ Conventional commit types (for `semantic-release`): `feat:`, `fix:`, `chore:`, `
 |------|---------|
 | zsh | `source ~/.zshrc` |
 | tmux | `tmux source-file ~/.tmux.conf` or `Ctrl+a` `r` |
-| nvim | `:source ~/.vimrc` or `,sv` |
+| nvim | `:source ~/.vimrc` or `,sv` (also runs `:Sleuth`) |
 | Full dotfiles symlink | `./install.sh` from repo root |
 
 ---

@@ -1,0 +1,560 @@
+#!/usr/bin/env bash
+# tmux-agent-sessions — record pi/claude/agent session IDs for tmux-resurrect restore.
+set -o pipefail
+
+RESURRECT_DIR="${HOME}/.tmux/resurrect"
+MAP_FILE="${RESURRECT_DIR}/agent-sessions.tsv"
+TAB=$'\t'
+PANE_CACHE=""
+RESOLVED_MAP=""
+CLAIMED_IDS=""
+
+warn() { echo "tmux-agent-sessions: $*" >&2; }
+
+command -v tmux >/dev/null 2>&1 || { warn "tmux not found"; exit 0; }
+
+process_start_epoch() {
+  local pid="$1"
+  python3 - "$pid" 2>/dev/null <<'PY' || return 1
+import datetime, subprocess, sys
+pid = sys.argv[1]
+try:
+    out = subprocess.check_output(["ps", "-p", pid, "-o", "lstart="], text=True, stderr=subprocess.DEVNULL).strip()
+except subprocess.CalledProcessError:
+    sys.exit(1)
+for fmt in ("%a %b %d %H:%M:%S %Y", "%a %b %e %H:%M:%S %Y"):
+    try:
+        print(int(datetime.datetime.strptime(out, fmt).timestamp()))
+        sys.exit(0)
+    except ValueError:
+        pass
+sys.exit(1)
+PY
+}
+
+file_mtime_epoch() {
+  stat -f %m "$1" 2>/dev/null || stat -c %Y "$1" 2>/dev/null
+}
+
+pane_full_command() {
+  local pane_pid="$1"
+  local child
+  child="$(ps -ao "ppid,args" 2>/dev/null | sed 's/^ *//' | awk -v pp="$pane_pid" '$1 == pp { sub(/^[^ ]+ /, ""); print; exit }')"
+  if [ -n "$child" ]; then
+    echo "$child"
+    return 0
+  fi
+  ps -p "$pane_pid" -o args= 2>/dev/null | sed 's/^ //'
+}
+
+child_pids() {
+  local parent="$1"
+  ps -axo pid=,ppid= 2>/dev/null | awk -v p="$parent" '$2 == p { gsub(/ /, "", $1); print $1 }'
+}
+
+descendant_pids() {
+  local root="$1"
+  local all="$root"
+  local frontier="$root"
+  while [ -n "$frontier" ]; do
+    local next="" p k kids
+    for p in $frontier; do
+      kids="$(child_pids "$p")"
+      for k in $kids; do
+        k="$(echo "$k" | tr -d ' ')"
+        [ -n "$k" ] || continue
+        all="$all $k"
+        next="$next $k"
+      done
+    done
+    frontier="$next"
+  done
+  echo "$all"
+}
+
+detect_app() {
+  local cmd="$1"
+  echo "$cmd" | grep -Eq '(^|[/[:space:]])pi([[:space:]]|$)' && { echo "pi"; return; }
+  echo "$cmd" | grep -Eq '(^|[/[:space:]])claude([[:space:]]|$)' && { echo "claude"; return; }
+  echo "$cmd" | grep -Eq 'cursor-agent.*/index\.js' && { echo "agent"; return; }
+  echo "$cmd" | grep -Eq '(cursor-agent|/agent[[:space:]])' && { echo "agent"; return; }
+  echo "$cmd" | grep -Eq '(^|[/[:space:]])agent([[:space:]]|$)' && { echo "agent"; return; }
+}
+
+extract_existing_session() {
+  local cmd="$1"
+  local app="$2"
+  local id=""
+  if echo "$cmd" | grep -Eq -- '--session(=|[[:space:]]+)'; then
+    id="$(echo "$cmd" | sed -n 's/.*--session[= ]\([^[:space:]]*\).*/\1/p')"
+  elif echo "$cmd" | grep -Eq -- '--session-id(=|[[:space:]]+)'; then
+    id="$(echo "$cmd" | sed -n 's/.*--session-id[= ]\([^[:space:]]*\).*/\1/p')"
+  elif echo "$cmd" | grep -Eq -- '--resume(=|[[:space:]]+)'; then
+    id="$(echo "$cmd" | sed -n 's/.*--resume[= ]\([^[:space:]]*\).*/\1/p')"
+  elif [ "$app" = "claude" ] && echo "$cmd" | grep -Eq '(^|[[:space:]])-r[[:space:]]+'; then
+    id="$(echo "$cmd" | sed -n 's/.*[[:space:]]-r[[:space:]]\([^[:space:]]*\).*/\1/p')"
+  fi
+  echo "$id"
+}
+
+restore_command_for() {
+  local app="$1"
+  local id="$2"
+  case "$app" in
+    pi) echo "pi --session $id" ;;
+    claude) echo "claude --resume $id" ;;
+    agent) echo "agent --resume $id" ;;
+  esac
+}
+
+encode_pi_cwd() {
+  local cwd="$1"
+  local stripped="${cwd#/}"
+  local enc="${stripped//\//-}"
+  echo "--${enc}--"
+}
+
+encode_claude_cwd() {
+  local cwd="$1"
+  local enc="${cwd//\//-}"
+  echo "-${enc#-}"
+}
+
+pi_session_id_from_file() {
+  local file="$1"
+  local base
+  base="$(basename "$file" .jsonl)"
+  echo "${base##*_}"
+}
+
+is_claimed() {
+  local id="$1"
+  echo "$CLAIMED_IDS" | grep -Fxq "$id"
+}
+
+claim_id() {
+  local id="$1"
+  is_claimed "$id" || CLAIMED_IDS="${CLAIMED_IDS}${id}"$'\n'
+}
+
+location_key() {
+  printf '%s|%s|%s' "$1" "$2" "$3"
+}
+
+set_resolved() {
+  local key="$1" app="$2" sid="$3" restore_cmd="$4"
+  RESOLVED_MAP="${RESOLVED_MAP}${key}|${app}|${sid}|${restore_cmd}"$'\n'
+}
+
+lookup_resolved() {
+  local key="$1"
+  local session_name window_index pane_index
+  session_name="${key%%|*}"
+  local rest="${key#*|}"
+  window_index="${rest%%|*}"
+  pane_index="${rest#*|}"
+  # Fields: session|window|pane|app|sid|restore_cmd (restore may contain spaces)
+  echo "$RESOLVED_MAP" | awk -F '|' -v s="$session_name" -v w="$window_index" -v p="$pane_index" \
+    '$1 == s && $2 == w && $3 == p {
+      restore=$6
+      for (i = 7; i <= NF; i++) restore = restore "|" $i
+      print $4 "|" $5 "|" restore
+      exit
+    }'
+}
+
+agent_pid_for_command() {
+  local pane_pid="$1"
+  local cmd="$2"
+  local pid args
+  pid="$(echo "$cmd" | sed -n 's/^[[:space:]]*\([0-9][0-9]*\)[[:space:]].*/\1/p')"
+  if [ -n "$pid" ] && [ -n "$(detect_app "$cmd")" ] && ps -p "$pid" >/dev/null 2>&1; then
+    echo "$pid"
+    return
+  fi
+  for pid in $(descendant_pids "$pane_pid"); do
+    args="$(ps -p "$pid" -o args= 2>/dev/null)"
+    [ -n "$(detect_app "$args")" ] && { echo "$pid"; return; }
+  done
+  echo "$pane_pid"
+}
+
+lsof_paths_for_pids() {
+  local pids="$1"
+  command -v lsof >/dev/null 2>&1 || return 0
+  local csv
+  csv="$(echo "$pids" | tr ' ' ',')"
+  lsof -n -a -p "$csv" 2>/dev/null
+}
+
+resolve_agent_session() {
+  local pane_pid="$1"
+  local pids best_id=""
+  pids="$(descendant_pids "$pane_pid")"
+  local lsof_out line chat_id
+  lsof_out="$(lsof_paths_for_pids "$pids")"
+  [ -z "$lsof_out" ] && return 1
+
+  while IFS= read -r line; do
+    chat_id="$(echo "$line" | sed -n "s|.*/\.cursor/chats/[^/]*/\([^/]*\)/store\.db.*|\1|p")"
+    [ -n "$chat_id" ] || continue
+    is_claimed "$chat_id" && continue
+    echo "$line" | grep -Eq '[[:space:]][0-9]+u[[:space:]]' && { echo "$chat_id"; return 0; }
+    [ -z "$best_id" ] && best_id="$chat_id"
+  done <<EOF
+$lsof_out
+EOF
+
+  [ -n "$best_id" ] && echo "$best_id"
+}
+
+resolve_pi_session() {
+  local pane_pid="$1"
+  local cwd="$2"
+  local sess_dir="${HOME}/.pi/agent/sessions/$(encode_pi_cwd "$cwd")"
+  [ -d "$sess_dir" ] || return 1
+
+  local agent_pid start_epoch lsof_out line sid f mtime delta best_id="" best_delta=999999999999
+  agent_pid="$(agent_pid_for_command "$pane_pid" "$(pane_full_command "$pane_pid")")"
+  start_epoch="$(process_start_epoch "$agent_pid" 2>/dev/null || echo 0)"
+  lsof_out="$(lsof_paths_for_pids "$(descendant_pids "$pane_pid")")"
+
+  while IFS= read -r line; do
+    sid="$(echo "$line" | sed -n "s|.*/$(basename "$sess_dir")/\([^[:space:]]*\.jsonl\).*|\1|p")"
+    [ -n "$sid" ] || continue
+    sid="$(pi_session_id_from_file "$sid")"
+    is_claimed "$sid" && continue
+    echo "$sid"
+    return 0
+  done <<EOF
+$lsof_out
+EOF
+
+  for f in "$sess_dir"/*.jsonl; do
+    [ -f "$f" ] || continue
+    sid="$(pi_session_id_from_file "$f")"
+    is_claimed "$sid" && continue
+    mtime="$(file_mtime_epoch "$f")"
+    [ -z "$mtime" ] && continue
+    if [ "$start_epoch" -gt 0 ]; then
+      if [ "$mtime" -gt "$start_epoch" ]; then delta=$((mtime - start_epoch)); else delta=$((start_epoch - mtime)); fi
+    else
+      delta=$(( $(date +%s) - mtime ))
+    fi
+    if [ "$delta" -lt "$best_delta" ]; then
+      best_delta="$delta"
+      best_id="$sid"
+    fi
+  done
+  [ -n "$best_id" ] && echo "$best_id"
+}
+
+resolve_claude_session() {
+  local pane_pid="$1"
+  local cwd="$2"
+  local proj_dir="${HOME}/.claude/projects/$(encode_claude_cwd "$cwd")"
+  [ -d "$proj_dir" ] || return 1
+
+  local agent_pid start_epoch f sid mtime delta best_id="" best_delta=999999999999
+  agent_pid="$(agent_pid_for_command "$pane_pid" "$(pane_full_command "$pane_pid")")"
+  start_epoch="$(process_start_epoch "$agent_pid" 2>/dev/null || echo 0)"
+
+  for f in "$proj_dir"/*.jsonl; do
+    [ -f "$f" ] || continue
+    sid="$(basename "$f" .jsonl)"
+    is_claimed "$sid" && continue
+    mtime="$(file_mtime_epoch "$f")"
+    [ -z "$mtime" ] && continue
+    if [ "$start_epoch" -gt 0 ]; then
+      if [ "$mtime" -gt "$start_epoch" ]; then delta=$((mtime - start_epoch)); else delta=$((start_epoch - mtime)); fi
+    else
+      delta=$(( $(date +%s) - mtime ))
+    fi
+    if [ "$delta" -lt "$best_delta" ]; then
+      best_delta="$delta"
+      best_id="$sid"
+    fi
+  done
+  [ -n "$best_id" ] && echo "$best_id"
+}
+
+build_pane_cache() {
+  PANE_CACHE=""
+  local pane_id session_name window_index pane_index cwd pane_command pane_pid full_cmd app session_id restore_cmd
+  while IFS="$TAB" read -r pane_id session_name window_index pane_index cwd pane_command pane_pid; do
+    full_cmd="$(pane_full_command "$pane_pid")"
+    app="$(detect_app "$full_cmd")"
+    [ -z "$app" ] && continue
+    session_id="$(extract_existing_session "$full_cmd" "$app")"
+    restore_cmd=""
+    [ -n "$session_id" ] && restore_cmd="$(restore_command_for "$app" "$session_id")"
+    PANE_CACHE="${PANE_CACHE}${pane_id}${TAB}${session_name}${TAB}${window_index}${TAB}${pane_index}${TAB}${cwd}${TAB}${pane_pid}${TAB}${app}${TAB}${full_cmd}${TAB}${session_id}${TAB}${restore_cmd}"$'\n'
+  done <<EOF
+$(tmux list-panes -a -F "#{pane_id}	#{session_name}	#{window_index}	#{pane_index}	#{pane_current_path}	#{pane_current_command}	#{pane_pid}" 2>/dev/null)
+EOF
+}
+
+# Assign one pane at a time, re-resolving after each claim so multiple panes
+# in the same cwd do not all lock onto the same "best" session id.
+process_group_lines() {
+  local remaining="$1"
+  echo "$remaining" | grep -q '[^[:space:]]' || return 0
+  local gl sid pane_id session_name window_index pane_index cwd pane_pid app full_cmd loc_key
+  local best_score best_sid best_gl best_delta next_remaining assigned
+  local start_epoch mtime delta sess_dir f candidate_sid
+
+  while true; do
+    best_score=999999999999
+    best_sid=""
+    best_gl=""
+    next_remaining=""
+    assigned=0
+
+    while IFS= read -r gl; do
+      [ -n "$gl" ] || continue
+      IFS="$TAB" read -r pane_id session_name window_index pane_index cwd pane_pid app full_cmd <<EOF
+$gl
+EOF
+      sid=""
+      delta=999999999999
+      case "$app" in
+        agent)
+          sid="$(resolve_agent_session "$pane_pid" 2>/dev/null || true)"
+          [ -n "$sid" ] && delta=0
+          ;;
+        pi)
+          sid="$(resolve_pi_session "$pane_pid" "$cwd" 2>/dev/null || true)"
+          if [ -n "$sid" ]; then
+            sess_dir="${HOME}/.pi/agent/sessions/$(encode_pi_cwd "$cwd")"
+            start_epoch="$(process_start_epoch "$(agent_pid_for_command "$pane_pid" "$full_cmd")" 2>/dev/null || echo 0)"
+            for f in "$sess_dir"/*.jsonl; do
+              [ -f "$f" ] || continue
+              candidate_sid="$(pi_session_id_from_file "$f")"
+              [ "$candidate_sid" = "$sid" ] || continue
+              mtime="$(file_mtime_epoch "$f")"
+              [ -n "$mtime" ] || continue
+              if [ "$start_epoch" -gt 0 ]; then
+                if [ "$mtime" -gt "$start_epoch" ]; then delta=$((mtime - start_epoch)); else delta=$((start_epoch - mtime)); fi
+              else
+                delta=0
+              fi
+              break
+            done
+          fi
+          ;;
+        claude)
+          sid="$(resolve_claude_session "$pane_pid" "$cwd" 2>/dev/null || true)"
+          if [ -n "$sid" ]; then
+            start_epoch="$(process_start_epoch "$(agent_pid_for_command "$pane_pid" "$full_cmd")" 2>/dev/null || echo 0)"
+            f="${HOME}/.claude/projects/$(encode_claude_cwd "$cwd")/${sid}.jsonl"
+            mtime="$(file_mtime_epoch "$f")"
+            if [ -n "$mtime" ] && [ "$start_epoch" -gt 0 ]; then
+              if [ "$mtime" -gt "$start_epoch" ]; then delta=$((mtime - start_epoch)); else delta=$((start_epoch - mtime)); fi
+            else
+              delta=0
+            fi
+          fi
+          ;;
+      esac
+
+      if [ -n "$sid" ] && [ "$delta" -lt "$best_score" ]; then
+        best_score="$delta"
+        best_sid="$sid"
+        best_gl="$gl"
+      fi
+      next_remaining="${next_remaining}${gl}"$'\n'
+    done <<EOF
+$remaining
+EOF
+
+    [ -n "$best_sid" ] || break
+    is_claimed "$best_sid" && break
+
+    IFS="$TAB" read -r pane_id session_name window_index pane_index cwd pane_pid app full_cmd <<EOF
+$best_gl
+EOF
+    claim_id "$best_sid"
+    loc_key="$(location_key "$session_name" "$window_index" "$pane_index")"
+    set_resolved "$loc_key" "$app" "$best_sid" "$(restore_command_for "$app" "$best_sid")"
+    assigned=1
+
+    remaining=""
+    while IFS= read -r gl; do
+      [ -n "$gl" ] || continue
+      [ "$gl" = "$best_gl" ] && continue
+      remaining="${remaining}${gl}"$'\n'
+    done <<EOF
+$next_remaining
+EOF
+
+    [ "$assigned" -eq 1 ] || break
+    echo "$remaining" | grep -q '[^[:space:]]' || break
+  done
+}
+
+resolve_all_sessions() {
+  CLAIMED_IDS=""
+  RESOLVED_MAP=""
+  build_pane_cache
+  [ -z "$PANE_CACHE" ] && return 0
+
+  local pending_file pane_id session_name window_index pane_index cwd pane_pid app full_cmd session_id restore_cmd
+  pending_file="$(mktemp /tmp/tmux-agent-sessions.pending.XXXXXX)"
+  while IFS="$TAB" read -r pane_id session_name window_index pane_index cwd pane_pid app full_cmd session_id restore_cmd; do
+    [ -n "$session_id" ] && claim_id "$session_id"
+    [ -z "$session_id" ] && printf '%s\n' "${pane_id}${TAB}${session_name}${TAB}${window_index}${TAB}${pane_index}${TAB}${cwd}${TAB}${pane_pid}${TAB}${app}${TAB}${full_cmd}" >>"$pending_file"
+  done <<EOF
+$PANE_CACHE
+EOF
+
+  [ ! -s "$pending_file" ] && { rm -f "$pending_file"; return 0; }
+
+  local groups_file current_key="" group_lines="" item key
+  groups_file="$(mktemp /tmp/tmux-agent-sessions.groups.XXXXXX)"
+  awk -F "$TAB" 'NF >= 8 && $7 != "" { print $7 "\t" $5 "\t" $0 }' "$pending_file" | sort -t "$TAB" -k1,1 -k2,2 >"$groups_file"
+
+  while IFS= read -r item; do
+    key="$(echo "$item" | cut -f1,2 -d"$TAB")"
+    if [ -n "$current_key" ] && [ "$key" != "$current_key" ]; then
+      process_group_lines "$group_lines"
+      group_lines=""
+    fi
+    current_key="$key"
+    if [ -z "$group_lines" ]; then
+      group_lines="$(echo "$item" | cut -f3- -d"$TAB")"
+    else
+      group_lines="${group_lines}"$'\n'"$(echo "$item" | cut -f3- -d"$TAB")"
+    fi
+  done <"$groups_file"
+  [ -n "$group_lines" ] && process_group_lines "$group_lines"
+
+  rm -f "$pending_file" "$groups_file"
+}
+
+resolved_session_for_pane() {
+  local session_name="$1" window_index="$2" pane_index="$3" app="$4" session_id="$5"
+  local loc_key out restore_cmd
+  if [ -n "$session_id" ]; then
+    echo "${session_id}${TAB}$(restore_command_for "$app" "$session_id")"
+    return
+  fi
+  out="$(lookup_resolved "$(location_key "$session_name" "$window_index" "$pane_index")")"
+  [ -n "$out" ] && echo "$out" | awk -F '|' '{ print $2 "\t" $3 }'
+}
+
+print_status() {
+  resolve_all_sessions
+  echo -e "pane_id\tapp\tsession_id\tcwd\trestore_command"
+  local pane_id session_name window_index pane_index cwd pane_pid app full_cmd session_id restore_cmd out
+  while IFS="$TAB" read -r pane_id session_name window_index pane_index cwd pane_pid app full_cmd session_id restore_cmd; do
+    out="$(resolved_session_for_pane "$session_name" "$window_index" "$pane_index" "$app" "$session_id")"
+    if [ -n "$out" ]; then
+      session_id="$(echo "$out" | cut -f1)"
+      restore_cmd="$(echo "$out" | cut -f2)"
+    fi
+    printf '%s\t%s\t%s\t%s\t%s\n' "$pane_id" "$app" "${session_id:-}" "$cwd" "${restore_cmd:-}"
+  done <<EOF
+$PANE_CACHE
+EOF
+}
+
+resurrect_files_to_update() {
+  local last="${RESURRECT_DIR}/last"
+  [ -e "$last" ] || return 1
+  if [ -L "$last" ]; then
+    local target
+    target="$(readlink "$last")"
+    if [ "${target#/}" = "$target" ]; then
+      target="${RESURRECT_DIR}/${target}"
+    fi
+    [ -f "$target" ] && echo "$target"
+  else
+    echo "$last"
+  fi
+}
+
+rewrite_resurrect_file() {
+  local file="$1"
+  # Pass resolved map via env; rewrite pane lines with exact 11 tab fields.
+  RESOLVED_MAP="$RESOLVED_MAP" MAP_FILE_UNUSED=1 python3 - "$file" <<'PY'
+import os, sys
+path = sys.argv[1]
+resolved = {}
+for row in os.environ.get("RESOLVED_MAP", "").splitlines():
+    if not row.strip():
+        continue
+    parts = row.split("|", 5)
+    if len(parts) < 6:
+        continue
+    session, window, pane, app, _sid, restore = parts
+    resolved[(session, window, pane)] = (app, restore)
+
+out_lines = []
+with open(path, "r", encoding="utf-8", errors="replace") as fh:
+    for line in fh:
+        line = line.rstrip("\n")
+        if not line.startswith("pane\t"):
+            out_lines.append(line)
+            continue
+        parts = line.split("\t")
+        # Canonical: pane session window window_active flags pane_index title dir active cmd full_cmd
+        if len(parts) < 11:
+            out_lines.append(line)
+            continue
+        key = (parts[1], parts[2], parts[5])
+        hit = resolved.get(key)
+        if not hit:
+            out_lines.append(line)
+            continue
+        app, restore = hit
+        parts[9] = app
+        parts[10] = ":" + restore
+        out_lines.append("\t".join(parts[:11]))
+
+tmp = path + ".tmux-agent-sessions.tmp"
+with open(tmp, "w", encoding="utf-8") as fh:
+    fh.write("\n".join(out_lines) + ("\n" if out_lines else ""))
+os.replace(tmp, path)
+PY
+}
+
+cmd_save() {
+  mkdir -p "$RESURRECT_DIR" || { warn "cannot create $RESURRECT_DIR"; exit 0; }
+  resolve_all_sessions
+
+  local tmp_map pane_id session_name window_index pane_index cwd pane_pid app full_cmd session_id restore_cmd out
+  tmp_map="$(mktemp "${RESURRECT_DIR}/agent-sessions.XXXXXX")"
+  {
+    echo -e "pane_id\tapp\tsession_id\tcwd\trestore_command"
+    while IFS="$TAB" read -r pane_id session_name window_index pane_index cwd pane_pid app full_cmd session_id restore_cmd; do
+      out="$(resolved_session_for_pane "$session_name" "$window_index" "$pane_index" "$app" "$session_id")"
+      if [ -n "$out" ]; then
+        session_id="$(echo "$out" | cut -f1)"
+        restore_cmd="$(echo "$out" | cut -f2)"
+      fi
+      printf '%s\t%s\t%s\t%s\t%s\n' "$pane_id" "$app" "${session_id:-}" "$cwd" "${restore_cmd:-}"
+    done <<EOF
+$PANE_CACHE
+EOF
+  } >"$tmp_map" || { warn "failed to write map"; rm -f "$tmp_map"; exit 0; }
+  mv -f "$tmp_map" "$MAP_FILE"
+
+  local f
+  for f in $(resurrect_files_to_update 2>/dev/null); do
+    [ -n "$f" ] && rewrite_resurrect_file "$f" || warn "failed to rewrite $f"
+  done
+  exit 0
+}
+
+main() {
+  case "${1:-}" in
+    save) cmd_save ;;
+    status|dump) print_status ;;
+    *)
+      echo "Usage: tmux-agent-sessions {save|status|dump}" >&2
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"
