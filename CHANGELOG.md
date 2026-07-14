@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/andysolomon/dotfiles/compare/v1.2.0...v1.3.0) (2026-07-14)
+
+### Features
+
+* detect vim indent per file and restore tmux agent sessions ([859e550](https://github.com/andysolomon/dotfiles/commit/859e550bb7e4b58dbc00cabf5cf57b68d97b9911))
+
 ## [1.2.0](https://github.com/andysolomon/dotfiles/compare/v1.1.2...v1.2.0) (2026-07-14)
 
 ### Features
