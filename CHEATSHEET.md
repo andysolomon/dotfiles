@@ -41,7 +41,7 @@ Terminal app (Ghostty / iTerm / etc.)
 | `Ctrl+t` | Toggle file tree (NERDTree) |
 | `,w` / `,q` | Save / quit (Neovim) |
 | `,/` | Toggle comment |
-| `K` | Grep word under cursor |
+| `K` | Grep word under cursor; LSP hover in attached buffers |
 | `Ctrl+h/j/k/l` | Move between nvim splits |
 | `g` | `git status` (no args) or `git …` |
 | `tat` | Attach tmux session for current directory |
@@ -326,6 +326,9 @@ restore relaunches with `--session` or `--resume`. Debug mapping:
 
 Colorscheme: **Kanagawa** (`wave` dark). `vim`/`vi` both launch nvim.
 
+For the complete JS/JSX/TS/TSX workflow, see the
+[Neovim TypeScript cheatsheet](docs/NVIM_TYPESCRIPT_CHEATSHEET.md).
+
 ### Modes
 
 | Key | Mode |
@@ -431,11 +434,12 @@ After uncommenting or adding a `Plug` line in `vimrc.bundles`:
 
 ```sh
 nvim --headless -u ~/.vimrc.bundles "+PlugInstall --sync" +qa   # install/update
-nvim --headless -u ~/.vimrc.bundles "+PlugClean!" +qa          # remove disabled plugins
+nvim --headless -u ~/.vimrc.bundles "+lua require('nvim-treesitter').install({'javascript','jsdoc','typescript','tsx'}):wait(300000)" +qa
 bin/generate-vim-plugin-inventory                              # refresh PLUGIN_INVENTORY.md
 ```
 
 `./install.sh` runs the install step too. Re-open files or run `,sv` / `:Sleuth` so new plugins apply to already-open buffers.
+Do not run `PlugClean!` as part of normal TypeScript support verification.
 
 ### Plugins — your mappings
 
@@ -487,14 +491,51 @@ bin/generate-vim-plugin-inventory                              # refresh PLUGIN_
 
 #### LSP (built-in Neovim + lspconfig)
 
-| Command | Action |
-|---------|--------|
+Semantic mappings require an attached client. For JS/JSX/TS/TSX, `:LspInfo`
+should show exactly one `ts_ls` client launched through
+`typescript-language-server --stdio`.
+
+| Key / command | Action |
+|---------------|--------|
 | `:LspInfo` / `:checkhealth vim.lsp` | Server status |
-| `gd` | Go to definition |
-| `gr` | References |
-| `K` | Hover (overridden in your config for grep) |
-| `gi` | Go to implementation |
+| `gd` | Definition |
+| `K` | Hover in attached buffers; grep remains global elsewhere |
+| `grr` | References |
+| `gri` | Implementation |
+| `grn` | Rename |
+| `gra` | Code actions |
+| `[d` / `]d` | Previous / next diagnostic with float |
+| `,ih` | Toggle inlay hints off/on for the current buffer |
+| `:LspTypescriptSourceAction` | Explicit TypeScript source actions |
+| `:LspTypescriptGoToSourceDefinition` | Go to original TypeScript source definition |
+| `Ctrl+N` / `Ctrl+P` / `Ctrl+Y` | Navigate and accept native completion menu |
 | `Ctrl+o` / `Ctrl+i` | Jump back / forward |
+
+Diagnostics use ASCII signs, warning/error underlines, inline virtual text for
+errors only, and bordered detail floats.
+
+#### TypeScript formatting and linting
+
+| Key / command | Action |
+|---------------|--------|
+| `,fm` | Format with Prettier; local preferred, global explicit fallback allowed |
+| `:ConformInfo` | Formatter resolution and troubleshooting |
+| `,ll` | Lint with ESLint; local preferred, global explicit fallback allowed |
+| `:DotfilesTypeScriptLintDisable` | Disable automatic ESLint for the current buffer |
+
+Save-time Prettier runs only when `node_modules/.bin/prettier` is found upward
+from the buffer. Save-time ESLint runs only when local ESLint and a flat/legacy
+config are both found. Saves never fall back to global Prettier/ESLint and never
+run TypeScript organize-imports or fix-all source actions.
+
+#### TypeScript health checks
+
+```sh
+zsh -lic 'nvim --version | head -n1'
+zsh -lic 'tree-sitter --version'
+zsh -lic 'command -v typescript-language-server && typescript-language-server --version'
+zsh -lic 'bin/check-nvim-typescript-support'
+```
 
 ### Terminal inside nvim
 

@@ -25,23 +25,20 @@ Generated from `vimrc.bundles` by `bin/generate-vim-plugin-inventory`.
 | `jparise/vim-graphql` | Inactive | GraphQL syntax support | https://github.com/jparise/vim-graphql |
 | `junegunn/goyo.vim` | Inactive | Distraction-free writing mode | https://github.com/junegunn/goyo.vim |
 | `junegunn/limelight.vim` | Active | Focus mode that dims surrounding text | https://github.com/junegunn/limelight.vim |
-| `kabouzeid/nvim-lspinstall` | Active | Legacy Neovim LSP installer | https://github.com/kabouzeid/nvim-lspinstall |
 | `kchmck/vim-coffee-script` | Inactive | CoffeeScript syntax and indent support | https://github.com/kchmck/vim-coffee-script |
 | `lambdatoast/elm.vim` | Inactive | Elm language support | https://github.com/lambdatoast/elm.vim |
-| `leafgarland/typescript-vim` | Active | TypeScript syntax and filetype support | https://github.com/leafgarland/typescript-vim |
 | `luochen1990/rainbow` | Active | Rainbow bracket and parenthesis colors | https://github.com/luochen1990/rainbow |
+| `mfussenegger/nvim-lint` | Active | Asynchronous linting through external linters | https://github.com/mfussenegger/nvim-lint |
 | `mxw/vim-jsx` | Inactive | JSX syntax support | https://github.com/mxw/vim-jsx |
-| `neovim/nvim-lsp` | Active | Legacy Neovim LSP plugin | https://github.com/neovim/nvim-lsp |
 | `neovim/nvim-lspconfig` | Active | LSP server configurations for Neovim | https://github.com/neovim/nvim-lspconfig |
 | `nvim-lua/plenary.nvim` | Inactive | Lua utility library used by Neovim plugins | https://github.com/nvim-lua/plenary.nvim |
 | `nvim-telescope/telescope.nvim` | Inactive | Fuzzy finder and picker UI | https://github.com/nvim-telescope/telescope.nvim |
-| `nvim-treesitter/nvim-treesitter` | Inactive | Tree-sitter parsing and highlighting | https://github.com/nvim-treesitter/nvim-treesitter |
+| `nvim-treesitter/nvim-treesitter` | Active | Tree-sitter parsing and highlighting | https://github.com/nvim-treesitter/nvim-treesitter |
 | `othree/es.next.syntax.vim` | Inactive | ESNext syntax support | https://github.com/othree/es.next.syntax.vim |
 | `othree/javascript-libraries-syntax.vim` | Inactive | JavaScript library and framework syntax add-ons | https://github.com/othree/javascript-libraries-syntax.vim |
 | `othree/yajs.vim` | Inactive | Improved JavaScript syntax | https://github.com/othree/yajs.vim |
 | `pangloss/vim-javascript` | Active | JavaScript syntax and highlighting | https://github.com/pangloss/vim-javascript |
 | `pbrisbin/vim-mkdir` | Inactive | Auto-create missing directories on save | https://github.com/pbrisbin/vim-mkdir |
-| `peitalin/vim-jsx-typescript` | Inactive | TypeScript JSX (TSX) syntax support | https://github.com/peitalin/vim-jsx-typescript |
 | `plasticboy/vim-markdown` | Inactive | Markdown editing and syntax support | https://github.com/plasticboy/vim-markdown |
 | `prettier/vim-prettier` | Inactive | Prettier formatter integration | https://github.com/prettier/vim-prettier |
 | `rebelot/kanagawa.nvim` | Active | Kanagawa colorscheme inspired by Hokusai | https://github.com/rebelot/kanagawa.nvim |
@@ -54,6 +51,7 @@ Generated from `vimrc.bundles` by `bin/generate-vim-plugin-inventory`.
 | `sheerun/vim-polyglot` | Inactive | Language pack with many syntax files | https://github.com/sheerun/vim-polyglot |
 | `SirVer/ultisnips` | Inactive | Snippet engine | https://github.com/SirVer/ultisnips |
 | `slim-template/vim-slim` | Inactive | Slim template syntax support | https://github.com/slim-template/vim-slim |
+| `stevearc/conform.nvim` | Active | Lightweight formatter integration for Neovim | https://github.com/stevearc/conform.nvim |
 | `styled-components/vim-styled-components` | Inactive | styled-components syntax support | https://github.com/styled-components/vim-styled-components |
 | `terryma/vim-multiple-cursors` | Inactive | Multiple cursors editing | https://github.com/terryma/vim-multiple-cursors |
 | `thoughtbot/vim-rspec` | Inactive | RSpec test runner helpers | https://github.com/thoughtbot/vim-rspec |
@@ -68,4 +66,3 @@ Generated from `vimrc.bundles` by `bin/generate-vim-plugin-inventory`.
 | `tpope/vim-surround` | Inactive | Add/change/delete surroundings | https://github.com/tpope/vim-surround |
 | `vim-ruby/vim-ruby` | Inactive | Ruby syntax and filetype support | https://github.com/vim-ruby/vim-ruby |
 | `vim-scripts/tComment` | Inactive | Comment toggling plugin | https://github.com/vim-scripts/tComment |
-| `williamboman/nvim-lsp-installer` | Active | Legacy LSP installer plugin | https://github.com/williamboman/nvim-lsp-installer |

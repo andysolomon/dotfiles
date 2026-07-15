@@ -1,5 +1,59 @@
 #!/bin/sh
 
+set -eu
+
+NVIM_BIN="${NVIM_BIN:-nvim}"
+REQUIRED_NVIM_VERSION="0.12.0"
+
+version_ge() {
+  awk -v have="$1" -v need="$2" '
+    BEGIN {
+      split(have, h, ".")
+      split(need, n, ".")
+      for (i = 1; i <= 3; i++) {
+        hv = h[i] + 0
+        nv = n[i] + 0
+        if (hv > nv) exit 0
+        if (hv < nv) exit 1
+      }
+      exit 0
+    }
+  '
+}
+
+require_supported_nvim() {
+  if ! command -v "$NVIM_BIN" >/dev/null 2>&1; then
+    cat >&2 <<'EOF'
+ERROR: Neovim 0.12+ is required before installing these dotfiles plugins.
+
+Install or upgrade Neovim first, then rerun ./install.sh.
+On macOS with Homebrew:
+  brew install neovim tree-sitter-cli
+
+The Tree-sitter CLI command must be available as `tree-sitter` and report 0.26.1+.
+EOF
+    exit 1
+  fi
+
+  nvim_version="$("$NVIM_BIN" --version | awk 'NR == 1 { sub(/^NVIM v/, "", $2); sub(/-.*/, "", $2); print $2 }')"
+  if [ -z "$nvim_version" ] || ! version_ge "$nvim_version" "$REQUIRED_NVIM_VERSION"; then
+    cat >&2 <<EOF
+ERROR: Neovim $REQUIRED_NVIM_VERSION or newer is required; found ${nvim_version:-unknown}.
+
+Upgrade Neovim first, then rerun ./install.sh.
+On macOS with Homebrew:
+  brew update
+  brew upgrade neovim
+  brew install tree-sitter-cli
+
+The Tree-sitter CLI command must be available as \`tree-sitter\` and report 0.26.1+.
+EOF
+    exit 1
+  fi
+}
+
+require_supported_nvim
+
 for name in *; do
   target="$HOME/.$name"
   if [ -e "$target" ]; then
@@ -7,7 +61,7 @@ for name in *; do
       echo "WARNING: $target exists but is not a symlink."
     fi
   else
-    if [ "$name" != 'install.sh' ] && [ "$name" != 'README.md' ]; then
+    if [ "$name" != 'install.sh' ] && [ "$name" != 'README.md' ] && [ "$name" != 'docs' ]; then
       echo "Creating $target"
       ln -s "$PWD/$name" "$target"
     fi
@@ -27,8 +81,5 @@ if [ ! -f "$PLUG_PATH" ]; then
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
-if command -v nvim >/dev/null 2>&1; then
-  nvim --headless -u ~/.vimrc.bundles "+PlugInstall --sync" +qa
-else
-  vim -u ~/.vimrc.bundles "+PlugInstall --sync" +qa
-fi
+"$NVIM_BIN" --headless -u ~/.vimrc.bundles "+PlugInstall --sync" +qa
+"$NVIM_BIN" --headless -u ~/.vimrc.bundles "+lua require('nvim-treesitter').install({'javascript','jsdoc','typescript','tsx'}):wait(300000)" +qa
