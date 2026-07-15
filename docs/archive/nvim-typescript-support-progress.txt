@@ -1,9 +1,9 @@
 nvim-typescript-support - Neovim TypeScript Support - Progress
 Generated: 2026-07-14 18:52:38 EDT
 Plan approved: 2026-07-14
-Implementation status: Phases 1–5 accepted; Phase 6 final review and clean two-Mac verification passed; authorized shipping and post-merge archival remain pending
-Plan: docs/nvim-typescript-support-IMPLEMENTATION_PLAN.md
-On completion, move this file and the plan to docs/archive/.
+Implementation status: Complete; implementation merged in PR #11, released as v1.4.0, and planning artifacts archived together
+Plan: docs/archive/nvim-typescript-support-IMPLEMENTATION_PLAN.md
+Archived after PR #11 merged on 2026-07-15.
 
 [x] 1.0 - Phase 1 - Establish the supported runtime and external tool contract
     [x] 1.1 - Update README requirements for Neovim 0.12+, tree-sitter CLI 0.26.1+, build tools, typescript-language-server, Prettier, and ESLint
@@ -47,8 +47,8 @@ On completion, move this file and the plan to docs/archive/.
     [x] 5.7 - Provision and run headless/smoke, disposable tools, re-source, and read-only draftMachine QA on the MacBook Pro
     [x] 5.8 - Complete interactive navigation/completion/Copilot/format/lint QA in draftMachine on the MacBook Pro
 
-[ ] 6.0 - Phase 6 - Ship and archive the in-flight plan
+[x] 6.0 - Phase 6 - Ship and archive the in-flight plan
     [x] 6.1 - Review the final focused diff and exclude the unrelated zshrc modification
     [x] 6.2 - Re-run clean pinned-plugin/parser installation on both Macs plus the full automated and manual verification matrix
-    [ ] 6.3 - Prepare a focused shipping handoff; open a PR or perform GitHub/merge actions only when explicitly authorized
-    [ ] 6.4 - If/when merged, move docs/nvim-typescript-support-IMPLEMENTATION_PLAN.md and docs/nvim-typescript-support-progress.txt to docs/archive/
+    [x] 6.3 - Prepare a focused shipping handoff; open a PR or perform GitHub/merge actions only when explicitly authorized
+    [x] 6.4 - If/when merged, move docs/nvim-typescript-support-IMPLEMENTATION_PLAN.md and docs/nvim-typescript-support-progress.txt to docs/archive/
