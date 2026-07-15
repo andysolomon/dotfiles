@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/andysolomon/dotfiles/compare/v1.3.0...v1.4.0) (2026-07-15)
+
+### Features
+
+* **vim:** add modern TypeScript support ([#11](https://github.com/andysolomon/dotfiles/issues/11)) ([996367b](https://github.com/andysolomon/dotfiles/commit/996367b72726ef70a5d15cc54088d69725a14807))
+
 ## [1.3.0](https://github.com/andysolomon/dotfiles/compare/v1.2.0...v1.3.0) (2026-07-14)
 
 ### Features
