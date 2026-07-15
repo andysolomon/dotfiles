@@ -69,7 +69,6 @@ augroup ominfuncs
   autocmd FileType html setlocal omnifunc=htmlcomplete#CompleteTags
   autocmd FileType css,scss,sass set omnifunc=csscomplete#CompleteCSS
   autocmd FileType javascript,jsx setlocal omnifunc=javascriptcomplete#CompleteJS
-  autocmd FileType typescript,tx,tsx setlocal omnifunc=typescriptcomplete#Complete
 augroup END
 "}}}
 autocmd bufread *.cls set ft=apex syntax=apex
@@ -84,5 +83,4 @@ set statusline=%F
 set statusline+=\ %y
 highlight StatusLine guibg=#ffffff guifg=#006086 
 "}}}
-
 

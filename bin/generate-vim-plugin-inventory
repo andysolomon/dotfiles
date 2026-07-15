@@ -70,6 +70,8 @@ awk '
     d["kabouzeid/nvim-lspinstall"] = "Legacy Neovim LSP installer"
     d["neovim/nvim-lsp"] = "Legacy Neovim LSP plugin"
     d["williamboman/nvim-lsp-installer"] = "Legacy LSP installer plugin"
+    d["stevearc/conform.nvim"] = "Lightweight formatter integration for Neovim"
+    d["mfussenegger/nvim-lint"] = "Asynchronous linting through external linters"
     d["github/copilot.vim"] = "GitHub Copilot integration"
     d["nvim-lua/plenary.nvim"] = "Lua utility library used by Neovim plugins"
     d["nvim-telescope/telescope.nvim"] = "Fuzzy finder and picker UI"

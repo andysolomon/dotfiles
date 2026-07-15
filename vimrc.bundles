@@ -43,7 +43,6 @@ Plug 'pangloss/vim-javascript'
 Plug 'itchyny/lightline.vim'
 Plug 'airblade/vim-gitgutter'
 " == JavaScript syntax highlighting ==
-Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
 "Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
 "Plug 'othree/yajs.vim', { 'for': ['javascript'] }
 "Plug 'othree/es.next.syntax.vim', { 'for': ['javascript'] }
@@ -66,21 +65,17 @@ Plug 'tpope/vim-sleuth'
 "Plug 'sainnhe/vim-color-forest-night'
 Plug 'rebelot/kanagawa.nvim'
 
-Plug 'leafgarland/typescript-vim'
-"Plug 'peitalin/vim-jsx-typescript'
 "Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 "Plug 'jparise/vim-graphql'
-Plug 'neovim/nvim-lspconfig'
-Plug 'kabouzeid/nvim-lspinstall'
-Plug 'neovim/nvim-lsp'
-Plug 'williamboman/nvim-lsp-installer'
-Plug 'neovim/nvim-lspconfig'
+Plug 'neovim/nvim-lspconfig', { 'commit': 'cb5bc0b2b35a6d513e3298d285db81453e791f4f' }
+Plug 'nvim-treesitter/nvim-treesitter', { 'branch': 'main', 'commit': '4916d6592ede8c07973490d9322f187e07dfefac', 'do': ':TSUpdate' }
+Plug 'stevearc/conform.nvim', { 'commit': '619363c30309d29ffa631e67c8183f2a72caa373' }
+Plug 'mfussenegger/nvim-lint', { 'commit': '606b823a57b027502a9ae00978ebf4f5d5158098' }
 Plug 'github/copilot.vim'
 "Plug 'nvim-lua/plenary.nvim'
 "Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.1' }
 "Plug 'BurntSushi/ripgrep'
 "Plug 'sharkdp/fd'
-"Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'ryanoasis/vim-devicons'
 Plug 'ejholmes/vim-forcedotcom'
 

@@ -75,3 +75,361 @@ let g:limelight_priority = -1
 
 let g:ale_sign_error = '❌'
 let g:ale_sign_warning = '⚠️'
+
+if has('nvim')
+  lua << EOF
+local js_ts_filetypes = {
+  javascript = true,
+  javascriptreact = true,
+  typescript = true,
+  typescriptreact = true,
+}
+
+local function is_js_ts(ft)
+  return js_ts_filetypes[ft] == true
+end
+
+local function buf_name(bufnr)
+  return vim.api.nvim_buf_get_name(bufnr or 0)
+end
+
+local function dirname(path)
+  if path == nil or path == '' then
+    return vim.fn.getcwd()
+  end
+  return vim.fs.dirname(path) or vim.fn.getcwd()
+end
+
+local function executable_file(path)
+  return path and vim.fn.executable(path) == 1
+end
+
+local function find_upward(start, names, predicate)
+  local dir = start
+  if dir == nil or dir == '' then
+    dir = vim.fn.getcwd()
+  end
+  local found = vim.fs.find(names, {
+    path = dir,
+    upward = true,
+    stop = vim.loop.os_homedir(),
+    limit = 20,
+    type = 'file',
+  })
+  for _, path in ipairs(found) do
+    if predicate == nil or predicate(path) then
+      return path
+    end
+  end
+  return nil
+end
+
+local function nearest_local_prettier(filename)
+  local path = find_upward(dirname(filename), { 'node_modules/.bin/prettier' }, executable_file)
+  if path then
+    return {
+      command = path,
+      root = path:gsub('/node_modules/%.bin/prettier$', ''),
+    }
+  end
+  return nil
+end
+
+local function package_json_has_eslint_config(path)
+  local ok, lines = pcall(vim.fn.readfile, path)
+  if not ok then
+    return false
+  end
+  local ok_json, package = pcall(vim.json.decode, table.concat(lines, '\n'))
+  return ok_json and type(package) == 'table' and package.eslintConfig ~= nil
+end
+
+local function nearest_eslint_config(filename)
+  local config_names = {
+    'eslint.config.js',
+    'eslint.config.mjs',
+    'eslint.config.cjs',
+    'eslint.config.ts',
+    'eslint.config.mts',
+    'eslint.config.cts',
+    '.eslintrc',
+    '.eslintrc.js',
+    '.eslintrc.cjs',
+    '.eslintrc.yaml',
+    '.eslintrc.yml',
+    '.eslintrc.json',
+    'package.json',
+  }
+  return find_upward(dirname(filename), config_names, function(path)
+    if vim.fs.basename(path) == 'package.json' then
+      return package_json_has_eslint_config(path)
+    end
+    return true
+  end)
+end
+
+local function nearest_local_eslint(filename)
+  local command = find_upward(dirname(filename), { 'node_modules/.bin/eslint' }, executable_file)
+  local config = nearest_eslint_config(filename)
+  if command and config then
+    return {
+      command = command,
+      config = config,
+      cwd = vim.fs.dirname(config),
+    }
+  end
+  return {
+    command = command,
+    config = config,
+  }
+end
+
+local treesitter_ok, treesitter = pcall(require, 'nvim-treesitter')
+if treesitter_ok then
+  local parser_by_ft = {
+    javascript = 'javascript',
+    javascriptreact = 'javascript',
+    typescript = 'typescript',
+    typescriptreact = 'tsx',
+  }
+  local tree_group = vim.api.nvim_create_augroup('DotfilesTreesitter', { clear = true })
+  vim.api.nvim_create_autocmd('FileType', {
+    group = tree_group,
+    pattern = vim.tbl_keys(parser_by_ft),
+    callback = function(args)
+      local lang = parser_by_ft[vim.bo[args.buf].filetype]
+      if lang then
+        pcall(vim.treesitter.start, args.buf, lang)
+      end
+    end,
+  })
+end
+
+local conform_ok, conform = pcall(require, 'conform')
+if conform_ok then
+  conform.setup({
+    formatters_by_ft = {
+      javascript = { 'prettier' },
+      javascriptreact = { 'prettier' },
+      typescript = { 'prettier' },
+      typescriptreact = { 'prettier' },
+    },
+    formatters = {
+      prettier = {
+        command = function(_, ctx)
+          local local_prettier = nearest_local_prettier(ctx.filename)
+          return local_prettier and local_prettier.command or 'prettier'
+        end,
+        cwd = function(_, ctx)
+          local local_prettier = nearest_local_prettier(ctx.filename)
+          return local_prettier and local_prettier.root or dirname(ctx.filename)
+        end,
+      },
+    },
+    format_on_save = function(bufnr)
+      local ft = vim.bo[bufnr].filetype
+      if not is_js_ts(ft) then
+        return nil
+      end
+      if nearest_local_prettier(buf_name(bufnr)) then
+        return { timeout_ms = 5000, lsp_format = 'never' }
+      end
+      return nil
+    end,
+  })
+end
+
+local lint_ok, lint = pcall(require, 'lint')
+if lint_ok then
+  lint.linters_by_ft = {
+    javascript = { 'eslint' },
+    javascriptreact = { 'eslint' },
+    typescript = { 'eslint' },
+    typescriptreact = { 'eslint' },
+  }
+
+  if lint.linters.eslint then
+    lint.linters.eslint.cmd = function()
+      return vim.b.dotfiles_eslint_cmd or 'eslint'
+    end
+  end
+
+  local function reset_eslint_diagnostics(bufnr)
+    local ok_ns, namespace = pcall(lint.get_namespace, 'eslint')
+    if ok_ns and namespace then
+      vim.diagnostic.reset(namespace, bufnr)
+    end
+  end
+
+  function _G.DotfilesTryAutoEslint()
+    local bufnr = vim.api.nvim_get_current_buf()
+    if not is_js_ts(vim.bo[bufnr].filetype) then
+      return
+    end
+    if vim.b[bufnr].dotfiles_eslint_disabled or vim.g.dotfiles_eslint_disabled then
+      reset_eslint_diagnostics(bufnr)
+      return
+    end
+    local eslint = nearest_local_eslint(buf_name(bufnr))
+    if eslint.command and eslint.config then
+      vim.b[bufnr].dotfiles_eslint_cmd = eslint.command
+      lint.try_lint('eslint', { cwd = eslint.cwd })
+    else
+      reset_eslint_diagnostics(bufnr)
+    end
+  end
+
+  local lint_group = vim.api.nvim_create_augroup('DotfilesEslint', { clear = true })
+  vim.api.nvim_create_autocmd('BufWritePost', {
+    group = lint_group,
+    pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
+    callback = function()
+      _G.DotfilesTryAutoEslint()
+    end,
+  })
+end
+
+local function explicit_format()
+  if not conform_ok then
+    vim.notify('conform.nvim is not installed', vim.log.levels.WARN)
+    return
+  end
+  local filename = buf_name(0)
+  if not nearest_local_prettier(filename) and vim.fn.executable('prettier') ~= 1 then
+    vim.notify('No project-local or global prettier executable found', vim.log.levels.WARN)
+    return
+  end
+  conform.format({ async = false, timeout_ms = 5000, lsp_format = 'never' })
+end
+
+local function explicit_lint()
+  if not lint_ok then
+    vim.notify('nvim-lint is not installed', vim.log.levels.WARN)
+    return
+  end
+  local bufnr = vim.api.nvim_get_current_buf()
+  local eslint = nearest_local_eslint(buf_name(bufnr))
+  if eslint.command and eslint.config then
+    vim.b[bufnr].dotfiles_eslint_cmd = eslint.command
+    lint.try_lint('eslint', { cwd = eslint.cwd })
+  elseif eslint.command and not eslint.config then
+    vim.notify('Local eslint found, but no eslint.config.*, .eslintrc*, or package.json eslintConfig was found', vim.log.levels.WARN)
+  elseif vim.fn.executable('eslint') == 1 then
+    vim.b[bufnr].dotfiles_eslint_cmd = 'eslint'
+    lint.try_lint('eslint', { cwd = dirname(buf_name(bufnr)) })
+  else
+    vim.notify('No project-local or global eslint executable found', vim.log.levels.WARN)
+  end
+end
+
+vim.api.nvim_create_user_command('DotfilesTypeScriptLintDisable', function()
+  vim.b.dotfiles_eslint_disabled = true
+  if lint_ok then
+    local ok_ns, namespace = pcall(lint.get_namespace, 'eslint')
+    if ok_ns and namespace then
+      vim.diagnostic.reset(namespace, 0)
+    end
+  end
+end, { desc = 'Disable project ESLint for the current buffer' })
+
+vim.diagnostic.config({
+  severity_sort = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = 'E',
+      [vim.diagnostic.severity.WARN] = 'W',
+      [vim.diagnostic.severity.INFO] = 'I',
+      [vim.diagnostic.severity.HINT] = 'H',
+    },
+  },
+  underline = {
+    severity = { min = vim.diagnostic.severity.WARN },
+  },
+  virtual_text = {
+    severity = { min = vim.diagnostic.severity.ERROR },
+    source = 'if_many',
+    spacing = 2,
+  },
+  float = {
+    border = 'rounded',
+    source = 'if_many',
+  },
+})
+
+pcall(function()
+  vim.opt.completeopt = { 'menu', 'menuone', 'noselect', 'popup' }
+end)
+
+vim.lsp.config('ts_ls', {
+  settings = {
+    typescript = {
+      inlayHints = {
+        includeInlayParameterNameHints = 'all',
+        includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayVariableTypeHints = true,
+        includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayEnumMemberValueHints = true,
+      },
+    },
+    javascript = {
+      inlayHints = {
+        includeInlayParameterNameHints = 'all',
+        includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayVariableTypeHints = true,
+        includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayEnumMemberValueHints = true,
+      },
+    },
+  },
+})
+vim.lsp.enable('ts_ls')
+
+local function toggle_inlay_hints(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
+  vim.lsp.inlay_hint.enable(not enabled, { bufnr = bufnr })
+end
+
+local lsp_group = vim.api.nvim_create_augroup('DotfilesLspAttach', { clear = true })
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = lsp_group,
+  callback = function(args)
+    local bufnr = args.buf
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client and client:supports_method('textDocument/completion') then
+      pcall(vim.lsp.completion.enable, true, client.id, bufnr, { autotrigger = true })
+    end
+
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = bufnr, desc = 'LSP definition' })
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = bufnr, desc = 'LSP hover' })
+    vim.keymap.set('n', '[d', function()
+      vim.diagnostic.jump({ count = -1, float = true })
+    end, { buffer = bufnr, desc = 'Previous diagnostic' })
+    vim.keymap.set('n', ']d', function()
+      vim.diagnostic.jump({ count = 1, float = true })
+    end, { buffer = bufnr, desc = 'Next diagnostic' })
+    vim.keymap.set('n', '<leader>fm', explicit_format, { buffer = bufnr, desc = 'Format with Prettier' })
+    vim.keymap.set('n', '<leader>ll', explicit_lint, { buffer = bufnr, desc = 'Lint with ESLint' })
+    vim.keymap.set('n', '<leader>ih', function()
+      toggle_inlay_hints(bufnr)
+    end, { buffer = bufnr, desc = 'Toggle inlay hints' })
+  end,
+})
+
+local ts_tools_group = vim.api.nvim_create_augroup('DotfilesTypeScriptTools', { clear = true })
+vim.api.nvim_create_autocmd('FileType', {
+  group = ts_tools_group,
+  pattern = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+  callback = function(args)
+    vim.keymap.set('n', '<leader>fm', explicit_format, { buffer = args.buf, desc = 'Format with Prettier' })
+    vim.keymap.set('n', '<leader>ll', explicit_lint, { buffer = args.buf, desc = 'Lint with ESLint' })
+  end,
+})
+EOF
+endif

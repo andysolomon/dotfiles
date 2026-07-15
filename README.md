@@ -25,6 +25,7 @@ Personal shell, editor, and tmux configuration with a bootstrap installer.
 - `vimrc*` and `vim/`: Vim + Neovim settings and plugin config.
 - `tmux.conf` and `.tmux/`: tmux behavior and TPM plugin setup.
 - `bin/`: utility scripts (`git-churn`, `replace`, `tat`, etc).
+- `docs/`: repository planning and decision records; it is intentionally not linked into `$HOME`.
 
 ## Requirements
 
@@ -32,7 +33,10 @@ Personal shell, editor, and tmux configuration with a bootstrap installer.
 - `zsh`
 - `git`
 - `curl`
-- `vim` or `nvim`
+- Neovim 0.12+
+- Tree-sitter CLI 0.26.1+ (`tree-sitter --version`), `tar`, and a C compiler
+- NVM with an active default Node for global editor tools
+- `typescript@5.9.3`, `typescript-language-server`, `prettier`, and `eslint` installed with npm under the active NVM default
 
 Set login shell to zsh if needed:
 
@@ -52,15 +56,19 @@ cd ~/dotfiles
 
 `install.sh` performs these steps:
 
+1. Fails before any home, plugin, or parser mutation unless `nvim` is available and reports 0.12+.
 1. Symlinks each top-level repo item to `$HOME` as a dotfile.
-1. Skips only `install.sh` and `README.md`.
+1. Skips `install.sh`, `README.md`, and the repository-only `docs/` planning directory.
 1. Warns (does not overwrite) if a destination exists and is not a symlink.
 1. Creates `~/.config/nvim/init.vim` (if missing) with `source ~/.vimrc`.
 1. Installs `vim-plug` for Neovim into:
    - `${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim`
 1. Runs plugin install:
    - `nvim --headless -u ~/.vimrc.bundles "+PlugInstall --sync" +qa`
-   - falls back to `vim` if `nvim` is unavailable.
+1. Installs the bounded Tree-sitter parser set:
+   - `javascript`, `jsdoc`, `typescript`, and `tsx`
+
+`install.sh` does not install or upgrade Homebrew or npm packages.
 
 ## Neovim and Vim
 
@@ -77,14 +85,61 @@ Neovim compatibility is handled via `~/.config/nvim/init.vim` sourcing `~/.vimrc
 
 ### Neovim-first
 
-This config targets **Neovim**. It declares Neovim-only plugins (`nvim-lspconfig`,
-`nvim-lspinstall`, and friends), and `install.sh` bootstraps `vim-plug` only into
-Neovim's autoload path. Plain `vim` therefore errors on the `Plug` declarations and
-NERDTree never loads.
+This config targets **Neovim 0.12+**. It declares Neovim-only plugins such as
+`nvim-lspconfig`, `nvim-treesitter`, `conform.nvim`, and `nvim-lint`, and
+`install.sh` bootstraps `vim-plug` only into Neovim's autoload path. Plain `vim`
+is not a supported plugin-install fallback.
 
-To avoid that, `vim` and `vi` are aliased to `nvim` (see [`aliases`](aliases)). If you
-deliberately want plain Vim to work too, install `vim-plug` into `~/.vim/autoload/plug.vim`
-as well.
+To avoid that, `vim` and `vi` are aliased to `nvim` (see [`aliases`](aliases)).
+If you deliberately want plain Vim behavior, use it without this Neovim plugin stack.
+
+### TypeScript, TSX, JavaScript, and JSX
+
+The TypeScript editor path is external-tool first:
+
+See the [Neovim TypeScript cheatsheet](docs/NVIM_TYPESCRIPT_CHEATSHEET.md) for
+the exact mappings, save policy, health checks, and troubleshooting reference.
+
+```sh
+brew install neovim tree-sitter-cli
+nvm install 24
+nvm alias default 24
+npm install -g typescript@5.9.3 typescript-language-server prettier eslint
+```
+
+Homebrew's CLI formula is `tree-sitter-cli`; the command it installs is
+`tree-sitter`. The required command contract is `tree-sitter --version` reporting
+0.26.1 or newer.
+
+Run these checks in a login zsh so NVM's default Node is on `PATH`:
+
+```sh
+zsh -lic 'nvim --version | head -n1'
+zsh -lic 'tree-sitter --version'
+zsh -lic 'nvm --version && node --version'
+zsh -lic 'command -v typescript-language-server && typescript-language-server --version'
+zsh -lic 'tsc --version && prettier --version && eslint --version'
+zsh -lic 'nvim --headless -u ~/.vimrc +qa'
+zsh -lic 'bin/check-nvim-typescript-support'
+```
+
+`ts_ls` launches `typescript-language-server --stdio`. A raw `tsserver` binary is
+not an LSP server and is not enough for Neovim semantic support. The global
+fallback is pinned to TypeScript 5.9.3 because npm's TypeScript 7 package does not
+ship `lib/tsserver.js` and is rejected by `typescript-language-server` 5.3.0.
+Project-local TypeScript, Prettier, and ESLint are preferred when present. Global
+Prettier and ESLint are explicit fallbacks only; save-time formatting and linting
+require project-local tools.
+
+On the supported Macs, use the same login-shell flow:
+
+```sh
+NO_AUTO_TMUX=1 ssh andrewsolomon@andrews-mac-mini-1 'cd ~/dotfiles && zsh -lic "bin/check-nvim-typescript-support"'
+NO_AUTO_TMUX=1 ssh andrewsolomon@qianas-macbook-pro-1 'cd ~/dotfiles && zsh -lic "bin/check-nvim-typescript-support"'
+```
+
+Do not run the remote command until you intend to verify that machine; these checks
+read editor state and may install parsers only through `./install.sh`.
 
 ### Leader key
 
@@ -120,6 +175,9 @@ nvim --headless -u ~/.vimrc.bundles "+PlugClean!" +qa
 - `itchyny/lightline.vim`
 - `github/copilot.vim`
 - `neovim/nvim-lspconfig`
+- `nvim-treesitter/nvim-treesitter`
+- `stevearc/conform.nvim`
+- `mfussenegger/nvim-lint`
 
 ## Key mappings and usage
 
@@ -324,6 +382,35 @@ This repo also has a fallback in [`vimrc.plugins`](vimrc.plugins):
 ```vim
 :source ~/.vimrc
 ```
+
+### TypeScript LSP does not attach
+
+- Confirm Neovim is 0.12+ and `typescript-language-server` is on Neovim's `PATH`:
+  `zsh -lic 'nvim --version | head -n1; command -v typescript-language-server'`.
+- Open a file under a pinned `ts_ls` root: the nearest package-manager
+  lockfile or `.git` directory, with Neovim's process cwd as the fallback. Then
+  run `:LspInfo`.
+- `:checkhealth vim.lsp` reports Neovim LSP health. `:LspTypescriptSourceAction`
+  and `:LspTypescriptGoToSourceDefinition` are only useful after `ts_ls` attaches.
+
+### Tree-sitter parsers are missing
+
+Run:
+
+```sh
+zsh -lic 'tree-sitter --version'
+zsh -lic 'nvim --headless -u ~/.vimrc.bundles "+lua require(\"nvim-treesitter\").install({\"javascript\",\"jsdoc\",\"typescript\",\"tsx\"}):wait(300000)" +qa'
+```
+
+### Prettier or ESLint does not run automatically
+
+- Save-time Prettier requires a project-local executable at
+  `node_modules/.bin/prettier`.
+- Save-time ESLint requires both `node_modules/.bin/eslint` and a discoverable
+  `eslint.config.*`, `.eslintrc*`, or `package.json` `eslintConfig`.
+- `,fm` may fall back to global `prettier`; `,ll` may fall back to global `eslint`
+  or report that local ESLint has no config.
+- In untrusted checkouts, run `:DotfilesTypeScriptLintDisable` before saving.
 
 ### tmux keybindings not applying
 

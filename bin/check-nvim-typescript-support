@@ -1,0 +1,276 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MIN_NVIM="0.12.0"
+MIN_TREE_SITTER="0.26.1"
+EXPECTED_TYPESCRIPT="5.9.3"
+
+fail() {
+  printf 'FAIL: %s\n' "$*" >&2
+  exit 1
+}
+
+pass() {
+  printf 'ok: %s\n' "$*"
+}
+
+version_ge() {
+  awk -v have="$1" -v need="$2" '
+    BEGIN {
+      split(have, h, ".")
+      split(need, n, ".")
+      for (i = 1; i <= 3; i++) {
+        hv = h[i] + 0
+        nv = n[i] + 0
+        if (hv > nv) exit 0
+        if (hv < nv) exit 1
+      }
+      exit 0
+    }
+  '
+}
+
+command -v nvim >/dev/null 2>&1 || fail "nvim is required"
+command -v tree-sitter >/dev/null 2>&1 || fail "tree-sitter CLI is required; install Homebrew formula tree-sitter-cli"
+command -v typescript-language-server >/dev/null 2>&1 || fail "typescript-language-server is required on PATH"
+command -v tsc >/dev/null 2>&1 || fail "typescript is required on PATH"
+command -v prettier >/dev/null 2>&1 || fail "prettier is required on PATH for explicit fallback verification"
+command -v eslint >/dev/null 2>&1 || fail "eslint is required on PATH for explicit fallback verification"
+command -v git >/dev/null 2>&1 || fail "git is required for pinned Neovim plugin verification"
+
+nvim_version="$(nvim --version | awk 'NR == 1 { sub(/^NVIM v/, "", $2); sub(/-.*/, "", $2); print $2 }')"
+version_ge "$nvim_version" "$MIN_NVIM" || fail "nvim $MIN_NVIM+ required; found $nvim_version"
+pass "nvim $nvim_version"
+
+tree_sitter_version="$(tree-sitter --version | awk '{ print $2 }')"
+version_ge "$tree_sitter_version" "$MIN_TREE_SITTER" || fail "tree-sitter $MIN_TREE_SITTER+ required; found $tree_sitter_version"
+pass "tree-sitter $tree_sitter_version"
+
+pass "typescript-language-server $(typescript-language-server --version)"
+typescript_version="$(tsc --version | awk '{ print $2 }')"
+[[ "$typescript_version" == "$EXPECTED_TYPESCRIPT" ]] || fail "global TypeScript $EXPECTED_TYPESCRIPT required for the tested tsserver fallback; found $typescript_version"
+pass "typescript $typescript_version"
+pass "prettier $(prettier --version)"
+pass "eslint $(eslint --version)"
+
+for plugin in nvim-lspconfig nvim-treesitter conform.nvim nvim-lint; do
+  case "$plugin" in
+    nvim-lspconfig) expected_head="cb5bc0b2b35a6d513e3298d285db81453e791f4f" ;;
+    nvim-treesitter) expected_head="4916d6592ede8c07973490d9322f187e07dfefac" ;;
+    conform.nvim) expected_head="619363c30309d29ffa631e67c8183f2a72caa373" ;;
+    nvim-lint) expected_head="606b823a57b027502a9ae00978ebf4f5d5158098" ;;
+  esac
+  plugin_dir="$HOME/.vim/bundle/$plugin"
+  [[ -d "$plugin_dir/.git" ]] || fail "$plugin is not installed at $plugin_dir"
+  plugin_head="$(git -C "$plugin_dir" rev-parse HEAD 2>/dev/null)" || fail "could not read $plugin HEAD at $plugin_dir"
+  [[ "$plugin_head" == "$expected_head" ]] || fail "$plugin HEAD mismatch: expected $expected_head, found $plugin_head"
+  pass "$plugin pinned at $plugin_head"
+done
+
+tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/nvim-ts-check.XXXXXX")"
+cleanup() {
+  rm -rf "$tmpdir"
+}
+trap cleanup EXIT
+mkdir -p "$tmpdir/state"
+
+parser_result="$tmpdir/parser-result.txt"
+parser_error="$tmpdir/parser-error.txt"
+if ! XDG_STATE_HOME="$tmpdir/state" NVIM_TS_CHECK_PARSERS="$parser_result" nvim --headless --cmd 'set shadafile=NONE' -u "$HOME/.vimrc.bundles" \
+  "+lua local ok, ts = pcall(require, 'nvim-treesitter'); if not ok then error(ts) end; local installed = {}; for _, lang in ipairs(ts.get_installed()) do installed[lang] = true end; local missing = {}; for _, lang in ipairs({'javascript', 'jsdoc', 'typescript', 'tsx'}) do if not installed[lang] then table.insert(missing, lang) end end; if #missing > 0 then error('missing Tree-sitter parsers: ' .. table.concat(missing, ', ')) end; vim.fn.writefile({'ok'}, vim.env.NVIM_TS_CHECK_PARSERS)" +qa \
+  >/dev/null 2>"$parser_error"; then
+  fail "Tree-sitter parser check failed: $(tr '\n' ' ' < "$parser_error")"
+fi
+grep -q '^ok$' "$parser_result" || fail "Tree-sitter parser check did not report ok"
+pass "Tree-sitter parsers javascript/jsdoc/typescript/tsx installed"
+
+mkdir -p "$tmpdir/src"
+global_node_modules="$(npm root -g 2>/dev/null || true)"
+typescript_source=""
+if [[ -n "$global_node_modules" && -f "$global_node_modules/typescript/lib/tsserver.js" ]]; then
+  typescript_source="$global_node_modules/typescript"
+elif [[ -f "$ROOT_DIR/node_modules/typescript/lib/tsserver.js" ]]; then
+  typescript_source="$ROOT_DIR/node_modules/typescript"
+fi
+if [[ -n "$typescript_source" ]]; then
+  mkdir -p "$tmpdir/node_modules"
+  cp -R "$typescript_source" "$tmpdir/node_modules/typescript"
+fi
+cat > "$tmpdir/package.json" <<'JSON'
+{
+  "name": "nvim-ts-check",
+  "private": true,
+  "type": "module"
+}
+JSON
+cat > "$tmpdir/tsconfig.json" <<'JSON'
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "strict": true,
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
+  },
+  "include": ["src"]
+}
+JSON
+cat > "$tmpdir/src/index.ts" <<'TS'
+export const value: number = "wrong";
+export function greet(name: string) {
+  return name.toUpperCase();
+}
+greet("world");
+TS
+cat > "$tmpdir/src/component.tsx" <<'TSX'
+type Props = { label: string };
+export function Component(props: Props) {
+  return <button>{props.label}</button>;
+}
+TSX
+cat > "$tmpdir/src/plain.js" <<'JS'
+export const plain = { answer: 42 };
+plain.answer;
+JS
+cat > "$tmpdir/src/view.jsx" <<'JSX'
+export function View() {
+  return <main>ok</main>;
+}
+JSX
+
+lua_check="$tmpdir/check.lua"
+result_file="$tmpdir/result.txt"
+cat > "$lua_check" <<'LUA'
+local result_file = vim.env.NVIM_TS_CHECK_RESULT
+
+local function finish(ok, message)
+  if result_file and result_file ~= '' then
+    vim.fn.writefile({ ok and 'ok' or message }, result_file)
+  end
+  if ok then
+    vim.cmd('qa')
+  else
+    vim.cmd('cquit')
+  end
+end
+
+local ok, err = xpcall(function()
+local expected = {
+  ['index.ts'] = 'typescript',
+  ['component.tsx'] = 'typescriptreact',
+  ['plain.js'] = 'javascript',
+  ['view.jsx'] = 'javascriptreact',
+}
+
+local function die(msg)
+  error(msg, 0)
+end
+
+local function assert_true(value, msg)
+  if not value then
+    die(msg)
+  end
+end
+
+local function wait_for(label, predicate)
+  local ok = vim.wait(20000, predicate, 100)
+  assert_true(ok, 'timed out waiting for ' .. label)
+end
+
+assert_true(vim.fn.exists(':Copilot') == 2, 'Copilot command did not load')
+assert_true(vim.fn.exists('*copilot#Accept') == 1, 'copilot#Accept() did not load')
+local tab_map = vim.fn.maparg('<Tab>', 'i')
+assert_true(type(tab_map) == 'string' and tab_map:match('copilot#Accept'), 'insert Tab is not mapped through copilot#Accept()')
+
+local root = vim.fn.getcwd()
+for file, ft in pairs(expected) do
+  local path = root .. '/src/' .. file
+  vim.cmd.edit(vim.fn.fnameescape(path))
+  local bufnr = vim.api.nvim_get_current_buf()
+  wait_for(file .. ' filetype', function()
+    return vim.bo[bufnr].filetype == ft
+  end)
+  assert_true(vim.bo[bufnr].filetype == ft, file .. ' filetype mismatch')
+  wait_for(file .. ' Tree-sitter highlighter', function()
+    return vim.treesitter.highlighter.active[bufnr] ~= nil
+  end)
+  wait_for(file .. ' ts_ls client', function()
+    return #vim.lsp.get_clients({ bufnr = bufnr, name = 'ts_ls' }) == 1
+  end)
+  local client = vim.lsp.get_clients({ bufnr = bufnr, name = 'ts_ls' })[1]
+  assert_true(client ~= nil, file .. ' missing ts_ls client')
+  assert_true(client:supports_method('textDocument/completion'), file .. ' client lacks completion')
+  local cmd = table.concat(client.config.cmd or {}, ' ')
+  assert_true(cmd:match('typescript%-language%-server') and cmd:match('%-%-stdio'), 'ts_ls command mismatch: ' .. cmd)
+end
+
+vim.cmd.edit(vim.fn.fnameescape(root .. '/src/index.ts'))
+local tsbuf = vim.api.nvim_get_current_buf()
+wait_for('TypeScript diagnostic', function()
+  return #vim.diagnostic.get(tsbuf, { severity = vim.diagnostic.severity.ERROR }) > 0
+end)
+
+vim.cmd.edit(vim.fn.fnameescape(root .. '/src/component.tsx'))
+local tsxbuf = vim.api.nvim_get_current_buf()
+assert_true(not vim.lsp.inlay_hint.is_enabled({ bufnr = tsxbuf }), 'inlay hints should start disabled')
+vim.lsp.inlay_hint.enable(true, { bufnr = tsxbuf })
+assert_true(vim.lsp.inlay_hint.is_enabled({ bufnr = tsxbuf }), 'inlay hints did not enable')
+vim.lsp.inlay_hint.enable(false, { bufnr = tsxbuf })
+assert_true(not vim.lsp.inlay_hint.is_enabled({ bufnr = tsxbuf }), 'inlay hints did not disable')
+end, function(message)
+  return message
+end)
+
+finish(ok, err)
+LUA
+
+(
+  cd "$tmpdir"
+  XDG_STATE_HOME="$tmpdir/state" NVIM_TS_CHECK_RESULT="$result_file" nvim --headless --cmd 'set shadafile=NONE' -u "$HOME/.vimrc" "+luafile $lua_check"
+) || fail "headless Neovim TypeScript smoke check failed: $(test -f "$result_file" && cat "$result_file" || printf 'no Lua result written')"
+grep -q '^ok$' "$result_file" || fail "$(cat "$result_file")"
+pass "headless TS/TSX/JS/JSX smoke check"
+
+copilot_status="$tmpdir/copilot-status.txt"
+copilot_check="$tmpdir/copilot-check.lua"
+cat > "$copilot_check" <<'LUA'
+local status_file = vim.env.NVIM_TS_CHECK_COPILOT_STATUS
+local function finish(ok, message)
+  vim.fn.writefile({ message }, status_file)
+  if ok then
+    vim.cmd('qa')
+  else
+    vim.cmd('cquit')
+  end
+end
+
+local ok, err = xpcall(function()
+  local root = vim.fn.getcwd()
+  vim.cmd.edit(vim.fn.fnameescape(root .. '/src/index.ts'))
+  vim.fn['copilot#Init']()
+  local ready = vim.wait(20000, function()
+    local client = vim.fn['copilot#RunningClient']()
+    return type(client) == 'table' and client.serverInfo ~= nil
+  end, 100)
+  if not ready then
+    error('Copilot language server did not initialize within 20s for src/index.ts', 0)
+  end
+  local status = vim.fn.execute('Copilot status')
+  if not status:match('Ready') then
+    error('Copilot status was not Ready: ' .. status:gsub('\n', ' '), 0)
+  end
+end, function(message)
+  return message
+end)
+
+finish(ok, ok and 'ok' or err)
+LUA
+(
+  cd "$tmpdir"
+  XDG_STATE_HOME="$tmpdir/state" NVIM_TS_CHECK_COPILOT_STATUS="$copilot_status" nvim --headless --cmd 'set shadafile=NONE' -u "$HOME/.vimrc" "+luafile $copilot_check"
+) >/dev/null 2>&1 || fail "Copilot status check failed: $(test -f "$copilot_status" && tr '\n' ' ' < "$copilot_status" || printf 'no Lua result written')"
+grep -q '^ok$' "$copilot_status" || fail "$(cat "$copilot_status")"
+pass "Copilot Ready"
+
+printf 'PASS: Neovim TypeScript support checks passed\n'
