@@ -1,3 +1,16 @@
+" Keep Copilot's encrypted master-key access on one signed Node identity.
+" Update this only after verifying the replacement NVM Node's code signature.
+let s:copilot_node_root = expand('~/.nvm/versions/node/v24.18.0')
+let s:copilot_node_command = s:copilot_node_root . '/bin/node'
+let g:copilot_node_command = s:copilot_node_command
+" copilot.vim 1.59 launches through npx by default, so pin that interpreter too.
+let g:copilot_npx_command = [
+      \ '/usr/bin/env',
+      \ 'PATH=' . s:copilot_node_root . '/bin:' . $PATH,
+      \ s:copilot_node_command,
+      \ s:copilot_node_root . '/lib/node_modules/npm/bin/npx-cli.js',
+      \ ]
+
 " Toggle NERDTree
 noremap <C-T> :NERDTreeToggle<CR>
 nmap <leader>n :NERDTreeFind<CR>R
