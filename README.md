@@ -1,6 +1,6 @@
 # Dotfiles
 
-Personal shell, editor, and tmux configuration with a bootstrap installer.
+Personal shell, editor, tmux, and Herdr configuration with a bootstrap installer.
 
 ## Contents
 
@@ -12,6 +12,7 @@ Personal shell, editor, and tmux configuration with a bootstrap installer.
 - [Plugin management](#plugin-management)
 - [Key mappings and usage](#key-mappings-and-usage)
 - [tmux](#tmux)
+- [Herdr](#herdr)
 - [Tailscale machine workflow](#tailscale-machine-workflow)
 - [Local machine overrides](#local-machine-overrides)
 - [Releases](#releases)
@@ -26,6 +27,7 @@ Personal shell, editor, and tmux configuration with a bootstrap installer.
 - `tmux.conf` and `.tmux/`: tmux behavior and TPM plugin setup.
 - `bin/`: utility scripts (`git-churn`, `replace`, `tat`, etc).
 - `docs/`: repository planning and decision records; it is intentionally not linked into `$HOME`.
+- `herdr/`: Herdr config; `install.sh` links `herdr/config.toml` to `~/.config/herdr/config.toml` instead of `~/.herdr`.
 
 ## Requirements
 
@@ -58,9 +60,10 @@ cd ~/dotfiles
 
 1. Fails before any home, plugin, or parser mutation unless `nvim` is available and reports 0.12+.
 1. Symlinks each top-level repo item to `$HOME` as a dotfile.
-1. Skips `install.sh`, `README.md`, and the repository-only `docs/` planning directory.
+1. Skips `install.sh`, `README.md`, the repository-only `docs/` planning directory, and `herdr/` (installed into XDG config, not `~/.herdr`).
 1. Warns (does not overwrite) if a destination exists and is not a symlink.
 1. Creates `~/.config/nvim/init.vim` (if missing) with `source ~/.vimrc`.
+1. Symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
 1. Installs `vim-plug` for Neovim into:
    - `${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim`
 1. Runs plugin install:
@@ -250,11 +253,26 @@ Known Tailscale Macs get host-specific tmux status colors:
 - Unknown hosts: yellow
 
 Interactive SSH shells auto-attach to a tmux session named `ssh-$HOST` via
-[`zsh/configs/ssh-tmux.zsh`](zsh/configs/ssh-tmux.zsh). Bypass this for one session with:
+[`zsh/configs/ssh-tmux.zsh`](zsh/configs/ssh-tmux.zsh). Auto-attach is skipped when
+`NO_AUTO_TMUX=1` or when the shell is already inside Herdr (`HERDR_ENV=1`). Bypass
+for one session with:
 
 ```sh
 NO_AUTO_TMUX=1 ssh andrewsolomon@andrews-mac-mini-1
 ```
+
+## Herdr
+
+Herdr config is tracked as [`herdr/config.toml`](herdr/config.toml) and installed to
+`~/.config/herdr/config.toml`. The top-level `herdr/` directory is not symlinked to
+`~/.herdr`.
+
+While tmux is still nested inside Herdr, the prefix stays `ctrl+b` so it does not
+collide with tmux `Ctrl+a`. Detach Herdr with `Ctrl+b q`; detach tmux with
+`Ctrl+a d`. Reload a running server with `herdr server reload-config`.
+
+zsh completion is generated into [`zsh/completion/_herdr`](zsh/completion/_herdr)
+(`herdr completion zsh`). Re-source `~/.zshrc` (or open a new shell) after install.
 
 ## Tailscale machine workflow
 
@@ -280,6 +298,7 @@ cd ~/dotfiles
 git pull --ff-only
 ./install.sh
 tmux source-file ~/.tmux.conf
+herdr server reload-config
 ```
 
 Run T3 Code through:

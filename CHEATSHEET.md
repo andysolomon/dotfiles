@@ -1,6 +1,6 @@
 # Keyboard & Command Cheat Sheet
 
-Personal reference for this dotfiles setup: **zsh (vi mode) → tmux (`Ctrl+a`) → Neovim (leader `,`)**.
+Personal reference for this dotfiles setup: **zsh (vi mode) → Herdr (`Ctrl+b`, optional) → tmux (`Ctrl+a`) → Neovim (leader `,`)**.
 
 Print-friendly one-pager. Regenerate or extend as your config changes.
 
@@ -10,14 +10,16 @@ Print-friendly one-pager. Regenerate or extend as your config changes.
 
 ```
 Terminal app (Ghostty / iTerm / etc.)
-  └─ zsh          history, completion, aliases, shell functions
-       └─ tmux     sessions, windows, panes, copy mode
-            └─ nvim   edit files, grep, LSP, Copilot, NERDTree
+  └─ herdr        outer multiplexer (prefix Ctrl+b); optional while tmux is nested
+       └─ zsh     history, completion, aliases, shell functions
+            └─ tmux   sessions, windows, panes, copy mode
+                 └─ nvim   edit files, grep, LSP, Copilot, NERDTree
 ```
 
 | Layer | Prefix / mode | Escape hatch |
 |-------|---------------|--------------|
 | zsh | `Esc` → vi command mode | `Ctrl+C` cancel, `Ctrl+D` logout |
+| herdr | `Ctrl+b` then key | `Ctrl+b` `q` detach |
 | tmux | `Ctrl+a` then key | `Ctrl+a` `d` detach |
 | nvim | `,` leader, `jk` = Esc | `:q!` force quit |
 
@@ -41,7 +43,8 @@ Terminal app (Ghostty / iTerm / etc.)
 | `Ctrl+t` | Toggle file tree (NERDTree) |
 | `,w` / `,q` | Save / quit (Neovim) |
 | `,/` | Toggle comment |
-| `K` | Grep word under cursor; LSP hover in attached buffers |
+| `K` | Grep word under cursor (`ag`) |
+| `gh` | LSP hover (types/docs) in attached buffers |
 | `Ctrl+h/j/k/l` | Move between nvim splits |
 | `g` | `git status` (no args) or `git …` |
 | `tat` | Attach tmux session for current directory |
@@ -239,7 +242,7 @@ Press prefix, release, then the second key — unless noted as a chord (`Ctrl+a`
 | `Ctrl+a` `s` | Session picker |
 | `Ctrl+a` `(` / `)` | Previous / next session |
 
-SSH auto-attaches to `ssh-$HOST` unless `NO_AUTO_TMUX=1`.
+SSH auto-attaches to `ssh-$HOST` unless `NO_AUTO_TMUX=1` or `HERDR_ENV=1` (already inside Herdr).
 
 ### Windows
 
@@ -317,6 +320,20 @@ restore relaunches with `--session` or `--resume`. Debug mapping:
 | `andrews-mac-mini-1` | Green |
 | `qianas-macbook-pro-1` | Blue |
 | Other hosts | Yellow |
+
+---
+
+## Herdr
+
+Outer multiplexer while tmux is still nested. Prefix is `Ctrl+b` so it does not
+fight tmux `Ctrl+a`. Config: `herdr/config.toml` → `~/.config/herdr/config.toml`.
+
+| Keys | Action |
+|------|--------|
+| `herdr` | Attach (or start) the default session |
+| `Ctrl+b` `q` | Detach Herdr (panes keep running) |
+| `Ctrl+b` `?` | Show live keybindings |
+| `herdr server reload-config` | Reload `config.toml` |
 
 ---
 
@@ -499,7 +516,7 @@ should show exactly one `ts_ls` client launched through
 |---------------|--------|
 | `:LspInfo` / `:checkhealth vim.lsp` | Server status |
 | `gd` | Definition |
-| `K` | Hover in attached buffers; grep remains global elsewhere |
+| `gh` | Hover (types/docs); `K` stays project-wide `ag` search |
 | `grr` | References |
 | `gri` | Implementation |
 | `grn` | Rename |
@@ -602,6 +619,7 @@ Conventional commit types (for `semantic-release`): `feat:`, `fix:`, `chore:`, `
 |------|---------|
 | zsh | `source ~/.zshrc` |
 | tmux | `tmux source-file ~/.tmux.conf` or `Ctrl+a` `r` |
+| Herdr | `herdr server reload-config` |
 | nvim | `:source ~/.vimrc` or `,sv` (also runs `:Sleuth`) |
 | Full dotfiles symlink | `./install.sh` from repo root |
 
@@ -612,6 +630,7 @@ Conventional commit types (for `semantic-release`): `feat:`, `fix:`, `chore:`, `
 | Variable | Effect |
 |----------|--------|
 | `NO_AUTO_TMUX=1` | Skip SSH auto-attach to tmux |
+| `HERDR_ENV=1` | Set by Herdr in its panes; also skips SSH auto-tmux |
 | `DOTFILES_NERD_FONT=0` | ASCII-safe NERDTree arrows (no icon font) |
 | `T3_CODE_NPX_PACKAGE` | Override package for `npxt3` |
 | `PS1=…` | Override zsh prompt (exported) |

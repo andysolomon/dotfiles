@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Personal dotfiles for zsh, Vim/Neovim, and tmux, deployed to `$HOME` by a symlink-based
+Personal dotfiles for zsh, Vim/Neovim, tmux, and Herdr, deployed to `$HOME` by a symlink-based
 installer. There is no build or test suite — "running" a change means re-sourcing the
 relevant config and confirming it loads without error.
 
@@ -20,20 +20,22 @@ It is a false positive — this repo has no web app. Ignore it.
 `install.sh` is the deployment mechanism and the key thing to understand:
 
 - It iterates **every top-level file/dir** and symlinks it to `$HOME/.<name>`
-  (e.g. `zshrc` → `~/.zshrc`, `vim/` → `~/.vim`). Only `install.sh` and `README.md`
-  are skipped. So a new top-level file named `foo` becomes `~/.foo` on next install —
-  name new files with that in mind.
+  (e.g. `zshrc` → `~/.zshrc`, `vim/` → `~/.vim`). Skipped: `install.sh`, `README.md`,
+  `docs/` (repo planning), and `herdr/` (XDG config, not `~/.herdr`). A new top-level
+  file named `foo` becomes `~/.foo` on next install — name new files with that in mind.
 - It **never overwrites**: if `~/.<name>` already exists and is not a symlink, it only
   warns. Existing symlinks are left untouched. To re-link after renaming, remove the old
   symlink manually.
 - It writes `~/.config/nvim/init.vim` (containing `source ~/.vimrc`) so Neovim reuses the
   Vim config, installs `vim-plug`, then runs `PlugInstall --sync`.
+- It symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
 
 ## Reload without reinstalling
 
 - zsh: `source ~/.zshrc`
 - Vim/Neovim: `:source ~/.vimrc`
 - tmux: `tmux source-file ~/.tmux.conf`
+- Herdr: `herdr server reload-config`
 
 ## Architecture
 
@@ -95,9 +97,17 @@ and TPM-managed plugins (`tpm`, `tmux-sensible`, `tmux-resurrect`, `tmux-battery
 `.tmux/` holds TPM itself.
 
 SSH shells auto-attach to tmux through `zsh/configs/ssh-tmux.zsh` unless `NO_AUTO_TMUX=1`
-is set. The tmux status bar is host-color-coded for known Tailscale Macs:
+or `HERDR_ENV=1` is set (skip inside a Herdr pane so SSH does not exec tmux). The tmux
+status bar is host-color-coded for known Tailscale Macs:
 `andrews-mac-mini-1` / `Andrews-Mac-mini` is green, `qianas-macbook-pro-1` is blue,
 and unknown hosts are yellow.
+
+### Herdr
+
+`herdr/config.toml` is repository-only at the top level (not `~/.herdr`). `install.sh`
+symlinks it to `~/.config/herdr/config.toml`. Nested-tmux phase keeps Herdr's prefix on
+`ctrl+b` so it does not collide with tmux `Ctrl+a`. Completions live in
+`zsh/completion/_herdr`.
 
 ### bin/ utilities (on PATH)
 
