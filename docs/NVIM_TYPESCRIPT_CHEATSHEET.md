@@ -151,8 +151,8 @@ available.
 
 ## Verification checklist for both Macs
 
-Repeat this checklist locally on `andrews-mac-mini-1` and
-`qianas-macbook-pro-1`:
+Repeat this checklist locally on `andrews-mac-mini` and
+`qianas-macbook-pro`:
 
 1. From `~/dotfiles`, run
    `zsh -lic 'bin/check-nvim-typescript-support'` and require the final `PASS`.
