@@ -99,7 +99,7 @@ and TPM-managed plugins (`tpm`, `tmux-sensible`, `tmux-resurrect`, `tmux-battery
 SSH shells auto-attach to tmux through `zsh/configs/ssh-tmux.zsh` unless `NO_AUTO_TMUX=1`
 or `HERDR_ENV=1` is set (skip inside a Herdr pane so SSH does not exec tmux). The tmux
 status bar is host-color-coded for known Tailscale Macs:
-`andrews-mac-mini-1` / `Andrews-Mac-mini` is green, `qianas-macbook-pro-1` is blue,
+`andrews-mac-mini` / `Andrews-Mac-mini` is green, `qianas-macbook-pro` is blue,
 and unknown hosts are yellow.
 
 ### Herdr
@@ -122,8 +122,8 @@ symlinks it to `~/.config/herdr/config.toml`. Nested-tmux phase keeps Herdr's pr
 Use `.agents/skills/tailscale-machine-ops/SKILL.md` as the shared machine inventory for
 Codex and Claude Code. Current known devices:
 
-- `andrews-mac-mini-1` / `Andrews-Mac-mini` / `100.86.225.105` / macOS / current Mac mini.
-- `qianas-macbook-pro-1` / `qianas-macbook-pro` / `100.85.162.117` / macOS / other MacBook Pro.
+- `andrews-mac-mini` / `Andrews-Mac-mini` / `100.77.5.31` / macOS / current Mac mini.
+- `qianas-macbook-pro` / `100.122.22.119` / macOS / other MacBook Pro.
 
 ## Conventions
 

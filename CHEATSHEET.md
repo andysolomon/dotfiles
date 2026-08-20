@@ -317,8 +317,8 @@ restore relaunches with `--session` or `--resume`. Debug mapping:
 
 | Host | Bar color |
 |------|-----------|
-| `andrews-mac-mini-1` | Green |
-| `qianas-macbook-pro-1` | Blue |
+| `andrews-mac-mini` | Green |
+| `qianas-macbook-pro` | Blue |
 | Other hosts | Yellow |
 
 ---
@@ -655,8 +655,8 @@ Use a **Nerd Font** (e.g. Hack Nerd Font) for devicons in nvim unless `DOTFILES_
 ## SSH workflow (this setup)
 
 ```sh
-ssh andrewsolomon@andrews-mac-mini-1      # auto-attaches tmux (green bar)
-ssh andrewsolomon@qianas-macbook-pro-1    # blue bar
+ssh andrewsolomon@andrews-mac-mini        # auto-attaches tmux (green bar)
+ssh andrewsolomon@qianas-macbook-pro      # blue bar
 NO_AUTO_TMUX=1 ssh user@host              # plain shell, no tmux
 ```
 

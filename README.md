@@ -137,8 +137,8 @@ require project-local tools.
 On the supported Macs, use the same login-shell flow:
 
 ```sh
-NO_AUTO_TMUX=1 ssh andrewsolomon@andrews-mac-mini-1 'cd ~/dotfiles && zsh -lic "bin/check-nvim-typescript-support"'
-NO_AUTO_TMUX=1 ssh andrewsolomon@qianas-macbook-pro-1 'cd ~/dotfiles && zsh -lic "bin/check-nvim-typescript-support"'
+NO_AUTO_TMUX=1 ssh andrewsolomon@andrews-mac-mini 'cd ~/dotfiles && zsh -lic "bin/check-nvim-typescript-support"'
+NO_AUTO_TMUX=1 ssh andrewsolomon@qianas-macbook-pro 'cd ~/dotfiles && zsh -lic "bin/check-nvim-typescript-support"'
 ```
 
 Do not run the remote command until you intend to verify that machine; these checks
@@ -248,8 +248,8 @@ Configured with TPM:
 
 Known Tailscale Macs get host-specific tmux status colors:
 
-- `andrews-mac-mini-1` / `Andrews-Mac-mini`: green
-- `qianas-macbook-pro-1` / `qianas-macbook-pro`: blue
+- `andrews-mac-mini` / `Andrews-Mac-mini`: green
+- `qianas-macbook-pro`: blue
 - Unknown hosts: yellow
 
 Interactive SSH shells auto-attach to a tmux session named `ssh-$HOST` via
@@ -258,7 +258,7 @@ Interactive SSH shells auto-attach to a tmux session named `ssh-$HOST` via
 for one session with:
 
 ```sh
-NO_AUTO_TMUX=1 ssh andrewsolomon@andrews-mac-mini-1
+NO_AUTO_TMUX=1 ssh andrewsolomon@andrews-mac-mini
 ```
 
 ## Herdr
@@ -281,14 +281,14 @@ Shared machine details for Codex and Claude Code live in
 
 Current devices:
 
-- `andrews-mac-mini-1` / `100.86.225.105`
-- `qianas-macbook-pro-1` / `100.85.162.117`
+- `andrews-mac-mini` / `100.77.5.31`
+- `qianas-macbook-pro` / `100.122.22.119`
 
 Common SSH targets:
 
 ```sh
-ssh andrewsolomon@andrews-mac-mini-1
-ssh andrewsolomon@qianas-macbook-pro-1
+ssh andrewsolomon@andrews-mac-mini
+ssh andrewsolomon@qianas-macbook-pro
 ```
 
 To apply these dotfiles on another Mac:
