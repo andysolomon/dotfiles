@@ -1,0 +1,10 @@
+# Nested-tmux phase: Herdr stays on ctrl+b so it does not fight tmux's Ctrl+a prefix.
+# Do not run tmux2herdr against this file until panes live in Herdr instead of
+# inside `tmux attach`.
+
+[ui]
+agent_panel_sort = "spaces"
+mouse_capture = true
+
+[keys]
+prefix = "ctrl+b"

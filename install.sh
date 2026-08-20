@@ -54,23 +54,42 @@ EOF
 
 require_supported_nvim
 
+skip_top_level() {
+  case "$1" in
+    install.sh|README.md|docs|herdr) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 for name in *; do
   target="$HOME/.$name"
+  if skip_top_level "$name"; then
+    continue
+  fi
   if [ -e "$target" ]; then
     if [ ! -L "$target" ]; then
       echo "WARNING: $target exists but is not a symlink."
     fi
   else
-    if [ "$name" != 'install.sh' ] && [ "$name" != 'README.md' ] && [ "$name" != 'docs' ]; then
-      echo "Creating $target"
-      ln -s "$PWD/$name" "$target"
-    fi
+    echo "Creating $target"
+    ln -s "$PWD/$name" "$target"
   fi
 done
 
 mkdir -p "$HOME/.config/nvim"
 if [ ! -f "$HOME/.config/nvim/init.vim" ]; then
   printf 'source ~/.vimrc\n' > "$HOME/.config/nvim/init.vim"
+fi
+
+mkdir -p "$HOME/.config/herdr"
+herdr_config="$HOME/.config/herdr/config.toml"
+if [ -e "$herdr_config" ] || [ -L "$herdr_config" ]; then
+  if [ ! -L "$herdr_config" ]; then
+    echo "WARNING: $herdr_config exists but is not a symlink."
+  fi
+else
+  echo "Creating $herdr_config"
+  ln -s "$PWD/herdr/config.toml" "$herdr_config"
 fi
 
 PLUG_PATH="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim"

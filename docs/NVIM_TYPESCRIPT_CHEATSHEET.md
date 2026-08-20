@@ -44,14 +44,15 @@ language-server integration are outside this configuration.
 
 ## LSP navigation and refactoring
 
-`gd`, `K`, diagnostic navigation, formatting, linting, and inlay hints are set
+`gd`, `gh`, diagnostic navigation, formatting, linting, and inlay hints are set
 buffer-locally on LSP attachment. The `gr*`, `gO`, and insert-mode `Ctrl+S`
-mappings below are Neovim 0.12 native LSP defaults.
+mappings below are Neovim 0.12 native LSP defaults. Global `K` remains
+project-wide `ag` search (not LSP hover).
 
 | Key | Action |
 |-----|--------|
 | `gd` | Go to definition |
-| `K` | Show hover; without an attached LSP it keeps this config's global grep action |
+| `gh` | Show hover (types/docs) |
 | `grr` | List references |
 | `gri` | Go to implementation |
 | `grt` | Go to type definition |
@@ -143,8 +144,8 @@ available.
 - Missing ESLint diagnostics: save-time lint needs both a local executable and
   config. Run `,ll` for explicit feedback. Disabling automatic lint also clears
   the current buffer's ESLint diagnostics, not its `ts_ls` diagnostics.
-- `K` greps instead of showing hover: no LSP buffer-local mapping has attached;
-  confirm with `:LspInfo`.
+- `gh` does nothing / no hover: no LSP buffer-local mapping has attached;
+  confirm with `:LspInfo`. `K` is always project-wide `ag` search.
 - Copilot is absent: run `:Copilot status`; do not use setup or sign-out as a
   health check.
 
@@ -158,7 +159,7 @@ Repeat this checklist locally on `andrews-mac-mini-1` and
 2. Open representative `.ts` and `.tsx` project files; confirm their filetypes,
    Tree-sitter highlighting, and exactly one `ts_ls` in `:LspInfo`. Spot-check
    `.js` and `.jsx` attachment too.
-3. Exercise `gd`, `K`, `grr`, `gri`, `grt`, `grn`, `gra`, `[d`/`]d`, both
+3. Exercise `gd`, `gh`, `grr`, `gri`, `grt`, `grn`, `gra`, `[d`/`]d`, both
    TypeScript commands, and the `,ih` off/on/off cycle.
 4. Confirm LSP completion with `Ctrl+N`/`Ctrl+P`/`Ctrl+Y`, then separately check
    `:Copilot status` and accept an inline suggestion with `Tab`.
