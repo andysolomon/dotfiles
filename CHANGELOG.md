@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/andysolomon/dotfiles/compare/v1.4.0...v1.5.0) (2026-08-20)
+
+### Features
+
+* add herdr nested-tmux config and editor workflow tweaks ([#14](https://github.com/andysolomon/dotfiles/issues/14)) ([1f44ce2](https://github.com/andysolomon/dotfiles/commit/1f44ce246efed19be4efc237f9616f21c4e2f09b))
+
 ## [1.4.0](https://github.com/andysolomon/dotfiles/compare/v1.3.0...v1.4.0) (2026-07-15)
 
 ### Features
