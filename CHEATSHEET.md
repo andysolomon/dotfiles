@@ -207,7 +207,7 @@ Machine-specific aliases: `~/.aliases.local`
 |---------|--------|
 | `tat` | `tmux attach -t $(basename $PWD)` — session per directory |
 | `replace old new files…` | Find/replace across files via `ag` + `sed` |
-| `git-churn` | Rank changed files by commit frequency vs `origin/master` |
+| `git-churn` | Rank changed files by commit frequency vs `origin/main` |
 | `npxt3` | Run T3 Code via `npx -y ${T3_CODE_NPX_PACKAGE:-t3@latest}` |
 | `generate-vim-plugin-inventory` | Regenerate `PLUGIN_INVENTORY.md` |
 

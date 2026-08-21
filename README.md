@@ -352,7 +352,7 @@ Use Conventional Commit types in commit subjects:
 
 ### Release flow
 
-- Releases run automatically on pushes to `master` via GitHub Actions.
+- Releases run automatically on pushes to `main` via GitHub Actions.
 - `semantic-release` calculates the next version from commit history.
 - It creates/updates `CHANGELOG.md`, creates a Git tag, and publishes a GitHub Release.
 
