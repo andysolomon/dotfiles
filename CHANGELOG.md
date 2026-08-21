@@ -1,3 +1,9 @@
+## [1.6.0](https://github.com/andysolomon/dotfiles/compare/v1.5.0...v1.6.0) (2026-08-21)
+
+### Features
+
+* attach Herdr on interactive SSH login ([#16](https://github.com/andysolomon/dotfiles/issues/16)) ([a47cc38](https://github.com/andysolomon/dotfiles/commit/a47cc3819cb36207c9a796d05798b1a9d7749cbf))
+
 ## [1.5.0](https://github.com/andysolomon/dotfiles/compare/v1.4.0...v1.5.0) (2026-08-20)
 
 ### Features
