@@ -242,7 +242,8 @@ Press prefix, release, then the second key — unless noted as a chord (`Ctrl+a`
 | `Ctrl+a` `s` | Session picker |
 | `Ctrl+a` `(` / `)` | Previous / next session |
 
-SSH auto-attaches to `ssh-$HOST` unless `NO_AUTO_TMUX=1` or `HERDR_ENV=1` (already inside Herdr).
+SSH auto-attaches to Herdr (`exec herdr`) unless `NO_AUTO_TMUX=1` or `HERDR_ENV=1`.
+Falls back to tmux `ssh-$HOST` if Herdr is not installed.
 
 ### Windows
 
@@ -629,8 +630,8 @@ Conventional commit types (for `semantic-release`): `feat:`, `fix:`, `chore:`, `
 
 | Variable | Effect |
 |----------|--------|
-| `NO_AUTO_TMUX=1` | Skip SSH auto-attach to tmux |
-| `HERDR_ENV=1` | Set by Herdr in its panes; also skips SSH auto-tmux |
+| `NO_AUTO_TMUX=1` | Skip SSH auto-attach to Herdr (or tmux fallback) |
+| `HERDR_ENV=1` | Set by Herdr in its panes; also skips SSH auto-attach |
 | `DOTFILES_NERD_FONT=0` | ASCII-safe NERDTree arrows (no icon font) |
 | `T3_CODE_NPX_PACKAGE` | Override package for `npxt3` |
 | `PS1=…` | Override zsh prompt (exported) |
@@ -655,9 +656,9 @@ Use a **Nerd Font** (e.g. Hack Nerd Font) for devicons in nvim unless `DOTFILES_
 ## SSH workflow (this setup)
 
 ```sh
-ssh andrewsolomon@andrews-mac-mini        # auto-attaches tmux (green bar)
-ssh andrewsolomon@qianas-macbook-pro      # blue bar
-NO_AUTO_TMUX=1 ssh user@host              # plain shell, no tmux
+ssh andrewsolomon@andrews-mac-mini        # auto-attaches this machine's Herdr session
+ssh andrewsolomon@qianas-macbook-pro      # Herdr if installed, else tmux (blue bar)
+NO_AUTO_TMUX=1 ssh user@host              # plain shell, no Herdr/tmux
 ```
 
 After dotfiles install on a remote Mac: `./install.sh`, then `source ~/.zshrc`.
