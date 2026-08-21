@@ -96,11 +96,11 @@ bin/generate-vim-plugin-inventory
 and TPM-managed plugins (`tpm`, `tmux-sensible`, `tmux-resurrect`, `tmux-battery`).
 `.tmux/` holds TPM itself.
 
-SSH shells auto-attach to tmux through `zsh/configs/ssh-tmux.zsh` unless `NO_AUTO_TMUX=1`
-or `HERDR_ENV=1` is set (skip inside a Herdr pane so SSH does not exec tmux). The tmux
-status bar is host-color-coded for known Tailscale Macs:
-`andrews-mac-mini` / `Andrews-Mac-mini` is green, `qianas-macbook-pro` is blue,
-and unknown hosts are yellow.
+SSH shells attach to Herdr through `zsh/configs/post/ssh-herdr.zsh` (`exec herdr`)
+unless `NO_AUTO_TMUX=1` or `HERDR_ENV=1` is set. If Herdr is missing, they fall
+back to tmux (`ssh-$HOST`). The tmux status bar is host-color-coded for known
+Tailscale Macs: `andrews-mac-mini` / `Andrews-Mac-mini` is green,
+`qianas-macbook-pro` is blue, and unknown hosts are yellow.
 
 ### Herdr
 

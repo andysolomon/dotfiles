@@ -252,10 +252,11 @@ Known Tailscale Macs get host-specific tmux status colors:
 - `qianas-macbook-pro`: blue
 - Unknown hosts: yellow
 
-Interactive SSH shells auto-attach to a tmux session named `ssh-$HOST` via
-[`zsh/configs/ssh-tmux.zsh`](zsh/configs/ssh-tmux.zsh). Auto-attach is skipped when
-`NO_AUTO_TMUX=1` or when the shell is already inside Herdr (`HERDR_ENV=1`). Bypass
-for one session with:
+Interactive SSH shells attach to the host's Herdr session via
+[`zsh/configs/post/ssh-herdr.zsh`](zsh/configs/post/ssh-herdr.zsh) (`exec herdr`).
+If Herdr is not installed, they fall back to a tmux session named `ssh-$HOST`.
+Skipped when `NO_AUTO_TMUX=1` or when the shell is already inside Herdr
+(`HERDR_ENV=1`). Bypass for one session with:
 
 ```sh
 NO_AUTO_TMUX=1 ssh andrewsolomon@andrews-mac-mini
