@@ -21,14 +21,17 @@ It is a false positive — this repo has no web app. Ignore it.
 
 - It iterates **every top-level file/dir** and symlinks it to `$HOME/.<name>`
   (e.g. `zshrc` → `~/.zshrc`, `vim/` → `~/.vim`). Skipped: `install.sh`, `README.md`,
-  `docs/` (repo planning), and `herdr/` (XDG config, not `~/.herdr`). A new top-level
-  file named `foo` becomes `~/.foo` on next install — name new files with that in mind.
+  `docs/` (repo planning), `herdr/` (XDG config, not `~/.herdr`), and `ssh/`
+  (installed as `~/.ssh/config`, without managing private keys). A new top-level file
+  named `foo` becomes `~/.foo` on next install — name new files with that in mind.
 - It **never overwrites**: if `~/.<name>` already exists and is not a symlink, it only
   warns. Existing symlinks are left untouched. To re-link after renaming, remove the old
   symlink manually.
 - It writes `~/.config/nvim/init.vim` (containing `source ~/.vimrc`) so Neovim reuses the
   Vim config, installs `vim-plug`, then runs `PlugInstall --sync`.
 - It symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
+- It symlinks `ssh/config` to `~/.ssh/config` if that path is missing; keys and
+  `known_hosts` remain machine-local.
 
 ## Reload without reinstalling
 
@@ -116,6 +119,11 @@ symlinks it to `~/.config/herdr/config.toml`. Nested-tmux phase keeps Herdr's pr
 - `tat` — attach/create a tmux session named after the current directory.
 - `git-churn` — rank files by commit frequency.
 - `replace` — project-wide find/replace helper.
+
+### SSH
+
+`ssh/config` is installed as `~/.ssh/config`. It tracks safe host aliases such as
+`ssh mini`; never commit private keys, `known_hosts`, or credentials.
 
 ### Tailscale machine ops
 
