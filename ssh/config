@@ -1,0 +1,5 @@
+Host mini
+  HostName andrews-mac-mini
+  User andrewsolomon
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes

@@ -26,6 +26,7 @@ Personal shell, editor, tmux, and Herdr configuration with a bootstrap installer
 - `vimrc*` and `vim/`: Vim + Neovim settings and plugin config.
 - `tmux.conf` and `.tmux/`: tmux behavior and TPM plugin setup.
 - `bin/`: utility scripts (`git-churn`, `replace`, `tat`, etc).
+- `ssh/config`: tracked host aliases; installed as `~/.ssh/config` without managing private keys.
 - `docs/`: repository planning and decision records; it is intentionally not linked into `$HOME`.
 - `herdr/`: Herdr config; `install.sh` links `herdr/config.toml` to `~/.config/herdr/config.toml` instead of `~/.herdr`.
 
@@ -62,6 +63,7 @@ cd ~/dotfiles
 1. Symlinks each top-level repo item to `$HOME` as a dotfile.
 1. Skips `install.sh`, `README.md`, the repository-only `docs/` planning directory, and `herdr/` (installed into XDG config, not `~/.herdr`).
 1. Warns (does not overwrite) if a destination exists and is not a symlink.
+1. Symlinks `ssh/config` to `~/.ssh/config` if that path is missing; private keys remain unmanaged.
 1. Creates `~/.config/nvim/init.vim` (if missing) with `source ~/.vimrc`.
 1. Symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
 1. Installs `vim-plug` for Neovim into:
@@ -288,9 +290,12 @@ Current devices:
 Common SSH targets:
 
 ```sh
-ssh andrewsolomon@andrews-mac-mini
+ssh mini
 ssh andrewsolomon@qianas-macbook-pro
 ```
+
+`ssh mini` is defined in [`ssh/config`](ssh/config) and uses the local
+`~/.ssh/id_ed25519` key for `andrewsolomon@andrews-mac-mini`.
 
 To apply these dotfiles on another Mac:
 

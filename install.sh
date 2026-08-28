@@ -56,7 +56,7 @@ require_supported_nvim
 
 skip_top_level() {
   case "$1" in
-    install.sh|README.md|docs|herdr) return 0 ;;
+    install.sh|README.md|docs|herdr|ssh) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -75,6 +75,18 @@ for name in *; do
     ln -s "$PWD/$name" "$target"
   fi
 done
+
+mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh"
+ssh_config="$HOME/.ssh/config"
+if [ -e "$ssh_config" ] || [ -L "$ssh_config" ]; then
+  if [ ! -L "$ssh_config" ]; then
+    echo "WARNING: $ssh_config exists but is not a symlink."
+  fi
+else
+  echo "Creating $ssh_config"
+  ln -s "$PWD/ssh/config" "$ssh_config"
+fi
 
 mkdir -p "$HOME/.config/nvim"
 if [ ! -f "$HOME/.config/nvim/init.vim" ]; then
