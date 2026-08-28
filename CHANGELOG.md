@@ -1,3 +1,10 @@
+## [1.6.0](https://github.com/andysolomon/dotfiles/compare/v1.5.0...v1.6.0) (2026-08-28)
+
+### Features
+
+* add Mac mini SSH alias ([42f3cef](https://github.com/andysolomon/dotfiles/commit/42f3cefd8c0422dfc9f359120ce1d37dbd159416))
+* attach Herdr on interactive SSH login ([#16](https://github.com/andysolomon/dotfiles/issues/16)) ([a47cc38](https://github.com/andysolomon/dotfiles/commit/a47cc3819cb36207c9a796d05798b1a9d7749cbf))
+
 ## [1.6.0](https://github.com/andysolomon/dotfiles/compare/v1.5.0...v1.6.0) (2026-08-21)
 
 ### Features
