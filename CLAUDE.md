@@ -24,14 +24,14 @@ It is a false positive — this repo has no web app. Ignore it.
   `docs/` (repo planning), `herdr/` (XDG config, not `~/.herdr`), and `ssh/`
   (installed as `~/.ssh/config`, without managing private keys). A new top-level file
   named `foo` becomes `~/.foo` on next install — name new files with that in mind.
-- It **never overwrites**: if `~/.<name>` already exists and is not a symlink, it only
-  warns. Existing symlinks are left untouched. To re-link after renaming, remove the old
-  symlink manually.
+- It **never overwrites** top-level `~/.<name>` targets: if the destination already exists
+  and is not a symlink, it only warns. Existing symlinks are left untouched. To re-link
+  after renaming, remove the old symlink manually.
 - It writes `~/.config/nvim/init.vim` (containing `source ~/.vimrc`) so Neovim reuses the
   Vim config, installs `vim-plug`, then runs `PlugInstall --sync`.
 - It symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
-- It symlinks `ssh/config` to `~/.ssh/config` if that path is missing; keys and
-  `known_hosts` remain machine-local.
+- It symlinks `ssh/config` to `~/.ssh/config`. A pre-existing real file is backed up to
+  `~/.ssh/config.pre-dotfiles`. Keys and `known_hosts` remain machine-local.
 
 ## Reload without reinstalling
 
@@ -108,8 +108,7 @@ Tailscale Macs: `andrews-mac-mini` / `Andrews-Mac-mini` is green,
 ### Herdr
 
 `herdr/config.toml` is repository-only at the top level (not `~/.herdr`). `install.sh`
-symlinks it to `~/.config/herdr/config.toml`. Nested-tmux phase keeps Herdr's prefix on
-`ctrl+b` so it does not collide with tmux `Ctrl+a`. Completions live in
+symlinks it to `~/.config/herdr/config.toml`. Prefix is `ctrl+a`. Completions live in
 `zsh/completion/_herdr`.
 
 ### bin/ utilities (on PATH)

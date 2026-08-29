@@ -1,5 +1,14 @@
+# Installed as ~/.ssh/config. Private keys stay machine-local (~/.ssh/id_*).
+# UseKeychain is macOS-only; IgnoreUnknown keeps Linux OpenSSH happy.
+
 Host mini
   HostName andrews-mac-mini
   User andrewsolomon
   IdentityFile ~/.ssh/id_ed25519
   IdentitiesOnly yes
+
+Host *
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/id_ed25519
+  IgnoreUnknown UseKeychain
+  UseKeychain yes

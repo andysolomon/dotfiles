@@ -1,6 +1,6 @@
 # Keyboard & Command Cheat Sheet
 
-Personal reference for this dotfiles setup: **zsh (vi mode) → Herdr (`Ctrl+b`, optional) → tmux (`Ctrl+a`) → Neovim (leader `,`)**.
+Personal reference for this dotfiles setup: **zsh (vi mode) → Herdr (`Ctrl+a`) → Neovim (leader `,`)**.
 
 Print-friendly one-pager. Regenerate or extend as your config changes.
 
@@ -10,17 +10,15 @@ Print-friendly one-pager. Regenerate or extend as your config changes.
 
 ```
 Terminal app (Ghostty / iTerm / etc.)
-  └─ herdr        outer multiplexer (prefix Ctrl+b); optional while tmux is nested
+  └─ herdr        multiplexer (prefix Ctrl+a)
        └─ zsh     history, completion, aliases, shell functions
-            └─ tmux   sessions, windows, panes, copy mode
-                 └─ nvim   edit files, grep, LSP, Copilot, NERDTree
+            └─ nvim   edit files, grep, LSP, Copilot, NERDTree
 ```
 
 | Layer | Prefix / mode | Escape hatch |
 |-------|---------------|--------------|
 | zsh | `Esc` → vi command mode | `Ctrl+C` cancel, `Ctrl+D` logout |
-| herdr | `Ctrl+b` then key | `Ctrl+b` `q` detach |
-| tmux | `Ctrl+a` then key | `Ctrl+a` `d` detach |
+| herdr | `Ctrl+a` then key | `Ctrl+a` `q` detach |
 | nvim | `,` leader, `jk` = Esc | `:q!` force quit |
 
 ---
@@ -32,11 +30,11 @@ Terminal app (Ghostty / iTerm / etc.)
 | `Ctrl+R` | Search shell history |
 | `Ctrl+A` / `Ctrl+E` | Line start / end (shell) |
 | `Ctrl+Q` | Stash current line, run something else, pop it back |
-| `Ctrl+a` | tmux prefix |
-| `Ctrl+a` `"` / `%` | Split pane horizontal / vertical |
-| `Ctrl+a` `h/j/k/l` | Move between tmux panes |
-| `Ctrl+a` `d` | Detach from tmux |
-| `Ctrl+a` `[` | tmux copy mode |
+| `Ctrl+a` | herdr prefix |
+| `Ctrl+a` `v` / `-` | Split pane right / down |
+| `Ctrl+a` `h/j/k/l` | Move between herdr panes |
+| `Ctrl+a` `q` | Detach from herdr |
+| `Ctrl+a` `[` | herdr copy mode |
 | `,` | Neovim leader |
 | `jk` | Leave insert mode (Neovim) |
 | `,,` | Toggle previous buffer |
@@ -326,14 +324,13 @@ restore relaunches with `--session` or `--resume`. Debug mapping:
 
 ## Herdr
 
-Outer multiplexer while tmux is still nested. Prefix is `Ctrl+b` so it does not
-fight tmux `Ctrl+a`. Config: `herdr/config.toml` → `~/.config/herdr/config.toml`.
+Multiplexer. Prefix is `Ctrl+a`. Config: `herdr/config.toml` → `~/.config/herdr/config.toml`.
 
 | Keys | Action |
 |------|--------|
 | `herdr` | Attach (or start) the default session |
-| `Ctrl+b` `q` | Detach Herdr (panes keep running) |
-| `Ctrl+b` `?` | Show live keybindings |
+| `Ctrl+a` `q` | Detach Herdr (panes keep running) |
+| `Ctrl+a` `?` | Show live keybindings |
 | `herdr server reload-config` | Reload `config.toml` |
 
 ---
