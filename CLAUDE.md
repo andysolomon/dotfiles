@@ -118,6 +118,8 @@ symlinks it to `~/.config/herdr/config.toml`. Prefix is `ctrl+a`. Completions li
 ### bin/ utilities (on PATH)
 
 - `generate-vim-plugin-inventory` — see above.
+- `pi` — forward normal commands to mise-managed Pi; translate Pi self-updates to
+  `mise upgrade pi`, including updates requested through ARC Pi.
 - `npxt3` — run T3 Code through `npx -y ${T3_CODE_NPX_PACKAGE:-t3@latest}`.
 - `tat` — attach/create a tmux session named after the current directory.
 - `git-churn` — rank files by commit frequency.

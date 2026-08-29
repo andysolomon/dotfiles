@@ -90,8 +90,4 @@ export PATH="$PATH:$HOME/.local/bin"
 # Kept out of the repo; sourced last so it can override anything above.
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
-# ARC Pi launchers
-alias arc-pi='/Users/andrewsolomon/pi-extend/bin/arc-pi'
-alias arc-orchestrator='/Users/andrewsolomon/pi-extend/bin/arc-orchestrator'
-
 # End of .zshrc configuration
