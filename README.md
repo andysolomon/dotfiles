@@ -64,7 +64,7 @@ cd ~/dotfiles
 1. Symlinks each top-level repo item to `$HOME` as a dotfile.
 1. Skips `install.sh`, `README.md`, the repository-only `docs/` planning directory, and `herdr/` (installed into XDG config, not `~/.herdr`).
 1. Warns (does not overwrite) if a destination exists and is not a symlink.
-1. Symlinks `ssh/config` to `~/.ssh/config` if that path is missing; private keys remain unmanaged.
+1. Symlinks `ssh/config` to `~/.ssh/config`. If a real file is already there, it is moved to `~/.ssh/config.pre-dotfiles` first. Private keys remain unmanaged.
 1. On Omarchy, copies `omarchy/hypr/input.lua` to `~/.config/hypr/input.lua`; a differing existing file is timestamp-backed up first.
 1. Creates `~/.config/nvim/init.vim` (if missing) with `source ~/.vimrc`.
 1. Symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
@@ -272,9 +272,8 @@ Herdr config is tracked as [`herdr/config.toml`](herdr/config.toml) and installe
 `~/.config/herdr/config.toml`. The top-level `herdr/` directory is not symlinked to
 `~/.herdr`.
 
-While tmux is still nested inside Herdr, the prefix stays `ctrl+b` so it does not
-collide with tmux `Ctrl+a`. Detach Herdr with `Ctrl+b q`; detach tmux with
-`Ctrl+a d`. Reload a running server with `herdr server reload-config`.
+Prefix is `ctrl+a`. Detach with `Ctrl+a q`. Reload a running server with
+`herdr server reload-config`.
 
 zsh completion is generated into [`zsh/completion/_herdr`](zsh/completion/_herdr)
 (`herdr completion zsh`). Re-source `~/.zshrc` (or open a new shell) after install.

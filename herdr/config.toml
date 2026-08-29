@@ -1,10 +1,27 @@
-# Nested-tmux phase: Herdr stays on ctrl+b so it does not fight tmux's Ctrl+a prefix.
-# Do not run tmux2herdr against this file until panes live in Herdr instead of
-# inside `tmux attach`.
+# Herdr is the multiplexer. Prefix is Ctrl+a (same chord as the old tmux config).
 
 [ui]
 agent_panel_sort = "spaces"
 mouse_capture = true
 
 [keys]
-prefix = "ctrl+b"
+prefix = "ctrl+a"
+
+# Keep Control held after the prefix. Without these aliases Herdr sees ctrl+h
+# (etc.), finds no binding, and silently drops the key.
+help = ["prefix+?", "prefix+ctrl+/"]
+detach = ["prefix+q", "prefix+ctrl+q"]
+goto = ["prefix+g", "prefix+ctrl+g"]
+workspace_picker = ["prefix+w", "prefix+ctrl+w"]
+new_tab = ["prefix+c", "prefix+ctrl+c"]
+previous_tab = ["prefix+p", "prefix+ctrl+p"]
+next_tab = ["prefix+n", "prefix+ctrl+n"]
+focus_pane_left = ["prefix+h", "prefix+ctrl+h"]
+focus_pane_down = ["prefix+j", "prefix+ctrl+j"]
+focus_pane_up = ["prefix+k", "prefix+ctrl+k"]
+focus_pane_right = ["prefix+l", "prefix+ctrl+l"]
+split_vertical = ["prefix+v", "prefix+ctrl+v"]
+split_horizontal = ["prefix+minus", "prefix+ctrl+minus"]
+close_pane = ["prefix+x", "prefix+ctrl+x"]
+zoom = ["prefix+z", "prefix+ctrl+z"]
+toggle_sidebar = ["prefix+b", "prefix+ctrl+b"]

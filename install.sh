@@ -79,13 +79,21 @@ done
 mkdir -p "$HOME/.ssh"
 chmod 700 "$HOME/.ssh"
 ssh_config="$HOME/.ssh/config"
-if [ -e "$ssh_config" ] || [ -L "$ssh_config" ]; then
-  if [ ! -L "$ssh_config" ]; then
-    echo "WARNING: $ssh_config exists but is not a symlink."
+ssh_source="$PWD/ssh/config"
+if [ -L "$ssh_config" ]; then
+  current="$(readlink "$ssh_config")"
+  if [ "$current" != "$ssh_source" ]; then
+    echo "WARNING: $ssh_config is a symlink to $current, not $ssh_source."
   fi
+elif [ -e "$ssh_config" ]; then
+  backup="${ssh_config}.pre-dotfiles"
+  echo "Backing up $ssh_config to $backup"
+  mv "$ssh_config" "$backup"
+  echo "Creating $ssh_config"
+  ln -s "$ssh_source" "$ssh_config"
 else
   echo "Creating $ssh_config"
-  ln -s "$PWD/ssh/config" "$ssh_config"
+  ln -s "$ssh_source" "$ssh_config"
 fi
 
 if [ -f /etc/os-release ] && grep -q '^ID=omarchy$' /etc/os-release; then
