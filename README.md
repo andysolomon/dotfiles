@@ -8,6 +8,7 @@ Personal shell, editor, tmux, and Herdr configuration with a bootstrap installer
 - [Requirements](#requirements)
 - [Install](#install)
 - [How install works](#how-install-works)
+- [Pi updates](#pi-updates)
 - [Neovim and Vim](#neovim-and-vim)
 - [Plugin management](#plugin-management)
 - [Key mappings and usage](#key-mappings-and-usage)
@@ -76,6 +77,20 @@ cd ~/dotfiles
    - `javascript`, `jsdoc`, `typescript`, and `tsx`
 
 `install.sh` does not install or upgrade Homebrew or npm packages.
+
+## Pi updates
+
+Pi is installed and versioned by mise, so its bundled executable cannot update
+itself directly. The tracked [`bin/pi`](bin/pi) launcher translates self-update
+requests to mise while preserving Pi's normal package and model commands:
+
+```sh
+pi update          # update mise-managed Pi
+arc-pi update      # same update through the ARC Pi launcher
+pi update --models # refresh Pi's model catalogs
+```
+
+Both `pi` and `arc-pi` resolve this launcher through `~/.bin` in login zsh shells.
 
 ## Neovim and Vim
 

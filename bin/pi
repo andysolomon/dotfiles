@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Make Pi's update commands work when the Pi executable is managed by mise.
+set -euo pipefail
+
+update_pi() {
+  if [[ "${1:-}" == "--force" ]]; then
+    MISE_MINIMUM_RELEASE_AGE=0 mise install --force pi@latest
+  else
+    MISE_MINIMUM_RELEASE_AGE=0 mise upgrade pi
+  fi
+}
+
+case "${1:-}" in
+  update)
+    case "${2:-}" in
+      ""|pi|self|--self)
+        update_pi "${3:-}"
+        exit
+        ;;
+      --all)
+        update_pi
+        pi_bin="$(mise which pi)"
+        exec "$pi_bin" update --extensions "${@:3}"
+        ;;
+    esac
+    ;;
+esac
+
+pi_bin="$(mise which pi)"
+exec "$pi_bin" "$@"
