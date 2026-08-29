@@ -90,14 +90,17 @@ fi
 
 if [ -f /etc/os-release ] && grep -q '^ID=omarchy$' /etc/os-release; then
   mkdir -p "$HOME/.config/hypr"
+  hypr_input_source="$PWD/omarchy/hypr/input.lua"
   hypr_input="$HOME/.config/hypr/input.lua"
-  if [ -e "$hypr_input" ] || [ -L "$hypr_input" ]; then
-    if [ ! -L "$hypr_input" ]; then
-      echo "WARNING: $hypr_input exists but is not a symlink."
-    fi
-  else
+  if [ ! -e "$hypr_input" ] && [ ! -L "$hypr_input" ]; then
     echo "Creating $hypr_input"
-    ln -s "$PWD/omarchy/hypr/input.lua" "$hypr_input"
+    cp "$hypr_input_source" "$hypr_input"
+  elif [ -L "$hypr_input" ] || ! cmp -s "$hypr_input_source" "$hypr_input"; then
+    hypr_input_backup="$hypr_input.backup.$(date +%Y%m%d-%H%M%S)"
+    echo "Backing up $hypr_input to $hypr_input_backup"
+    cp -L "$hypr_input" "$hypr_input_backup"
+    rm "$hypr_input"
+    cp "$hypr_input_source" "$hypr_input"
   fi
 fi
 

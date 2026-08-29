@@ -33,8 +33,9 @@ It is a false positive — this repo has no web app. Ignore it.
 - It symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
 - It symlinks `ssh/config` to `~/.ssh/config` if that path is missing; keys and
   `known_hosts` remain machine-local.
-- On Omarchy, it symlinks `omarchy/hypr/input.lua` to `~/.config/hypr/input.lua`
-  if that path is missing.
+- On Omarchy, it copies `omarchy/hypr/input.lua` to `~/.config/hypr/input.lua`.
+  Hyprland's Lua loader requires the module beneath its config root, so this file cannot
+  be an out-of-tree symlink. A differing destination is timestamp-backed up first.
 
 ## Reload without reinstalling
 
@@ -125,9 +126,10 @@ symlinks it to `~/.config/herdr/config.toml`. Nested-tmux phase keeps Herdr's pr
 
 ### Omarchy
 
-`omarchy/hypr/input.lua` is installed as `~/.config/hypr/input.lua` only on
-Omarchy systems. Validate changes with `hyprctl reload` and `hyprctl configerrors`.
-The tracked override maps Caps Lock to Ctrl with `ctrl:nocaps`.
+`omarchy/hypr/input.lua` is copied to `~/.config/hypr/input.lua` only on Omarchy
+systems. It cannot be an out-of-tree symlink because Hyprland's Lua module loader
+requires the file beneath its config root. Validate changes with `hyprctl reload` and
+`hyprctl configerrors`. The tracked override maps Caps Lock to Ctrl with `ctrl:nocaps`.
 
 ### SSH
 
