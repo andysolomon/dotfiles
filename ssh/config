@@ -7,6 +7,12 @@ Host mini
   IdentityFile ~/.ssh/id_ed25519
   IdentitiesOnly yes
 
+Host macbook
+  HostName qianas-macbook-pro
+  User andrewsolomon
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+
 Host *
   AddKeysToAgent yes
   IdentityFile ~/.ssh/id_ed25519

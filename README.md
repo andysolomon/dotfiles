@@ -141,8 +141,8 @@ require project-local tools.
 On the supported Macs, use the same login-shell flow:
 
 ```sh
-NO_AUTO_TMUX=1 ssh andrewsolomon@andrews-mac-mini 'cd ~/dotfiles && zsh -lic "bin/check-nvim-typescript-support"'
-NO_AUTO_TMUX=1 ssh andrewsolomon@qianas-macbook-pro 'cd ~/dotfiles && zsh -lic "bin/check-nvim-typescript-support"'
+ssh mini 'export NO_AUTO_TMUX=1; cd ~/dotfiles && zsh -lic "bin/check-nvim-typescript-support"'
+ssh macbook 'export NO_AUTO_TMUX=1; cd ~/dotfiles && zsh -lic "bin/check-nvim-typescript-support"'
 ```
 
 Do not run the remote command until you intend to verify that machine; these checks
@@ -260,10 +260,10 @@ Interactive SSH shells attach to the host's Herdr session via
 [`zsh/configs/post/ssh-herdr.zsh`](zsh/configs/post/ssh-herdr.zsh) (`exec herdr`).
 If Herdr is not installed, they fall back to a tmux session named `ssh-$HOST`.
 Skipped when `NO_AUTO_TMUX=1` or when the shell is already inside Herdr
-(`HERDR_ENV=1`). Bypass for one session with:
+(`HERDR_ENV=1`). Bypass for one session by setting the variable on the remote shell:
 
 ```sh
-NO_AUTO_TMUX=1 ssh andrewsolomon@andrews-mac-mini
+ssh -t mini 'NO_AUTO_TMUX=1 exec zsh -l'
 ```
 
 ## Herdr
@@ -280,8 +280,8 @@ zsh completion is generated into [`zsh/completion/_herdr`](zsh/completion/_herdr
 
 ## Tailscale machine workflow
 
-Shared machine details for Codex and Claude Code live in
-[`.agents/skills/tailscale-machine-ops/SKILL.md`](.agents/skills/tailscale-machine-ops/SKILL.md).
+Use this inventory when operating across the Tailscale-connected Macs. Confirm
+`hostname` and `whoami` before making changes on a remote machine.
 
 Current devices:
 
@@ -292,11 +292,12 @@ Common SSH targets:
 
 ```sh
 ssh mini
-ssh andrewsolomon@qianas-macbook-pro
+ssh macbook
 ```
 
-`ssh mini` is defined in [`ssh/config`](ssh/config) and uses the local
-`~/.ssh/id_ed25519` key for `andrewsolomon@andrews-mac-mini`.
+Both aliases are defined in [`ssh/config`](ssh/config) and use the local
+`~/.ssh/id_ed25519` key. `mini` connects to `andrews-mac-mini`; `macbook`
+connects to `qianas-macbook-pro`.
 
 To apply these dotfiles on another Mac:
 

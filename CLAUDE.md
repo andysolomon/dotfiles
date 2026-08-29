@@ -132,13 +132,13 @@ requires the file beneath its config root. Validate changes with `hyprctl reload
 
 ### SSH
 
-`ssh/config` is installed as `~/.ssh/config`. It tracks safe host aliases such as
-`ssh mini`; never commit private keys, `known_hosts`, or credentials.
+`ssh/config` is installed as `~/.ssh/config`. It tracks safe host aliases `ssh mini`
+and `ssh macbook`; never commit private keys, `known_hosts`, or credentials.
 
 ### Tailscale machine ops
 
-Use `.agents/skills/tailscale-machine-ops/SKILL.md` as the shared machine inventory for
-Codex and Claude Code. Current known devices:
+Use this shared machine inventory for remote operations. Confirm `hostname` and
+`whoami` before changing another machine. Current known devices:
 
 - `andrews-mac-mini` / `Andrews-Mac-mini` / `100.77.5.31` / macOS / current Mac mini.
 - `qianas-macbook-pro` / `100.122.22.119` / macOS / other MacBook Pro.

@@ -653,9 +653,9 @@ Use a **Nerd Font** (e.g. Hack Nerd Font) for devicons in nvim unless `DOTFILES_
 ## SSH workflow (this setup)
 
 ```sh
-ssh andrewsolomon@andrews-mac-mini        # auto-attaches this machine's Herdr session
-ssh andrewsolomon@qianas-macbook-pro      # Herdr if installed, else tmux (blue bar)
-NO_AUTO_TMUX=1 ssh user@host              # plain shell, no Herdr/tmux
+ssh mini                                  # auto-attaches this machine's Herdr session
+ssh macbook                               # Herdr if installed, else tmux (blue bar)
+ssh -t macbook 'NO_AUTO_TMUX=1 exec zsh -l' # plain shell, no Herdr/tmux
 ```
 
 After dotfiles install on a remote Mac: `./install.sh`, then `source ~/.zshrc`.
