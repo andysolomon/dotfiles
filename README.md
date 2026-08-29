@@ -29,6 +29,7 @@ Personal shell, editor, tmux, and Herdr configuration with a bootstrap installer
 - `ssh/config`: tracked host aliases; installed as `~/.ssh/config` without managing private keys.
 - `docs/`: repository planning and decision records; it is intentionally not linked into `$HOME`.
 - `herdr/`: Herdr config; `install.sh` links `herdr/config.toml` to `~/.config/herdr/config.toml` instead of `~/.herdr`.
+- `omarchy/hypr/input.lua`: Omarchy keyboard overrides; installed as `~/.config/hypr/input.lua` on Omarchy systems.
 
 ## Requirements
 
@@ -64,6 +65,7 @@ cd ~/dotfiles
 1. Skips `install.sh`, `README.md`, the repository-only `docs/` planning directory, and `herdr/` (installed into XDG config, not `~/.herdr`).
 1. Warns (does not overwrite) if a destination exists and is not a symlink.
 1. Symlinks `ssh/config` to `~/.ssh/config` if that path is missing; private keys remain unmanaged.
+1. On Omarchy, symlinks `omarchy/hypr/input.lua` to `~/.config/hypr/input.lua` if that path is missing.
 1. Creates `~/.config/nvim/init.vim` (if missing) with `source ~/.vimrc`.
 1. Symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
 1. Installs `vim-plug` for Neovim into:
@@ -323,6 +325,16 @@ Override the npm package if needed:
 
 ```sh
 T3_CODE_NPX_PACKAGE='actual-package@latest' npxt3
+```
+
+## Omarchy keyboard
+
+The tracked Omarchy input override maps Caps Lock to an additional Ctrl key with
+`kb_options = "ctrl:nocaps"`. Hyprland applies changes automatically; validate them with:
+
+```sh
+hyprctl reload
+hyprctl configerrors
 ```
 
 ## Local machine overrides

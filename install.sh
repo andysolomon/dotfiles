@@ -56,7 +56,7 @@ require_supported_nvim
 
 skip_top_level() {
   case "$1" in
-    install.sh|README.md|docs|herdr|ssh) return 0 ;;
+    install.sh|README.md|docs|herdr|omarchy|ssh) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -86,6 +86,19 @@ if [ -e "$ssh_config" ] || [ -L "$ssh_config" ]; then
 else
   echo "Creating $ssh_config"
   ln -s "$PWD/ssh/config" "$ssh_config"
+fi
+
+if [ -f /etc/os-release ] && grep -q '^ID=omarchy$' /etc/os-release; then
+  mkdir -p "$HOME/.config/hypr"
+  hypr_input="$HOME/.config/hypr/input.lua"
+  if [ -e "$hypr_input" ] || [ -L "$hypr_input" ]; then
+    if [ ! -L "$hypr_input" ]; then
+      echo "WARNING: $hypr_input exists but is not a symlink."
+    fi
+  else
+    echo "Creating $hypr_input"
+    ln -s "$PWD/omarchy/hypr/input.lua" "$hypr_input"
+  fi
 fi
 
 mkdir -p "$HOME/.config/nvim"
