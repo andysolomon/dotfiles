@@ -21,8 +21,9 @@ It is a false positive — this repo has no web app. Ignore it.
 
 - It iterates **every top-level file/dir** and symlinks it to `$HOME/.<name>`
   (e.g. `zshrc` → `~/.zshrc`, `vim/` → `~/.vim`). Skipped: `install.sh`, `README.md`,
-  `docs/` (repo planning), `herdr/` (XDG config, not `~/.herdr`), and `ssh/`
-  (installed as `~/.ssh/config`, without managing private keys). A new top-level file
+  `docs/` (repo planning), `herdr/` (XDG config, not `~/.herdr`), `omarchy/`
+  (Omarchy-specific XDG config), and `ssh/` (installed as `~/.ssh/config`, without
+  managing private keys). A new top-level file
   named `foo` becomes `~/.foo` on next install — name new files with that in mind.
 - It **never overwrites** top-level `~/.<name>` targets: if the destination already exists
   and is not a symlink, it only warns. Existing symlinks are left untouched. To re-link
@@ -32,6 +33,9 @@ It is a false positive — this repo has no web app. Ignore it.
 - It symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
 - It symlinks `ssh/config` to `~/.ssh/config`. A pre-existing real file is backed up to
   `~/.ssh/config.pre-dotfiles`. Keys and `known_hosts` remain machine-local.
+- On Omarchy, it copies `omarchy/hypr/input.lua` to `~/.config/hypr/input.lua`.
+  Hyprland's Lua loader requires the module beneath its config root, so this file cannot
+  be an out-of-tree symlink. A differing destination is timestamp-backed up first.
 
 ## Reload without reinstalling
 
@@ -118,6 +122,13 @@ symlinks it to `~/.config/herdr/config.toml`. Prefix is `ctrl+a`. Completions li
 - `tat` — attach/create a tmux session named after the current directory.
 - `git-churn` — rank files by commit frequency.
 - `replace` — project-wide find/replace helper.
+
+### Omarchy
+
+`omarchy/hypr/input.lua` is copied to `~/.config/hypr/input.lua` only on Omarchy
+systems. It cannot be an out-of-tree symlink because Hyprland's Lua module loader
+requires the file beneath its config root. Validate changes with `hyprctl reload` and
+`hyprctl configerrors`. The tracked override maps Caps Lock to Ctrl with `ctrl:nocaps`.
 
 ### SSH
 

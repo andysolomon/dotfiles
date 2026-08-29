@@ -56,7 +56,7 @@ require_supported_nvim
 
 skip_top_level() {
   case "$1" in
-    install.sh|README.md|docs|herdr|ssh) return 0 ;;
+    install.sh|README.md|docs|herdr|omarchy|ssh) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -94,6 +94,22 @@ elif [ -e "$ssh_config" ]; then
 else
   echo "Creating $ssh_config"
   ln -s "$ssh_source" "$ssh_config"
+fi
+
+if [ -f /etc/os-release ] && grep -q '^ID=omarchy$' /etc/os-release; then
+  mkdir -p "$HOME/.config/hypr"
+  hypr_input_source="$PWD/omarchy/hypr/input.lua"
+  hypr_input="$HOME/.config/hypr/input.lua"
+  if [ ! -e "$hypr_input" ] && [ ! -L "$hypr_input" ]; then
+    echo "Creating $hypr_input"
+    cp "$hypr_input_source" "$hypr_input"
+  elif [ -L "$hypr_input" ] || ! cmp -s "$hypr_input_source" "$hypr_input"; then
+    hypr_input_backup="$hypr_input.backup.$(date +%Y%m%d-%H%M%S)"
+    echo "Backing up $hypr_input to $hypr_input_backup"
+    cp -L "$hypr_input" "$hypr_input_backup"
+    rm "$hypr_input"
+    cp "$hypr_input_source" "$hypr_input"
+  fi
 fi
 
 mkdir -p "$HOME/.config/nvim"
