@@ -1,3 +1,19 @@
+## [1.6.0](https://github.com/andysolomon/dotfiles/compare/v1.5.0...v1.6.0) (2026-08-31)
+
+### Features
+
+* add Mac mini SSH alias ([42f3cef](https://github.com/andysolomon/dotfiles/commit/42f3cefd8c0422dfc9f359120ce1d37dbd159416))
+* attach Herdr on interactive SSH login ([#16](https://github.com/andysolomon/dotfiles/issues/16)) ([a47cc38](https://github.com/andysolomon/dotfiles/commit/a47cc3819cb36207c9a796d05798b1a9d7749cbf))
+* persist Herdr sessions and manage Omarchy config ([#23](https://github.com/andysolomon/dotfiles/issues/23)) ([1ae7675](https://github.com/andysolomon/dotfiles/commit/1ae76753886a437e3b5cf438a2faaa41c5c9fb03))
+* track Omarchy Caps Lock mapping ([b743dc7](https://github.com/andysolomon/dotfiles/commit/b743dc7fe2b9ff85db19e2578b9ca858dd9ebbd0))
+* track ssh config in dotfiles and switch herdr to ctrl+a ([#20](https://github.com/andysolomon/dotfiles/issues/20)) ([24f677f](https://github.com/andysolomon/dotfiles/commit/24f677f88e36535982106668678f8dec79c58788))
+
+### Bug Fixes
+
+* copy Omarchy input config into place ([80e73c7](https://github.com/andysolomon/dotfiles/commit/80e73c7e19bb37be1658e4e72fb30b1c97340465))
+* improve Tailscale SSH workflow ([95d578e](https://github.com/andysolomon/dotfiles/commit/95d578e500c0a37fc662afc01d65832b02c3ee3e))
+* update mise-managed Pi through launchers ([699ad5f](https://github.com/andysolomon/dotfiles/commit/699ad5ff59d5cb68be2eb9dfe3e38f56cb75ed55))
+
 ## [1.6.0](https://github.com/andysolomon/dotfiles/compare/v1.5.0...v1.6.0) (2026-08-29)
 
 ### Features
