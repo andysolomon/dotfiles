@@ -96,20 +96,54 @@ else
   ln -s "$ssh_source" "$ssh_config"
 fi
 
-if [ -f /etc/os-release ] && grep -q '^ID=omarchy$' /etc/os-release; then
-  mkdir -p "$HOME/.config/hypr"
-  hypr_input_source="$PWD/omarchy/hypr/input.lua"
-  hypr_input="$HOME/.config/hypr/input.lua"
-  if [ ! -e "$hypr_input" ] && [ ! -L "$hypr_input" ]; then
-    echo "Creating $hypr_input"
-    cp "$hypr_input_source" "$hypr_input"
-  elif [ -L "$hypr_input" ] || ! cmp -s "$hypr_input_source" "$hypr_input"; then
-    hypr_input_backup="$hypr_input.backup.$(date +%Y%m%d-%H%M%S)"
-    echo "Backing up $hypr_input to $hypr_input_backup"
-    cp -L "$hypr_input" "$hypr_input_backup"
-    rm "$hypr_input"
-    cp "$hypr_input_source" "$hypr_input"
+install_omarchy_copy() {
+  omarchy_source="$1"
+  omarchy_destination="$2"
+
+  if [ ! -e "$omarchy_destination" ] && [ ! -L "$omarchy_destination" ]; then
+    echo "Creating $omarchy_destination"
+    cp "$omarchy_source" "$omarchy_destination"
+  elif [ -L "$omarchy_destination" ] || [ ! -f "$omarchy_destination" ] || ! cmp -s "$omarchy_source" "$omarchy_destination"; then
+    omarchy_backup="$omarchy_destination.backup.$(date +%Y%m%d-%H%M%S)"
+    omarchy_backup_suffix=1
+    while [ -e "$omarchy_backup" ] || [ -L "$omarchy_backup" ]; do
+      omarchy_backup="$omarchy_destination.backup.$(date +%Y%m%d-%H%M%S).$omarchy_backup_suffix"
+      omarchy_backup_suffix=$((omarchy_backup_suffix + 1))
+    done
+    echo "Backing up $omarchy_destination to $omarchy_backup"
+    mv "$omarchy_destination" "$omarchy_backup"
+    cp "$omarchy_source" "$omarchy_destination"
   fi
+}
+
+install_omarchy_xcompose() {
+  omarchy_xcompose_source="$PWD/omarchy/XCompose"
+  omarchy_xcompose="$HOME/.XCompose"
+  omarchy_xcompose_local="$HOME/.XCompose.local"
+
+  if [ -e "$omarchy_xcompose_local" ] || [ -L "$omarchy_xcompose_local" ]; then
+    :
+  elif [ ! -e "$omarchy_xcompose" ] && [ ! -L "$omarchy_xcompose" ]; then
+    echo "Creating $omarchy_xcompose_local"
+    (umask 077 && : > "$omarchy_xcompose_local")
+    chmod 600 "$omarchy_xcompose_local"
+  elif [ -f "$omarchy_xcompose" ] && cmp -s "$omarchy_xcompose_source" "$omarchy_xcompose"; then
+    echo "Creating $omarchy_xcompose_local"
+    (umask 077 && : > "$omarchy_xcompose_local")
+    chmod 600 "$omarchy_xcompose_local"
+  else
+    echo "WARNING: $omarchy_xcompose_local is absent while $omarchy_xcompose differs from the tracked wrapper; leaving $omarchy_xcompose untouched." >&2
+    return 0
+  fi
+
+  install_omarchy_copy "$omarchy_xcompose_source" "$omarchy_xcompose"
+}
+
+if [ -f /etc/os-release ] && grep -q '^ID=omarchy$' /etc/os-release; then
+  mkdir -p "$HOME/.config/hypr" "$HOME/.config/omarchy"
+  install_omarchy_copy "$PWD/omarchy/hypr/input.lua" "$HOME/.config/hypr/input.lua"
+  install_omarchy_copy "$PWD/omarchy/shell.json" "$HOME/.config/omarchy/shell.json"
+  install_omarchy_xcompose
 fi
 
 mkdir -p "$HOME/.config/nvim"
@@ -126,6 +160,19 @@ if [ -e "$herdr_config" ] || [ -L "$herdr_config" ]; then
 else
   echo "Creating $herdr_config"
   ln -s "$PWD/herdr/config.toml" "$herdr_config"
+fi
+
+if command -v herdr >/dev/null 2>&1; then
+  for pi_agent_dir in "$HOME/.pi/agent" "$HOME/.arc-pi"; do
+    if [ ! -d "$pi_agent_dir" ]; then
+      continue
+    fi
+    if PI_CODING_AGENT_DIR="$pi_agent_dir" herdr integration install pi; then
+      :
+    else
+      echo "WARNING: Herdr Pi integration install failed for $pi_agent_dir." >&2
+    fi
+  done
 fi
 
 PLUG_PATH="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim"

@@ -335,6 +335,12 @@ Multiplexer. Prefix is `Ctrl+a`. Config: `herdr/config.toml` → `~/.config/herd
 | `Ctrl+a` `?` | Show live keybindings |
 | `herdr server reload-config` | Reload `config.toml` |
 
+Herdr automatically snapshots workspace, tab, and pane topology. Native
+agent-session resume requires current official integrations. This config enables
+it with `resume_agents_on_restore = true`. Normal Pi uses `~/.pi/agent`; ARC Pi
+uses `~/.arc-pi`. After the first installation, already-running Pi panes need
+`/reload`. Diagnose an installation with `herdr integration status`.
+
 ---
 
 ## Neovim

@@ -14,6 +14,7 @@ Personal shell, editor, tmux, and Herdr configuration with a bootstrap installer
 - [Key mappings and usage](#key-mappings-and-usage)
 - [tmux](#tmux)
 - [Herdr](#herdr)
+- [Omarchy configuration](#omarchy-configuration)
 - [Tailscale machine workflow](#tailscale-machine-workflow)
 - [Local machine overrides](#local-machine-overrides)
 - [Releases](#releases)
@@ -30,7 +31,10 @@ Personal shell, editor, tmux, and Herdr configuration with a bootstrap installer
 - `ssh/config`: tracked host aliases; installed as `~/.ssh/config` without managing private keys.
 - `docs/`: repository planning and decision records; it is intentionally not linked into `$HOME`.
 - `herdr/`: Herdr config; `install.sh` links `herdr/config.toml` to `~/.config/herdr/config.toml` instead of `~/.herdr`.
-- `omarchy/hypr/input.lua`: Omarchy keyboard overrides; copied to `~/.config/hypr/input.lua` on Omarchy systems.
+- `omarchy/`: an explicit allowlist of Omarchy user overrides copied on Omarchy systems:
+  - `hypr/input.lua` → `~/.config/hypr/input.lua`
+  - `shell.json` → `~/.config/omarchy/shell.json`
+  - `XCompose` → `~/.XCompose`, with private rules included from `~/.XCompose.local`
 
 ## Requirements
 
@@ -63,12 +67,14 @@ cd ~/dotfiles
 
 1. Fails before any home, plugin, or parser mutation unless `nvim` is available and reports 0.12+.
 1. Symlinks each top-level repo item to `$HOME` as a dotfile.
-1. Skips `install.sh`, `README.md`, the repository-only `docs/` planning directory, and `herdr/` (installed into XDG config, not `~/.herdr`).
+1. Skips `install.sh`, `README.md`, the repository-only `docs/` planning directory, `herdr/`, `omarchy/`, and `ssh/` from generic top-level symlinking.
 1. Warns (does not overwrite) if a destination exists and is not a symlink.
 1. Symlinks `ssh/config` to `~/.ssh/config`. If a real file is already there, it is moved to `~/.ssh/config.pre-dotfiles` first. Private keys remain unmanaged.
-1. On Omarchy, copies `omarchy/hypr/input.lua` to `~/.config/hypr/input.lua`; a differing existing file is timestamp-backed up first.
+1. On Omarchy, copies only the explicit allowlist: `omarchy/hypr/input.lua` to `~/.config/hypr/input.lua`, `omarchy/shell.json` to `~/.config/omarchy/shell.json`, and `omarchy/XCompose` to `~/.XCompose`. Parent directories are created as needed. Identical regular files are skipped; differing files and symlinks are moved to timestamped backups before replacement.
+1. For XCompose, preserves any existing `~/.XCompose.local`. If it is absent, an empty mode-600 file is created only when `~/.XCompose` is absent or already equals the tracked wrapper. If an existing `~/.XCompose` differs while the local file is absent, the installer warns and leaves it untouched.
 1. Creates `~/.config/nvim/init.vim` (if missing) with `source ~/.vimrc`.
 1. Symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
+1. If `herdr` is available, installs the official Pi integration separately for each existing `~/.pi/agent` and `~/.arc-pi` directory; missing directories are skipped and failures warn without stopping the installer.
 1. Installs `vim-plug` for Neovim into:
    - `${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim`
 1. Runs plugin install:
@@ -290,6 +296,13 @@ Herdr config is tracked as [`herdr/config.toml`](herdr/config.toml) and installe
 Prefix is `ctrl+a`. Detach with `Ctrl+a q`. Reload a running server with
 `herdr server reload-config`.
 
+Herdr automatically snapshots workspace, tab, and pane topology. Native
+agent-session resume requires current official integrations. This config enables
+it with `resume_agents_on_restore = true`. Normal Pi uses `~/.pi/agent`; ARC Pi
+uses `~/.arc-pi`. After the first installation, already-running Pi panes need
+`/reload` before they can use the integration. Diagnose an installation with
+`herdr integration status`.
+
 zsh completion is generated into [`zsh/completion/_herdr`](zsh/completion/_herdr)
 (`herdr completion zsh`). Re-source `~/.zshrc` (or open a new shell) after install.
 
@@ -342,18 +355,38 @@ Override the npm package if needed:
 T3_CODE_NPX_PACKAGE='actual-package@latest' npxt3
 ```
 
-## Omarchy keyboard
+## Omarchy configuration
 
-The tracked Omarchy input override maps Caps Lock to an additional Ctrl key with
-`kb_options = "ctrl:nocaps"`. It is copied rather than symlinked because Hyprland's
-Lua module loader requires the module beneath `~/.config/hypr`. Apply repository
-updates with `./install.sh`; a differing destination is backed up first. Hyprland
-applies changes automatically; validate them with:
+The installer manages only this Omarchy allowlist:
+
+- `omarchy/hypr/input.lua` → `~/.config/hypr/input.lua`
+- `omarchy/shell.json` → `~/.config/omarchy/shell.json`
+- `omarchy/XCompose` → `~/.XCompose`
+
+These are regular copies, not symlinks. Identical regular destinations are left
+alone. A differing file or any symlink is moved to a timestamped backup before the
+tracked copy replaces it. The tracked input override maps Caps Lock to an additional
+Ctrl key with `kb_options = "ctrl:nocaps"`.
+
+`XCompose` includes Omarchy's default compose sequences and the private local file
+with `include "%H/.XCompose.local"`. Existing local content is never overwritten.
+When that file is absent, the installer creates an empty mode-600 local file only if
+the destination is absent or already the tracked wrapper. If an existing destination
+differs while the local file is absent, it warns and leaves the destination untouched.
+
+Stock-identical Omarchy files, monitor configuration, generated/themed files, and
+Omarchy-installed first-run hooks remain unmanaged so Omarchy continues to own them.
+
+Apply repository updates with `./install.sh`. Hyprland applies input changes
+automatically; force a reload and validate it with:
 
 ```sh
 hyprctl reload
 hyprctl configerrors
 ```
+
+The Omarchy shell hot-reloads `shell.json`; use `omarchy restart shell` to force a
+reload. Apply XCompose changes with `omarchy restart xcompose`.
 
 ## Local machine overrides
 
@@ -364,6 +397,8 @@ Use local files for machine-specific customization:
 - `~/.vimrc.local`
 - `~/.zshrc.local` — sourced last by `zshrc`, so it can override anything above; put
   secrets and per-host tool setup here.
+- `~/.XCompose.local` — private XCompose rules included by the tracked Omarchy
+  wrapper; it is never tracked or overwritten by this repository.
 
 These are sourced conditionally if present.
 

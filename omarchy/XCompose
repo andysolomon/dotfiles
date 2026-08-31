@@ -1,0 +1,7 @@
+# Run omarchy restart xcompose to apply changes.
+
+# Include Omarchy's default compose sequences.
+include "/usr/share/omarchy/default/xcompose"
+
+# Include private, machine-local compose rules.
+include "%H/.XCompose.local"
