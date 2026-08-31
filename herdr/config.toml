@@ -1,4 +1,8 @@
+onboarding = false
 # Herdr is the multiplexer. Prefix is Ctrl+a (same chord as the old tmux config).
+
+[session]
+resume_agents_on_restore = true
 
 [ui]
 agent_panel_sort = "spaces"

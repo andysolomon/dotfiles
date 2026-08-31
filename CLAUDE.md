@@ -14,7 +14,7 @@ It is a false positive — this repo has no web app. Ignore it.
 ## Install / apply changes
 
 ```sh
-./install.sh   # symlink every top-level item to ~/.<name>, set up nvim, install plugins
+./install.sh   # symlink top-level items, apply the explicit Omarchy allowlist, set up nvim, install plugins
 ```
 
 `install.sh` is the deployment mechanism and the key thing to understand:
@@ -33,9 +33,17 @@ It is a false positive — this repo has no web app. Ignore it.
 - It symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
 - It symlinks `ssh/config` to `~/.ssh/config`. A pre-existing real file is backed up to
   `~/.ssh/config.pre-dotfiles`. Keys and `known_hosts` remain machine-local.
-- On Omarchy, it copies `omarchy/hypr/input.lua` to `~/.config/hypr/input.lua`.
-  Hyprland's Lua loader requires the module beneath its config root, so this file cannot
-  be an out-of-tree symlink. A differing destination is timestamp-backed up first.
+- On Omarchy, it copies only the explicit allowlist: `omarchy/hypr/input.lua` to
+  `~/.config/hypr/input.lua`, `omarchy/shell.json` to `~/.config/omarchy/shell.json`,
+  and `omarchy/XCompose` to `~/.XCompose`. Parent directories are created as needed.
+  Copies are regular files, not symlinks; identical regular destinations are skipped,
+  while differing files and symlinks are moved to timestamped backups before replacement.
+- XCompose includes Omarchy's default sequences and `include "%H/.XCompose.local"`.
+  An existing `~/.XCompose.local` is preserved. If it is absent, an empty mode-600 file
+  is created only when `~/.XCompose` is absent or already equals the tracked wrapper; a
+  differing destination with no local file is warned about and left untouched.
+- Stock-identical Omarchy files, monitor configuration, generated/themed files, and
+  Omarchy-installed first-run hooks remain unmanaged.
 
 ## Reload without reinstalling
 
@@ -43,6 +51,9 @@ It is a false positive — this repo has no web app. Ignore it.
 - Vim/Neovim: `:source ~/.vimrc`
 - tmux: `tmux source-file ~/.tmux.conf`
 - Herdr: `herdr server reload-config`
+- Hyprland input: `hyprctl reload`, then `hyprctl configerrors`
+- Omarchy shell: hot-reloads `~/.config/omarchy/shell.json`; force with `omarchy restart shell`
+- XCompose: `omarchy restart xcompose`
 
 ## Architecture
 
@@ -127,10 +138,24 @@ symlinks it to `~/.config/herdr/config.toml`. Prefix is `ctrl+a`. Completions li
 
 ### Omarchy
 
-`omarchy/hypr/input.lua` is copied to `~/.config/hypr/input.lua` only on Omarchy
-systems. It cannot be an out-of-tree symlink because Hyprland's Lua module loader
-requires the file beneath its config root. Validate changes with `hyprctl reload` and
-`hyprctl configerrors`. The tracked override maps Caps Lock to Ctrl with `ctrl:nocaps`.
+The installer manages this explicit allowlist only on Omarchy systems:
+
+- `omarchy/hypr/input.lua` → `~/.config/hypr/input.lua`
+- `omarchy/shell.json` → `~/.config/omarchy/shell.json`
+- `omarchy/XCompose` → `~/.XCompose`
+
+These files are copied beneath their live destinations because Hyprland's Lua module
+loader requires `input.lua` beneath its config root and the other overrides are also
+intended to be regular files. Identical regular files are no-ops; differing files and
+symlinks are moved to timestamped backups before replacement. The input override maps
+Caps Lock to Ctrl with `ctrl:nocaps`.
+
+The tracked XCompose wrapper includes Omarchy's default sequences and the private
+`include "%H/.XCompose.local"`. Existing local content is never overwritten. A local
+file is created empty with mode 600 only when absent and safe to initialize; if a local
+file is absent while an existing `~/.XCompose` differs from the wrapper, the installer
+warns and leaves that destination untouched. Stock-identical Omarchy files, monitor
+configuration, generated/themed files, and first-run hooks remain unmanaged.
 
 ### SSH
 
@@ -148,7 +173,8 @@ Use this shared machine inventory for remote operations. Confirm `hostname` and
 ## Conventions
 
 - Local, non-committed customization goes in `*.local` files (`~/.aliases.local`,
-  `~/.vimrc.local`, `~/.zshrc.local`, `~/.vimrc.bundles.local`), sourced only if present.
+  `~/.vimrc.local`, `~/.zshrc.local`, `~/.vimrc.bundles.local`, `~/.XCompose.local`),
+  sourced or included only if present.
   Put machine-specific secrets/paths there, not in the tracked files.
 - `mac` and `macos.txt` are opinionated, optional macOS system bootstrap (Homebrew, defaults).
   They are not run by `install.sh` — invoke `./mac` deliberately, only if wanted.
