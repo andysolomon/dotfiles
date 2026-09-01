@@ -303,6 +303,11 @@ uses `~/.arc-pi`. After the first installation, already-running Pi panes need
 `/reload` before they can use the integration. Diagnose an installation with
 `herdr integration status`.
 
+ARC Pi publishes a blocked agent state while an operator question or approval is
+open. Herdr renders that state as an in-app toast (`[ui.toast] delivery =
+"herdr"`) and clears it when the prompt is answered, cancelled, or fails. The
+notification uses a generic label and never includes the question text.
+
 zsh completion is generated into [`zsh/completion/_herdr`](zsh/completion/_herdr)
 (`herdr completion zsh`). Re-source `~/.zshrc` (or open a new shell) after install.
 

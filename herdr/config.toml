@@ -8,6 +8,11 @@ resume_agents_on_restore = true
 agent_panel_sort = "spaces"
 mouse_capture = true
 
+# Show ARC Pi prompts that are waiting for operator input inside Herdr.
+[ui.toast]
+delivery = "herdr"
+delay_seconds = 0
+
 [keys]
 prefix = "ctrl+a"
 

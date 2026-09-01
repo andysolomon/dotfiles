@@ -126,6 +126,11 @@ Tailscale Macs: `andrews-mac-mini` / `Andrews-Mac-mini` is green,
 symlinks it to `~/.config/herdr/config.toml`. Prefix is `ctrl+a`. Completions live in
 `zsh/completion/_herdr`.
 
+Herdr in-app toasts are enabled for ARC Pi operator prompts. ARC Pi publishes a
+blocked agent state while a question or approval is open and clears it when the
+prompt settles; the notification label is generic and does not expose question
+text.
+
 ### bin/ utilities (on PATH)
 
 - `generate-vim-plugin-inventory` — see above.
