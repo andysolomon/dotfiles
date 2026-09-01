@@ -1,3 +1,10 @@
+## [1.8.0](https://github.com/andysolomon/dotfiles/compare/v1.7.0...v1.8.0) (2026-09-01)
+
+### Features
+
+* finish Herdr-only multiplexer cutover ([a0ae492](https://github.com/andysolomon/dotfiles/commit/a0ae4925a3bb9231170a7bc9e71fb9e347aea354))
+* **vim:** refresh NERDTree when the tree is visible ([458fb51](https://github.com/andysolomon/dotfiles/commit/458fb5196231c2d0ccaa143dbccbda4704d22562))
+
 ## [1.7.0](https://github.com/andysolomon/dotfiles/compare/v1.6.0...v1.7.0) (2026-08-31)
 
 ### Features
