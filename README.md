@@ -1,6 +1,6 @@
 # Dotfiles
 
-Personal shell, editor, tmux, and Herdr configuration with a bootstrap installer.
+Personal shell, editor, and Herdr configuration with a bootstrap installer.
 
 ## Contents
 
@@ -12,8 +12,8 @@ Personal shell, editor, tmux, and Herdr configuration with a bootstrap installer
 - [Neovim and Vim](#neovim-and-vim)
 - [Plugin management](#plugin-management)
 - [Key mappings and usage](#key-mappings-and-usage)
-- [tmux](#tmux)
 - [Herdr](#herdr)
+- [tmux (emergency hatch)](#tmux-emergency-hatch)
 - [Omarchy configuration](#omarchy-configuration)
 - [Tailscale machine workflow](#tailscale-machine-workflow)
 - [Local machine overrides](#local-machine-overrides)
@@ -26,7 +26,7 @@ Personal shell, editor, tmux, and Herdr configuration with a bootstrap installer
 - `zshrc` and `zsh/`: shell options, prompt, completions, and shell helpers.
 - `aliases`: command aliases for git/workflow shortcuts.
 - `vimrc*` and `vim/`: Vim + Neovim settings and plugin config.
-- `tmux.conf` and `.tmux/`: tmux behavior and TPM plugin setup.
+- `tmux.conf` and `.tmux/`: leftover tmux config kept only as a soak-period emergency hatch; daily multiplexing is Herdr.
 - `bin/`: utility scripts (`git-churn`, `replace`, `tat`, etc).
 - `ssh/config`: tracked host aliases; installed as `~/.ssh/config` without managing private keys.
 - `docs/`: repository planning and decision records; it is intentionally not linked into `$HOME`.
@@ -72,6 +72,7 @@ cd ~/dotfiles
 1. Symlinks `ssh/config` to `~/.ssh/config`. If a real file is already there, it is moved to `~/.ssh/config.pre-dotfiles` first. Private keys remain unmanaged.
 1. On Omarchy, copies only the explicit allowlist: `omarchy/hypr/input.lua` to `~/.config/hypr/input.lua`, `omarchy/shell.json` to `~/.config/omarchy/shell.json`, and `omarchy/XCompose` to `~/.XCompose`. Parent directories are created as needed. Identical regular files are skipped; differing files and symlinks are moved to timestamped backups before replacement.
 1. For XCompose, preserves any existing `~/.XCompose.local`. If it is absent, an empty mode-600 file is created only when `~/.XCompose` is absent or already equals the tracked wrapper. If an existing `~/.XCompose` differs while the local file is absent, the installer warns and leaves it untouched.
+1. If `~/.bin` is already a real directory (not a symlink to `bin/`), links each executable from `bin/` into `~/.bin/` so `tat` and the other PATH utilities resolve.
 1. Creates `~/.config/nvim/init.vim` (if missing) with `source ~/.vimrc`.
 1. Symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
 1. If `herdr` is available, installs the official Pi integration separately for each existing `~/.pi/agent` and `~/.arc-pi` directory; missing directories are skipped and failures warn without stopping the installer.
@@ -245,56 +246,21 @@ call nerdcommenter#Comment('x', 'toggle')
 - `<leader>x`: save and quit
 - `<leader>q`: quit
 
-## tmux
-
-### Prefix
-
-Prefix is `Ctrl+a` (default `Ctrl+b` is unbound).
-
-### Useful behavior
-
-- Vim-like pane navigation with `h/j/k/l`
-- Split windows in current pane path
-- Mouse toggle:
-  - `prefix + m` enables mouse
-  - `prefix + M` disables mouse
-- Copy mode uses vi keys and copies to macOS clipboard via `reattach-to-user-namespace` when available.
-
-### Plugins
-
-Configured with TPM:
-
-- `tmux-plugins/tpm`
-- `tmux-plugins/tmux-sensible`
-- `tmux-plugins/tmux-resurrect` (save hook records pi/claude/agent session IDs for resume)
-- `tmux-plugins/tmux-battery`
-
-### Host colors and SSH auto-attach
-
-Known Tailscale Macs get host-specific tmux status colors:
-
-- `andrews-mac-mini` / `Andrews-Mac-mini`: green
-- `qianas-macbook-pro`: blue
-- Unknown hosts: yellow
-
-Interactive SSH shells attach to the host's Herdr session via
-[`zsh/configs/post/ssh-herdr.zsh`](zsh/configs/post/ssh-herdr.zsh) (`exec herdr`).
-If Herdr is not installed, they fall back to a tmux session named `ssh-$HOST`.
-Skipped when `NO_AUTO_TMUX=1` or when the shell is already inside Herdr
-(`HERDR_ENV=1`). Bypass for one session by setting the variable on the remote shell:
-
-```sh
-ssh -t mini 'NO_AUTO_TMUX=1 exec zsh -l'
-```
-
 ## Herdr
 
-Herdr config is tracked as [`herdr/config.toml`](herdr/config.toml) and installed to
-`~/.config/herdr/config.toml`. The top-level `herdr/` directory is not symlinked to
-`~/.herdr`.
+Herdr is the terminal multiplexer. Config is tracked as
+[`herdr/config.toml`](herdr/config.toml) and installed to
+`~/.config/herdr/config.toml`. The top-level `herdr/` directory is not
+symlinked to `~/.herdr`.
 
-Prefix is `ctrl+a`. Detach with `Ctrl+a q`. Reload a running server with
-`herdr server reload-config`.
+Prefix is `Ctrl+a`. Detach with `Ctrl+a q`. Reload a running server with
+`herdr server reload-config` or `Ctrl+a Shift+r` (`Ctrl+a r` is resize mode).
+A prefix change may need `herdr server stop` followed by `herdr` rather than
+reload alone. Last pane is `Ctrl+a ;` because `Ctrl+a Ctrl+a` sends a literal
+prefix.
+
+`tat` focuses an existing workspace for `$PWD` (pane cwd or basename label) or
+creates one. One default session per machine; use workspaces for projects.
 
 Herdr automatically snapshots workspace, tab, and pane topology. Native
 agent-session resume requires current official integrations. This config enables
@@ -310,6 +276,30 @@ notification uses a generic label and never includes the question text.
 
 zsh completion is generated into [`zsh/completion/_herdr`](zsh/completion/_herdr)
 (`herdr completion zsh`). Re-source `~/.zshrc` (or open a new shell) after install.
+
+Interactive SSH shells attach to the host's Herdr session via
+[`zsh/configs/post/ssh-herdr.zsh`](zsh/configs/post/ssh-herdr.zsh) (`exec herdr`).
+Skipped when `NO_AUTO_HERDR=1`, `NO_AUTO_TMUX=1`, or when the shell is already
+inside Herdr (`HERDR_ENV=1`). If Herdr is not installed, SSH stays a plain
+shell. Bypass for one session with:
+
+```sh
+ssh -t mini 'NO_AUTO_HERDR=1 exec zsh -l'
+```
+
+Optional local thin client (does not replace SSH auto-attach):
+
+```sh
+herdr --remote andrews-mac-mini
+herdr --remote qianas-macbook-pro
+```
+
+## tmux (emergency hatch)
+
+`tmux.conf` remains in the repo until the Herdr-only soak is done. Do not nest
+tmux inside Herdr. To roll back to tmux, check out the last commit that treated
+tmux as daily config and run `tmux source-file ~/.tmux.conf`. Leave the Homebrew
+`tmux` formula installed.
 
 ## Tailscale machine workflow
 
@@ -338,7 +328,6 @@ To apply these dotfiles on another Mac:
 cd ~/dotfiles
 git pull --ff-only
 ./install.sh
-tmux source-file ~/.tmux.conf
 herdr server reload-config
 ```
 
@@ -507,19 +496,26 @@ zsh -lic 'nvim --headless -u ~/.vimrc.bundles "+lua require(\"nvim-treesitter\")
   or report that local ESLint has no config.
 - In untrusted checkouts, run `:DotfilesTypeScriptLintDisable` before saving.
 
-### tmux keybindings not applying
+### Herdr keybindings not applying
 
 Ensure config is linked:
 
 ```sh
-ln -s ~/dotfiles/tmux.conf ~/.tmux.conf
+ln -s ~/dotfiles/herdr/config.toml ~/.config/herdr/config.toml
 ```
 
-Reload tmux config:
+Reload:
 
 ```sh
-tmux source-file ~/.tmux.conf
+herdr server reload-config
 ```
+
+A prefix change may require restarting the server (`herdr server stop`, then
+`herdr`) rather than reload alone.
+
+If interactive SSH does not attach Herdr, confirm `herdr` is on PATH or at
+`~/.local/bin/herdr`. Missing Herdr now leaves a plain shell instead of falling
+back to tmux.
 
 ## Optional macOS bootstrap
 

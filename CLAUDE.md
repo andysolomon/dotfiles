@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Personal dotfiles for zsh, Vim/Neovim, tmux, and Herdr, deployed to `$HOME` by a symlink-based
+Personal dotfiles for zsh, Vim/Neovim, and Herdr, deployed to `$HOME` by a symlink-based
 installer. There is no build or test suite — "running" a change means re-sourcing the
 relevant config and confirming it loads without error.
 
@@ -28,6 +28,8 @@ It is a false positive — this repo has no web app. Ignore it.
 - It **never overwrites** top-level `~/.<name>` targets: if the destination already exists
   and is not a symlink, it only warns. Existing symlinks are left untouched. To re-link
   after renaming, remove the old symlink manually.
+- If `~/.bin` already exists as a directory, it still links each executable from `bin/`
+  into `~/.bin/` (PATH comes from `zsh/configs/post/path.zsh`).
 - It writes `~/.config/nvim/init.vim` (containing `source ~/.vimrc`) so Neovim reuses the
   Vim config, installs `vim-plug`, then runs `PlugInstall --sync`.
 - It symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
@@ -49,7 +51,6 @@ It is a false positive — this repo has no web app. Ignore it.
 
 - zsh: `source ~/.zshrc`
 - Vim/Neovim: `:source ~/.vimrc`
-- tmux: `tmux source-file ~/.tmux.conf`
 - Herdr: `herdr server reload-config`
 - Hyprland input: `hyprctl reload`, then `hyprctl configerrors`
 - Omarchy shell: hot-reloads `~/.config/omarchy/shell.json`; force with `omarchy restart shell`
@@ -108,18 +109,6 @@ bin/generate-vim-plugin-inventory
 `aliases` is a separate top-level file (→ `~/.aliases`) and is Ruby/Rails-era; it sources
 `~/.aliases.local` for machine-specific additions.
 
-### tmux
-
-`tmux.conf` (→ `~/.tmux.conf`) with prefix remapped to `Ctrl+a`, vi-style pane navigation,
-and TPM-managed plugins (`tpm`, `tmux-sensible`, `tmux-resurrect`, `tmux-battery`).
-`.tmux/` holds TPM itself.
-
-SSH shells attach to Herdr through `zsh/configs/post/ssh-herdr.zsh` (`exec herdr`)
-unless `NO_AUTO_TMUX=1` or `HERDR_ENV=1` is set. If Herdr is missing, they fall
-back to tmux (`ssh-$HOST`). The tmux status bar is host-color-coded for known
-Tailscale Macs: `andrews-mac-mini` / `Andrews-Mac-mini` is green,
-`qianas-macbook-pro` is blue, and unknown hosts are yellow.
-
 ### Herdr
 
 `herdr/config.toml` is repository-only at the top level (not `~/.herdr`). `install.sh`
@@ -131,13 +120,20 @@ blocked agent state while a question or approval is open and clears it when the
 prompt settles; the notification label is generic and does not expose question
 text.
 
+SSH shells attach to Herdr through `zsh/configs/post/ssh-herdr.zsh` (`exec herdr`)
+unless `NO_AUTO_HERDR=1`, `NO_AUTO_TMUX=1`, or `HERDR_ENV=1` is set. If Herdr is
+missing, SSH stays a plain shell.
+
+`tmux.conf` is still tracked as a soak-period emergency hatch. Do not nest tmux
+inside Herdr.
+
 ### bin/ utilities (on PATH)
 
 - `generate-vim-plugin-inventory` — see above.
 - `pi` — forward normal commands to mise-managed Pi; translate Pi self-updates to
   `mise upgrade pi`, including updates requested through ARC Pi.
 - `npxt3` — run T3 Code through `npx -y ${T3_CODE_NPX_PACKAGE:-t3@latest}`.
-- `tat` — attach/create a tmux session named after the current directory.
+- `tat` — focus or create a Herdr workspace for the current directory.
 - `git-churn` — rank files by commit frequency.
 - `replace` — project-wide find/replace helper.
 
