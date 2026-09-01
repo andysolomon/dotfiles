@@ -146,6 +146,25 @@ if [ -f /etc/os-release ] && grep -q '^ID=omarchy$' /etc/os-release; then
   install_omarchy_xcompose
 fi
 
+# ~/.bin is on PATH (zsh/configs/post/path.zsh). If it is already a real
+# directory, the top-level loop cannot replace it with a symlink to bin/, so
+# link each executable into ~/.bin the same way npxt3 was installed.
+if [ -d bin ] && [ -d "$HOME/.bin" ] && [ ! -L "$HOME/.bin" ]; then
+  for script in bin/*; do
+    [ -f "$script" ] && [ -x "$script" ] || continue
+    name="$(basename "$script")"
+    target="$HOME/.bin/$name"
+    if [ -e "$target" ] || [ -L "$target" ]; then
+      if [ ! -L "$target" ]; then
+        echo "WARNING: $target exists but is not a symlink."
+      fi
+    else
+      echo "Creating $target"
+      ln -s "$PWD/$script" "$target"
+    fi
+  done
+fi
+
 mkdir -p "$HOME/.config/nvim"
 if [ ! -f "$HOME/.config/nvim/init.vim" ]; then
   printf 'source ~/.vimrc\n' > "$HOME/.config/nvim/init.vim"

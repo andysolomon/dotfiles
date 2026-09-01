@@ -1,6 +1,90 @@
 #!/bin/sh
 #
-# Attach to tmux session named the same as current directory.
+# Focus or create a Herdr workspace for the current directory.
+# Matches an existing workspace by pane cwd, then by label == basename($PWD).
+# Outside Herdr, attaches after ensuring the workspace exists.
 #
+set -eu
 
-tmux attach -t `basename $PWD`
+label="$(basename "$PWD")"
+cwd="$(pwd -P 2>/dev/null || pwd)"
+
+herdr_bin=""
+if command -v herdr >/dev/null 2>&1; then
+  herdr_bin="$(command -v herdr)"
+elif [ -x "$HOME/.local/bin/herdr" ]; then
+  herdr_bin="$HOME/.local/bin/herdr"
+else
+  echo "tat: herdr not found on PATH or in ~/.local/bin" >&2
+  exit 1
+fi
+
+ensure_server() {
+  if "$herdr_bin" status server >/dev/null 2>&1; then
+    return 0
+  fi
+  "$herdr_bin" server >/dev/null 2>&1 &
+  i=0
+  while [ "$i" -lt 50 ]; do
+    if "$herdr_bin" status server >/dev/null 2>&1; then
+      return 0
+    fi
+    i=$((i + 1))
+    sleep 0.1
+  done
+  echo "tat: herdr server did not start" >&2
+  exit 1
+}
+
+ensure_server
+
+workspace_id="$(
+  LABEL="$label" CWD="$cwd" HERDR="$herdr_bin" python3 - <<'PY'
+import json, os, subprocess, sys
+
+herdr = os.environ["HERDR"]
+label = os.environ["LABEL"]
+cwd = os.path.realpath(os.environ["CWD"])
+
+def load(args):
+    raw = subprocess.check_output([herdr, *args], text=True)
+    return json.loads(raw)
+
+try:
+    listed = load(["workspace", "list"])
+except subprocess.CalledProcessError:
+    sys.exit(0)
+
+workspaces = listed.get("result", {}).get("workspaces") or []
+label_hit = None
+for workspace in workspaces:
+    workspace_id = workspace.get("workspace_id") or ""
+    if not workspace_id:
+        continue
+    if workspace.get("label") == label and label_hit is None:
+        label_hit = workspace_id
+    try:
+        panes = load(["pane", "list", "--workspace", workspace_id])
+    except subprocess.CalledProcessError:
+        continue
+    for pane in panes.get("result", {}).get("panes") or []:
+        pane_cwd = pane.get("foreground_cwd") or pane.get("cwd") or ""
+        if pane_cwd and os.path.realpath(pane_cwd) == cwd:
+            print(workspace_id)
+            sys.exit(0)
+if label_hit:
+    print(label_hit)
+PY
+)"
+
+if [ -n "$workspace_id" ]; then
+  "$herdr_bin" workspace focus "$workspace_id" >/dev/null
+else
+  "$herdr_bin" workspace create --cwd "$cwd" --label "$label" --focus >/dev/null
+fi
+
+# Attach only from a bare terminal. Skip when already in Herdr, or still inside
+# leftover tmux (nested-tmux soak), so we do not exec a nested client.
+if [ -z "${HERDR_ENV:-}" ] && [ -z "${TMUX:-}" ]; then
+  exec "$herdr_bin"
+fi

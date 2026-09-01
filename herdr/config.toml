@@ -1,5 +1,6 @@
 onboarding = false
 # Herdr is the multiplexer. Prefix is Ctrl+a (same chord as the old tmux config).
+# Keys limited to herdr 0.8.0 (tab_bar_right / window_title are newer).
 
 [session]
 resume_agents_on_restore = true
@@ -8,8 +9,13 @@ resume_agents_on_restore = true
 agent_panel_sort = "spaces"
 mouse_capture = true
 
+[terminal]
+new_cwd = "follow"
+
 [keys]
 prefix = "ctrl+a"
+# prefix+ctrl+a is reserved (sends a literal prefix). tmux last-pane was `;`.
+last_pane = "prefix+semicolon"
 
 # Keep Control held after the prefix. Without these aliases Herdr sees ctrl+h
 # (etc.), finds no binding, and silently drops the key.
@@ -24,8 +30,8 @@ focus_pane_left = ["prefix+h", "prefix+ctrl+h"]
 focus_pane_down = ["prefix+j", "prefix+ctrl+j"]
 focus_pane_up = ["prefix+k", "prefix+ctrl+k"]
 focus_pane_right = ["prefix+l", "prefix+ctrl+l"]
-split_vertical = ["prefix+v", "prefix+ctrl+v"]
+split_vertical = ["prefix+v", "prefix+ctrl+v", "prefix+%", "prefix+|"]
 split_horizontal = ["prefix+minus", "prefix+ctrl+minus"]
 close_pane = ["prefix+x", "prefix+ctrl+x"]
-zoom = ["prefix+z", "prefix+ctrl+z"]
+zoom = ["prefix+z", "prefix+ctrl+z", "prefix+plus"]
 toggle_sidebar = ["prefix+b", "prefix+ctrl+b"]

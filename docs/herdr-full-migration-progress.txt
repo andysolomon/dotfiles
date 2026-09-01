@@ -1,0 +1,64 @@
+herdr-full-migration - Herdr Full-Time Migration - Progress
+Generated: 2026-08-21 10:25:00 EDT
+Updated: 2026-08-21 10:45:00 EDT
+Cutover: 2026-08-21 10:50:00 EDT
+Plan: docs/herdr-full-migration-IMPLEMENTATION_PLAN.md
+On completion, move this file and the plan to docs/archive/.
+
+Phase 1 inventory (Andrews-Mac-mini, 2026-08-21):
+- herdr 0.8.0 at ~/.local/bin/herdr (direct install; Homebrew formula herdr 0.8.2 is available but not installed)
+- herdr status: server running, protocol 19, socket ~/.config/herdr/herdr.sock
+- brew services: no herdr service (formula not installed, so brew services start herdr is blocked until brew install herdr)
+- integrations current: pi v8, claude v7, cursor v1, plus codex/droid/opencode/kilo/hermes
+- tmux2herdr: not installed; keys hand-merged from tmux.conf
+- MacBook Herdr/tmux state: unknown (not authorized)
+
+Cutover (2026-08-21):
+- Created Herdr workspaces: arc-board, arc-skill-eval, sprtsmng, kingstonsolomon, myresume, arc-orchestrator, orchestrator, arc-worlds, arc-clis, arc-sim, codebase-atlas (plus existing ~, pi-extend, arc-chalk, arc-fnm, dotfiles)
+- Agent resume map written to ~/.config/herdr/tmux-cutover-restore.tsv (not git)
+- herdr server reload-config applied; dropped 0.8.0-unknown keys (tab_bar_right, window_title); last_pane is prefix+semicolon
+- tmux kill-server scheduled as the live cutover
+- brew services still blocked: herdr is ~/.local/bin, not the Homebrew formula
+
+Section 2 decisions (confirmed by execute request, unchanged):
+prefix ctrl+a; one session + workspaces; drop host colors; keep brew tmux; SSH stays exec herdr; keep NO_AUTO_TMUX plus NO_AUTO_HERDR.
+
+[x] 1.0 - Phase 1 - Inventory the live nested setup and confirm decisions
+    [x] 1.1 - Record Mac mini herdr --version, herdr status, brew services list, and herdr integration status in this file
+    [x] 1.2 - Dump tmux ls and tmux list-windows -a (plus pane commands) as the cutover inventory; do not kill tmux yet
+    [x] 1.3 - Run tmux2herdr ~/.tmux.conf --dry-run (or herdr plugin preview) and keep the output as reference only
+    [x] 1.4 - Confirm section 2 decisions: prefix ctrl+a, one session + workspaces, drop host colors, keep brew tmux, SSH stays exec herdr
+    [x] 1.5 - Note MacBook Herdr/tmux state as unknown until explicitly authorized
+
+[x] 2.0 - Phase 2 - Move daily panes into Herdr and take the prefix
+    [x] 2.1 - Hand-merge herdr/config.toml: prefix ctrl+a, daily splits/hjkl/tabs/zoom/copy/detach/reload, new_cwd follow, resume_agents_on_restore, onboarding false
+    [x] 2.2 - Leave experimental.allow_nested and experimental.pane_history unset/false; do not redirect tmux2herdr onto config.toml
+    [x] 2.3 - Install/upgrade official Herdr integrations for pi, Claude Code, and Cursor Agent; verify herdr integration status
+    [x] 2.4 - herdr server reload-config, and restart the server if prefix does not apply until restart
+    [x] 2.5 - Recreate one Herdr workspace per active project from the Phase 1 inventory and relaunch agents with native resume flags
+    [x] 2.6 - Confirm no daily pane is tmux attach, then tmux kill-server on the Mac mini
+    [ ] 2.7 - brew services start herdr and verify detach Ctrl+a q / reattach herdr restores the same workspaces
+
+[x] 3.0 - Phase 3 - Replace tmux-only scripts and close the SSH fallback
+    [x] 3.1 - Rewrite bin/tat to list-and-focus a matching Herdr workspace or create --cwd "$PWD" --label basename --focus; never call tmux
+    [x] 3.2 - Update zsh/configs/post/ssh-herdr.zsh to honor NO_AUTO_HERDR and NO_AUTO_TMUX, keep exec herdr, and remove the tmux fallback
+    [x] 3.3 - Document optional herdr --remote <host> in README without changing auto-attach to that path
+    [x] 3.4 - Verify tat from a repo dir focuses or creates exactly one workspace, and SSH still lands in the existing Herdr session
+
+[x] 4.0 - Phase 4 - Align user and agent documentation
+    [x] 4.1 - Rewrite CHEATSHEET.md mental model to terminal → herdr → zsh → nvim and replace the tmux key tables with Herdr
+    [x] 4.2 - Update README.md multiplexer/SSH/reload/troubleshooting sections to Herdr-only
+    [x] 4.3 - Update CLAUDE.md architecture, reload, tat, and SSH auto-attach to match shipped Herdr behavior
+    [x] 4.4 - Update .agents/skills/tailscale-machine-ops/SKILL.md so agents no longer install or attach tmux for SSH
+
+[ ] 5.0 - Phase 5 - Retire tracked tmux config after soak
+    [ ] 5.1 - Soak on the Mac mini: multiple detach/reattach cycles, one brew services restart herdr or reboot, one SSH attach
+    [ ] 5.2 - Remove tmux.conf, bin/tmux-agent-sessions, and tracked .tmux/ plugin tree from the repo
+    [ ] 5.3 - Confirm install.sh still links Herdr config and no longer creates a new ~/.tmux.conf; do not delete existing home symlinks from install.sh
+    [ ] 5.4 - Document the emergency hatch (keep brew tmux installed; restore tmux.conf from git history) and do not brew uninstall tmux
+
+[ ] 6.0 - Phase 6 - Verify, ship, and archive
+    [ ] 6.1 - Run the Mac mini verification matrix from the plan (keys, tat, SSH, NO_AUTO_HERDR, agent resume, no nested tmux)
+    [ ] 6.2 - With explicit authorization only, pull/install/reload on qianas-macbook-pro and repeat SSH/tat/services checks
+    [x] 6.3 - Open the shipping PR on feat/herdr-full-migration only when explicitly requested
+    [ ] 6.4 - On merge: move docs/herdr-full-migration-IMPLEMENTATION_PLAN.md and docs/herdr-full-migration-progress.txt to docs/archive/
