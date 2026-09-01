@@ -1,3 +1,9 @@
+## [1.9.0](https://github.com/andysolomon/dotfiles/compare/v1.8.0...v1.9.0) (2026-09-01)
+
+### Features
+
+* show ARC Pi prompts in Herdr ([f7dc9b9](https://github.com/andysolomon/dotfiles/commit/f7dc9b9e74bffaf0af15a33767942d10d543fb5b))
+
 ## [1.8.0](https://github.com/andysolomon/dotfiles/compare/v1.7.0...v1.8.0) (2026-09-01)
 
 ### Features
