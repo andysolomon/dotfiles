@@ -16,6 +16,32 @@ noremap <C-T> :NERDTreeToggle<CR>
 nmap <leader>n :NERDTreeFind<CR>R
 autocmd vimenter * NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+function! s:NERDTreeIsVisible() abort
+  if !exists('g:NERDTree') || !g:NERDTree.IsOpen()
+    return 0
+  endif
+  let l:winnr = g:NERDTree.GetWinNum()
+  return l:winnr > 0 && winwidth(l:winnr) > 0 && winheight(l:winnr) > 0
+endfunction
+
+function! s:NERDTreeMaybeRefresh() abort
+  if !s:NERDTreeIsVisible()
+    return
+  endif
+  silent! NERDTreeRefreshRoot
+endfunction
+
+augroup NERDTreeAutoRefresh
+  autocmd!
+  " Pick up files created/changed outside nvim (git, touch, another app)
+  autocmd FocusGained * call s:NERDTreeMaybeRefresh()
+  " Pick up files created/saved/deleted inside nvim
+  autocmd BufWritePost,BufDelete * call s:NERDTreeMaybeRefresh()
+  " Pick up files from shell commands (:!, :terminal)
+  autocmd ShellCmdPost * call s:NERDTreeMaybeRefresh()
+augroup END
+
 " Nerd Font fallback:
 " - Use Nerd Font icons by default.
 " - Set DOTFILES_NERD_FONT=0 to force ASCII-safe rendering on machines without Nerd Fonts.

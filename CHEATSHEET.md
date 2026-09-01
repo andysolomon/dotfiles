@@ -10,7 +10,7 @@ Print-friendly one-pager. Regenerate or extend as your config changes.
 
 ```
 Terminal app (Ghostty / iTerm / etc.)
-  └─ herdr        multiplexer (prefix Ctrl+a)
+  └─ herdr        multiplexer (prefix Ctrl+a); one workspace per project
        └─ zsh     history, completion, aliases, shell functions
             └─ nvim   edit files, grep, LSP, Copilot, NERDTree
 ```
@@ -30,11 +30,11 @@ Terminal app (Ghostty / iTerm / etc.)
 | `Ctrl+R` | Search shell history |
 | `Ctrl+A` / `Ctrl+E` | Line start / end (shell) |
 | `Ctrl+Q` | Stash current line, run something else, pop it back |
-| `Ctrl+a` | herdr prefix |
-| `Ctrl+a` `v` / `-` | Split pane right / down |
-| `Ctrl+a` `h/j/k/l` | Move between herdr panes |
-| `Ctrl+a` `q` | Detach from herdr |
-| `Ctrl+a` `[` | herdr copy mode |
+| `Ctrl+a` | Herdr prefix |
+| `Ctrl+a` `-` / `v` | Split pane down / right |
+| `Ctrl+a` `h/j/k/l` | Move between Herdr panes |
+| `Ctrl+a` `q` | Detach from Herdr |
+| `Ctrl+a` `[` | Herdr copy mode |
 | `,` | Neovim leader |
 | `jk` | Leave insert mode (Neovim) |
 | `,,` | Toggle previous buffer |
@@ -45,7 +45,7 @@ Terminal app (Ghostty / iTerm / etc.)
 | `gh` | LSP hover (types/docs) in attached buffers |
 | `Ctrl+h/j/k/l` | Move between nvim splits |
 | `g` | `git status` (no args) or `git …` |
-| `tat` | Attach tmux session for current directory |
+| `tat` | Focus or create a Herdr workspace for this directory |
 | `mcd dirname` | `mkdir -p` and `cd` into it |
 
 ---
@@ -203,7 +203,7 @@ Machine-specific aliases: `~/.aliases.local`
 
 | Command | Action |
 |---------|--------|
-| `tat` | `tmux attach -t $(basename $PWD)` — session per directory |
+| `tat` | Focus or create a Herdr workspace for `$PWD` |
 | `replace old new files…` | Find/replace across files via `ag` + `sed` |
 | `git-churn` | Rank changed files by commit frequency vs `origin/main` |
 | `pi update` / `arc-pi update` | Update the mise-managed Pi installation |
@@ -222,62 +222,60 @@ T3_CODE_NPX_PACKAGE='actual-package@latest' npxt3
 
 ---
 
-## Tmux
+## Herdr
 
-**Prefix: `Ctrl+a`** (GNU Screen style, not default `Ctrl+b`).
+**Prefix: `Ctrl+a`**. Press prefix, release, then the second key. Config:
+`herdr/config.toml` → `~/.config/herdr/config.toml`. Live help: `Ctrl+a` `?`.
 
-Press prefix, release, then the second key — unless noted as a chord (`Ctrl+a` held).
+One default session per machine. Projects are **workspaces**, not named sessions.
+New panes inherit the current directory (`terminal.new_cwd = "follow"`).
 
-### Sessions
+SSH auto-attaches (`exec herdr`) unless `NO_AUTO_HERDR=1`, `NO_AUTO_TMUX=1`, or
+`HERDR_ENV=1`. If Herdr is missing, SSH stays a plain shell.
 
-| Keys | Action |
-|------|--------|
-| `tmux` | New session |
-| `tmux new -s name` | Named session |
-| `tmux ls` | List sessions |
-| `tmux attach -t name` | Attach |
-| `tat` | Attach to session named after `basename $PWD` |
-| `Ctrl+a` `d` | Detach |
-| `Ctrl+a` `$` | Rename session |
-| `Ctrl+a` `s` | Session picker |
-| `Ctrl+a` `(` / `)` | Previous / next session |
+Optional thin client from another Mac (does not replace SSH auto-attach):
 
-SSH auto-attaches to Herdr (`exec herdr`) unless `NO_AUTO_TMUX=1` or `HERDR_ENV=1`.
-Falls back to tmux `ssh-$HOST` if Herdr is not installed.
+```sh
+herdr --remote andrews-mac-mini
+herdr --remote qianas-macbook-pro
+```
 
-### Windows
+### Session and workspaces
 
 | Keys | Action |
 |------|--------|
-| `Ctrl+a` `c` | New window |
-| `Ctrl+a` `n` / `p` | Next / previous window |
-| `Ctrl+a` `0`–`9` | Jump to window number |
-| `Ctrl+a` `,` | Rename window |
-| `Ctrl+a` `&` | Kill window |
-| `Ctrl+a` `w` | Window list |
-| `Ctrl+a` `Ctrl+h` / `Ctrl+l` | Previous / next window |
-| `Ctrl+a` `Ctrl+j` | `choose-tree` (session/window tree) |
+| `herdr` | Attach (or start) the default session |
+| `tat` | Focus or create a workspace for `$PWD` |
+| `Ctrl+a` `q` | Detach (panes keep running) |
+| `Ctrl+a` `w` | Workspace picker |
+| `Ctrl+a` `g` | Goto picker |
+| `Ctrl+a` `Shift+n` | New workspace |
+| `Ctrl+a` `Shift+w` | Rename workspace |
+| `herdr server reload-config` | Reload `config.toml` |
+| `Ctrl+a` `Shift+r` | Reload config (prefix+r is resize mode) |
 
-Windows are 1-indexed and renumber after closes.
+### Tabs
+
+| Keys | Action |
+|------|--------|
+| `Ctrl+a` `c` | New tab |
+| `Ctrl+a` `n` / `p` | Next / previous tab |
+| `Ctrl+a` `1`–`9` | Jump to tab number |
+| `Ctrl+a` `Shift+t` | Rename tab |
+| `Ctrl+a` `Shift+x` | Close tab |
 
 ### Panes
 
 | Keys | Action |
 |------|--------|
-| `Ctrl+a` `"` or `-` | Split horizontal (current path) |
-| `Ctrl+a` `%` or `\` or `\|` | Split vertical (current path) |
-| `Ctrl+a` `h` `j` `k` `l` | Move to pane (vi-style) |
-| `Ctrl+a` `Ctrl+a` | Toggle last pane |
-| `Ctrl+a` `o` | Cycle panes |
-| `Ctrl+a` `;` | Toggle last pane (default) |
-| `Ctrl+a` `x` | Kill pane |
-| `Ctrl+a` `!` | Move pane to new window |
-| `Ctrl+a` `b` | Break pane into new window |
-| `Ctrl+a` `+` | Zoom / unzoom pane |
-| `Ctrl+a` `=` | Tile all panes |
-| `Ctrl+a` `↑↓←→` | Resize pane (your config: 4–8 cells) |
-| `Ctrl+a` `q` | Show pane numbers, then jump |
-| `Ctrl+a` `{` / `}` | Swap pane with previous / next |
+| `Ctrl+a` `-` | Split down |
+| `Ctrl+a` `v` or `%` or `\|` | Split right |
+| `Ctrl+a` `h` `j` `k` `l` | Move to pane |
+| `Ctrl+a` `;` | Last pane |
+| `Ctrl+a` `x` | Close pane |
+| `Ctrl+a` `z` or `+` | Zoom / unzoom |
+| `Ctrl+a` `r` | Resize mode |
+| `Ctrl+a` `Shift+h/j/k/l` | Swap pane |
 
 ### Copy mode (vi keys)
 
@@ -286,54 +284,16 @@ Windows are 1-indexed and renumber after closes.
 | `Ctrl+a` `[` | Enter copy mode |
 | `h` `j` `k` `l` | Move |
 | `w` / `b` / `e` | Word motion |
-| `g` / `G` | Top / bottom |
-| `/` / `?` | Search forward / backward |
 | `v` | Begin selection |
-| `y` or `Enter` | Copy to macOS clipboard |
-| `q` | Quit copy mode |
-| `Esc` | Quit copy mode |
+| `y` or `Enter` | Copy to clipboard |
+| `q` / `Esc` | Quit copy mode |
 
-### Your custom tmux keys
+Mouse drag-select also copies. Agents (pi, Claude, Cursor Agent) resume after a
+Herdr server restart when official integrations are installed
+(`herdr integration status`).
 
-| Keys | Action |
-|------|--------|
-| `Ctrl+a` `r` | Reload `~/.tmux.conf` |
-| `Ctrl+a` `m` | Mouse on |
-| `Ctrl+a` `M` | Mouse off |
-| `Ctrl+a` `a` | Send literal `Ctrl+a` to app |
-
-### tmux-resurrect + continuum (installed)
-
-| Keys | Action |
-|------|--------|
-| `Ctrl+a` `Ctrl+s` | Save session |
-| `Ctrl+a` `Ctrl+r` | Restore session |
-
-Continuum autosaves about every **60 minutes** and restores the last save when the
-tmux server starts. Save also records pi / Claude / Cursor agent session IDs so
-restore relaunches with `--session` or `--resume`. Debug mapping:
-`tmux-agent-sessions status` (writes `~/.tmux/resurrect/agent-sessions.tsv` on save).
-
-### Host status bar colors (Tailscale SSH)
-
-| Host | Bar color |
-|------|-----------|
-| `andrews-mac-mini` | Green |
-| `qianas-macbook-pro` | Blue |
-| Other hosts | Yellow |
-
----
-
-## Herdr
-
-Multiplexer. Prefix is `Ctrl+a`. Config: `herdr/config.toml` → `~/.config/herdr/config.toml`.
-
-| Keys | Action |
-|------|--------|
-| `herdr` | Attach (or start) the default session |
-| `Ctrl+a` `q` | Detach Herdr (panes keep running) |
-| `Ctrl+a` `?` | Show live keybindings |
-| `herdr server reload-config` | Reload `config.toml` |
+`tmux.conf` is still in the repo as a soak-period emergency hatch. Do not nest
+tmux inside Herdr.
 
 Herdr automatically snapshots workspace, tab, and pane topology. Native
 agent-session resume requires current official integrations. This config enables
@@ -624,8 +584,7 @@ Conventional commit types (for `semantic-release`): `feat:`, `fix:`, `chore:`, `
 | What | Command |
 |------|---------|
 | zsh | `source ~/.zshrc` |
-| tmux | `tmux source-file ~/.tmux.conf` or `Ctrl+a` `r` |
-| Herdr | `herdr server reload-config` |
+| Herdr | `herdr server reload-config` or `Ctrl+a` `Shift+r` |
 | nvim | `:source ~/.vimrc` or `,sv` (also runs `:Sleuth`) |
 | Full dotfiles symlink | `./install.sh` from repo root |
 
@@ -635,7 +594,8 @@ Conventional commit types (for `semantic-release`): `feat:`, `fix:`, `chore:`, `
 
 | Variable | Effect |
 |----------|--------|
-| `NO_AUTO_TMUX=1` | Skip SSH auto-attach to Herdr (or tmux fallback) |
+| `NO_AUTO_HERDR=1` | Skip SSH auto-attach to Herdr (plain remote shell) |
+| `NO_AUTO_TMUX=1` | Same escape hatch as `NO_AUTO_HERDR` (legacy name) |
 | `HERDR_ENV=1` | Set by Herdr in its panes; also skips SSH auto-attach |
 | `DOTFILES_NERD_FONT=0` | ASCII-safe NERDTree arrows (no icon font) |
 | `T3_CODE_NPX_PACKAGE` | Override package for `npxt3` |
@@ -662,8 +622,9 @@ Use a **Nerd Font** (e.g. Hack Nerd Font) for devicons in nvim unless `DOTFILES_
 
 ```sh
 ssh mini                                  # auto-attaches this machine's Herdr session
-ssh macbook                               # Herdr if installed, else tmux (blue bar)
-ssh -t macbook 'NO_AUTO_TMUX=1 exec zsh -l' # plain shell, no Herdr/tmux
+ssh macbook                               # auto-attaches that machine's Herdr session
+ssh -t macbook 'NO_AUTO_HERDR=1 exec zsh -l' # plain shell, no Herdr
+herdr --remote andrews-mac-mini           # optional local thin client
 ```
 
 After dotfiles install on a remote Mac: `./install.sh`, then `source ~/.zshrc`.
