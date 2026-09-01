@@ -115,6 +115,11 @@ bin/generate-vim-plugin-inventory
 symlinks it to `~/.config/herdr/config.toml`. Prefix is `ctrl+a`. Completions live in
 `zsh/completion/_herdr`.
 
+Herdr in-app toasts are enabled for ARC Pi operator prompts. ARC Pi publishes a
+blocked agent state while a question or approval is open and clears it when the
+prompt settles; the notification label is generic and does not expose question
+text.
+
 SSH shells attach to Herdr through `zsh/configs/post/ssh-herdr.zsh` (`exec herdr`)
 unless `NO_AUTO_HERDR=1`, `NO_AUTO_TMUX=1`, or `HERDR_ENV=1` is set. If Herdr is
 missing, SSH stays a plain shell.
