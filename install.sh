@@ -213,6 +213,27 @@ for node_pkg in vercel convex; do
   install_node_global "$node_pkg"
 done
 
+# Install the global Vercel agent skills (idempotent). Targets Pi and Claude
+# Code so they symlink from their agent skill dirs to ~/.agents/skills/.
+# Skipped if npm/npx is unavailable; failures warn but do not abort.
+install_vercel_agent_skills() {
+  if ! command -v npm >/dev/null 2>&1; then
+    echo "WARNING: npm not found; skipping Vercel agent skills install." >&2
+    return 0
+  fi
+  echo "Installing Vercel agent skills globally via npx skills add"
+  if npx --yes skills add \
+      --agent pi --agent claude-code \
+      -g -y \
+      https://github.com/vercel-labs/agent-skills; then
+    :
+  else
+    echo "WARNING: Vercel agent skills install failed." >&2
+  fi
+}
+
+install_vercel_agent_skills
+
 PLUG_PATH="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim"
 
 if [ ! -f "$PLUG_PATH" ]; then
