@@ -1,3 +1,9 @@
+## [1.10.0](https://github.com/andysolomon/dotfiles/compare/v1.9.0...v1.10.0) (2026-09-15)
+
+### Features
+
+* add Markdown preview in Neovim and the shell ([#27](https://github.com/andysolomon/dotfiles/issues/27)) ([18ef227](https://github.com/andysolomon/dotfiles/commit/18ef227b51e8522f0938e6f6fc0045f61be03b19))
+
 ## [1.9.0](https://github.com/andysolomon/dotfiles/compare/v1.8.0...v1.9.0) (2026-09-01)
 
 ### Features
