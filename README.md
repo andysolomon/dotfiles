@@ -81,7 +81,7 @@ cd ~/dotfiles
 1. Runs plugin install:
    - `nvim --headless -u ~/.vimrc.bundles "+PlugInstall --sync" +qa`
 1. Installs the bounded Tree-sitter parser set:
-   - `javascript`, `jsdoc`, `typescript`, and `tsx`
+   - `javascript`, `jsdoc`, `typescript`, `tsx`, `markdown`, and `markdown_inline`
 
 `install.sh` does not install or upgrade Homebrew or npm packages.
 
@@ -115,9 +115,9 @@ Neovim compatibility is handled via `~/.config/nvim/init.vim` sourcing `~/.vimrc
 ### Neovim-first
 
 This config targets **Neovim 0.12+**. It declares Neovim-only plugins such as
-`nvim-lspconfig`, `nvim-treesitter`, `conform.nvim`, and `nvim-lint`, and
-`install.sh` bootstraps `vim-plug` only into Neovim's autoload path. Plain `vim`
-is not a supported plugin-install fallback.
+`nvim-lspconfig`, `nvim-treesitter`, `conform.nvim`, `nvim-lint`, and
+`render-markdown.nvim`, and `install.sh` bootstraps `vim-plug` only into
+Neovim's autoload path. Plain `vim` is not a supported plugin-install fallback.
 
 To avoid that, `vim` and `vi` are aliased to `nvim` (see [`aliases`](aliases)).
 If you deliberately want plain Vim behavior, use it without this Neovim plugin stack.
@@ -237,6 +237,16 @@ call nerdcommenter#Comment('x', 'toggle')
 
 - `Ctrl+l`: Limelight focus mode mapping
 - `Ctrl+l l`: toggle `:Limelight!!`
+
+### Markdown preview
+
+In a Markdown buffer:
+
+- `,mp`: open a rendered preview beside the editor (`:RenderMarkdown preview`)
+- `,mr`: toggle in-buffer Markdown rendering (`:RenderMarkdown toggle`)
+
+From the shell, `md README.md` pages a Glow preview. `md` with no arguments
+opens Glow's interactive TUI in the current directory.
 
 ### General navigation
 
@@ -483,7 +493,7 @@ Run:
 
 ```sh
 zsh -lic 'tree-sitter --version'
-zsh -lic 'nvim --headless -u ~/.vimrc.bundles "+lua require(\"nvim-treesitter\").install({\"javascript\",\"jsdoc\",\"typescript\",\"tsx\"}):wait(300000)" +qa'
+zsh -lic 'nvim --headless -u ~/.vimrc.bundles "+lua require(\"nvim-treesitter\").install({\"javascript\",\"jsdoc\",\"typescript\",\"tsx\",\"markdown\",\"markdown_inline\"}):wait(300000)" +qa'
 ```
 
 ### Prettier or ESLint does not run automatically

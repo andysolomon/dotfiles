@@ -230,6 +230,7 @@ if treesitter_ok then
     javascriptreact = 'javascript',
     typescript = 'typescript',
     typescriptreact = 'tsx',
+    markdown = 'markdown',
   }
   local tree_group = vim.api.nvim_create_augroup('DotfilesTreesitter', { clear = true })
   vim.api.nvim_create_autocmd('FileType', {
@@ -240,6 +241,26 @@ if treesitter_ok then
       if lang then
         pcall(vim.treesitter.start, args.buf, lang)
       end
+    end,
+  })
+end
+
+local render_md_ok, render_md = pcall(require, 'render-markdown')
+if render_md_ok then
+  render_md.setup({})
+  local md_group = vim.api.nvim_create_augroup('DotfilesRenderMarkdown', { clear = true })
+  vim.api.nvim_create_autocmd('FileType', {
+    group = md_group,
+    pattern = { 'markdown' },
+    callback = function(args)
+      vim.keymap.set('n', '<leader>mp', '<cmd>RenderMarkdown preview<cr>', {
+        buffer = args.buf,
+        desc = 'Markdown Preview',
+      })
+      vim.keymap.set('n', '<leader>mr', '<cmd>RenderMarkdown toggle<cr>', {
+        buffer = args.buf,
+        desc = 'Toggle Markdown Rendering',
+      })
     end,
   })
 end

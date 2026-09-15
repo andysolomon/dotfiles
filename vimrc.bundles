@@ -69,6 +69,8 @@ Plug 'rebelot/kanagawa.nvim'
 "Plug 'jparise/vim-graphql'
 Plug 'neovim/nvim-lspconfig', { 'commit': 'cb5bc0b2b35a6d513e3298d285db81453e791f4f' }
 Plug 'nvim-treesitter/nvim-treesitter', { 'branch': 'main', 'commit': '4916d6592ede8c07973490d9322f187e07dfefac', 'do': ':TSUpdate' }
+Plug 'nvim-tree/nvim-web-devicons', { 'commit': '2ae6958df7ced50baac5035cec0c15799eedfbf7' }
+Plug 'MeanderingProgrammer/render-markdown.nvim', { 'commit': '4663eb3ecd538bd5062628fb6d95bbe6bdca78f6' }
 Plug 'stevearc/conform.nvim', { 'commit': '619363c30309d29ffa631e67c8183f2a72caa373' }
 Plug 'mfussenegger/nvim-lint', { 'commit': '606b823a57b027502a9ae00978ebf4f5d5158098' }
 Plug 'github/copilot.vim'

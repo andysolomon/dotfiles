@@ -1,0 +1,16 @@
+# Render Markdown in the terminal via Glow.
+#   md README.md   — paged preview of a file
+#   md             — interactive TUI in the current directory
+#   cat file.md | md -   — render Markdown from stdin
+
+md() {
+  if ! command -v glow >/dev/null 2>&1; then
+    echo "glow is not installed. On macOS: brew install glow" >&2
+    return 127
+  fi
+  if [[ $# -eq 0 ]]; then
+    glow
+  else
+    glow -p "$@"
+  fi
+}
