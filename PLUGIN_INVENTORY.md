@@ -28,11 +28,13 @@ Generated from `vimrc.bundles` by `bin/generate-vim-plugin-inventory`.
 | `kchmck/vim-coffee-script` | Inactive | CoffeeScript syntax and indent support | https://github.com/kchmck/vim-coffee-script |
 | `lambdatoast/elm.vim` | Inactive | Elm language support | https://github.com/lambdatoast/elm.vim |
 | `luochen1990/rainbow` | Active | Rainbow bracket and parenthesis colors | https://github.com/luochen1990/rainbow |
+| `MeanderingProgrammer/render-markdown.nvim` | Active | In-buffer Markdown rendering and side-by-side preview | https://github.com/MeanderingProgrammer/render-markdown.nvim |
 | `mfussenegger/nvim-lint` | Active | Asynchronous linting through external linters | https://github.com/mfussenegger/nvim-lint |
 | `mxw/vim-jsx` | Inactive | JSX syntax support | https://github.com/mxw/vim-jsx |
 | `neovim/nvim-lspconfig` | Active | LSP server configurations for Neovim | https://github.com/neovim/nvim-lspconfig |
 | `nvim-lua/plenary.nvim` | Inactive | Lua utility library used by Neovim plugins | https://github.com/nvim-lua/plenary.nvim |
 | `nvim-telescope/telescope.nvim` | Inactive | Fuzzy finder and picker UI | https://github.com/nvim-telescope/telescope.nvim |
+| `nvim-tree/nvim-web-devicons` | Active | Filetype icons for Neovim Lua plugins | https://github.com/nvim-tree/nvim-web-devicons |
 | `nvim-treesitter/nvim-treesitter` | Active | Tree-sitter parsing and highlighting | https://github.com/nvim-treesitter/nvim-treesitter |
 | `othree/es.next.syntax.vim` | Inactive | ESNext syntax support | https://github.com/othree/es.next.syntax.vim |
 | `othree/javascript-libraries-syntax.vim` | Inactive | JavaScript library and framework syntax add-ons | https://github.com/othree/javascript-libraries-syntax.vim |

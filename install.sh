@@ -203,4 +203,4 @@ if [ ! -f "$PLUG_PATH" ]; then
 fi
 
 "$NVIM_BIN" --headless -u ~/.vimrc.bundles "+PlugInstall --sync" +qa
-"$NVIM_BIN" --headless -u ~/.vimrc.bundles "+lua require('nvim-treesitter').install({'javascript','jsdoc','typescript','tsx'}):wait(300000)" +qa
+"$NVIM_BIN" --headless -u ~/.vimrc.bundles "+lua require('nvim-treesitter').install({'javascript','jsdoc','typescript','tsx','markdown','markdown_inline'}):wait(300000)" +qa

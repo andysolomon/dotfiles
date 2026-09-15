@@ -78,6 +78,8 @@ awk '
     d["BurntSushi/ripgrep"] = "External search tool (not a Vim plugin)"
     d["sharkdp/fd"] = "External `find` alternative (not a Vim plugin)"
     d["nvim-treesitter/nvim-treesitter"] = "Tree-sitter parsing and highlighting"
+    d["nvim-tree/nvim-web-devicons"] = "Filetype icons for Neovim Lua plugins"
+    d["MeanderingProgrammer/render-markdown.nvim"] = "In-buffer Markdown rendering and side-by-side preview"
     d["ryanoasis/vim-devicons"] = "Filetype icons for plugin UIs"
     d["ejholmes/vim-forcedotcom"] = "Salesforce/Apex support for Vim"
     d["dense-analysis/ale"] = "Asynchronous linting and fixing"
