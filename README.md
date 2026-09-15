@@ -82,8 +82,9 @@ cd ~/dotfiles
    - `nvim --headless -u ~/.vimrc.bundles "+PlugInstall --sync" +qa`
 1. Installs the bounded Tree-sitter parser set:
    - `javascript`, `jsdoc`, `typescript`, `tsx`, `markdown`, and `markdown_inline`
+1. Installs a small set of Node-based global CLIs with `npm i -g` (currently `vercel` and `convex`). Skipped if `npm` is missing; failures warn without aborting the installer.
 
-`install.sh` does not install or upgrade Homebrew or npm packages.
+`install.sh` does not install or upgrade Homebrew or the broader npm package set; it only installs the named global CLIs listed above.
 
 ## Pi updates
 

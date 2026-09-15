@@ -194,6 +194,25 @@ if command -v herdr >/dev/null 2>&1; then
   done
 fi
 
+# Install Node-based global CLIs (idempotent). Skipped if npm is unavailable;
+# failures are reported but do not abort the dotfiles install.
+install_node_global() {
+  if ! command -v npm >/dev/null 2>&1; then
+    echo "WARNING: npm not found; skipping global install of $1." >&2
+    return 0
+  fi
+  echo "Installing global npm package: $1"
+  if npm i -g "$1"; then
+    :
+  else
+    echo "WARNING: global install of $1 failed." >&2
+  fi
+}
+
+for node_pkg in vercel convex; do
+  install_node_global "$node_pkg"
+done
+
 PLUG_PATH="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim"
 
 if [ ! -f "$PLUG_PATH" ]; then
