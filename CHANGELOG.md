@@ -1,3 +1,9 @@
+## [1.12.0](https://github.com/andysolomon/dotfiles/compare/v1.11.0...v1.12.0) (2026-09-15)
+
+### Features
+
+* **install:** install Vercel agent skills globally for Pi and Claude Code ([#29](https://github.com/andysolomon/dotfiles/issues/29)) ([4bd5aa2](https://github.com/andysolomon/dotfiles/commit/4bd5aa25b17404b1866f9ad02958c2d56db25089))
+
 ## [1.11.0](https://github.com/andysolomon/dotfiles/compare/v1.10.0...v1.11.0) (2026-09-15)
 
 ### Features
