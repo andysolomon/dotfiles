@@ -1,3 +1,9 @@
+## [1.11.0](https://github.com/andysolomon/dotfiles/compare/v1.10.0...v1.11.0) (2026-09-15)
+
+### Features
+
+* **install:** install vercel and convex as global npm packages ([#28](https://github.com/andysolomon/dotfiles/issues/28)) ([f6f0dec](https://github.com/andysolomon/dotfiles/commit/f6f0decebe4ac7dcb9b5d070272381732c8c61fc))
+
 ## [1.10.0](https://github.com/andysolomon/dotfiles/compare/v1.9.0...v1.10.0) (2026-09-15)
 
 ### Features
