@@ -1,3 +1,9 @@
+## [1.16.1](https://github.com/andysolomon/dotfiles/compare/v1.16.0...v1.16.1) (2026-10-12)
+
+### Bug Fixes
+
+* **omarchy:** track the bar as not transparent ([#35](https://github.com/andysolomon/dotfiles/issues/35)) ([fca97fc](https://github.com/andysolomon/dotfiles/commit/fca97fc702448fc875aaca8400dec29ad390fd10))
+
 ## [1.16.0](https://github.com/andysolomon/dotfiles/compare/v1.15.1...v1.16.0) (2026-10-12)
 
 ### Features
