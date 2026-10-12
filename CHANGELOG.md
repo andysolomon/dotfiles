@@ -1,3 +1,9 @@
+## [1.13.0](https://github.com/andysolomon/dotfiles/compare/v1.12.0...v1.13.0) (2026-10-12)
+
+### Features
+
+* **install:** install rea-agents as a global npm package ([#32](https://github.com/andysolomon/dotfiles/issues/32)) ([3a002d7](https://github.com/andysolomon/dotfiles/commit/3a002d71bf75c06e0b13f6d7831d7212da4a0c4c))
+
 ## [1.12.0](https://github.com/andysolomon/dotfiles/compare/v1.11.0...v1.12.0) (2026-09-15)
 
 ### Features
