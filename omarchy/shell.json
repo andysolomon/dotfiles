@@ -5,8 +5,8 @@
     "lock": 300
   },
   "bar": {
-    "position": "top",
-    "transparent": false,
+    "position": "bottom",
+    "transparent": true,
     "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [
@@ -35,12 +35,12 @@
         },
         {
           "id": "omarchy.system-update"
+        },
+        {
+          "id": "omarchy.tray"
         }
       ],
       "right": [
-        {
-          "id": "omarchy.tray"
-        },
         {
           "id": "omarchy.tailscale"
         },
