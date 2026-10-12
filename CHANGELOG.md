@@ -1,3 +1,9 @@
+## [1.15.1](https://github.com/andysolomon/dotfiles/compare/v1.15.0...v1.15.1) (2026-10-12)
+
+### Bug Fixes
+
+* **git:** drop machine-specific commit template ([#33](https://github.com/andysolomon/dotfiles/issues/33)) ([a171e24](https://github.com/andysolomon/dotfiles/commit/a171e241dc993f02fb40373cb7e116da7d2f8978))
+
 ## [1.15.0](https://github.com/andysolomon/dotfiles/compare/v1.14.0...v1.15.0) (2026-10-12)
 
 ### Features
