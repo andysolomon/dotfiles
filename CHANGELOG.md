@@ -1,3 +1,9 @@
+## [1.15.0](https://github.com/andysolomon/dotfiles/compare/v1.14.0...v1.15.0) (2026-10-12)
+
+### Features
+
+* run Pi without mise and sync pending shell changes ([#31](https://github.com/andysolomon/dotfiles/issues/31)) ([24f6424](https://github.com/andysolomon/dotfiles/commit/24f642492c4215b569a44d891610a9a5971d55a0))
+
 ## [1.14.0](https://github.com/andysolomon/dotfiles/compare/v1.13.0...v1.14.0) (2026-10-12)
 
 ### Features
