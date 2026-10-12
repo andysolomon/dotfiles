@@ -234,6 +234,29 @@ install_vercel_agent_skills() {
 
 install_vercel_agent_skills
 
+# Install Homebrew casks (idempotent, macOS only). Skipped if brew is
+# unavailable or the cask is already installed; failures warn but do not abort.
+install_brew_cask() {
+  if [ "$(uname -s)" != "Darwin" ]; then
+    return 0
+  fi
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "WARNING: brew not found; skipping cask install of $1." >&2
+    return 0
+  fi
+  if brew list --cask "$1" >/dev/null 2>&1; then
+    return 0
+  fi
+  echo "Installing Homebrew cask: $1"
+  if brew install --cask "$1"; then
+    :
+  else
+    echo "WARNING: cask install of $1 failed." >&2
+  fi
+}
+
+install_brew_cask grok-bot
+
 PLUG_PATH="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim"
 
 if [ ! -f "$PLUG_PATH" ]; then

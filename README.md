@@ -84,8 +84,9 @@ cd ~/dotfiles
    - `javascript`, `jsdoc`, `typescript`, `tsx`, `markdown`, and `markdown_inline`
 1. Installs a small set of Node-based global CLIs with `npm i -g` (currently `vercel`, `convex`, and `rea-agents`). Skipped if `npm` is missing; failures warn without aborting the installer.
 1. Installs the global Vercel agent skills via `npx --yes skills add --agent pi --agent claude-code -g -y https://github.com/vercel-labs/agent-skills`. The skills land in `~/.agents/skills/` and are symlinked into `~/.pi/agent/skills/` and `~/.claude/skills/`. Skipped if `npm` is missing; failures warn without aborting.
+1. On macOS, installs the Grok Bot desktop app with `brew install --cask grok-bot`. Skipped if `brew` is missing or the cask is already installed; failures warn without aborting.
 
-`install.sh` does not install or upgrade Homebrew or the broader npm package set; it only installs the named global CLIs and skills listed above.
+`install.sh` does not install or upgrade Homebrew itself or the broader npm package set; it only installs the named global CLIs, skills, and cask listed above.
 
 ## Pi updates
 
