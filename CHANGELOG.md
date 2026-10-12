@@ -1,3 +1,9 @@
+## [1.14.0](https://github.com/andysolomon/dotfiles/compare/v1.13.0...v1.14.0) (2026-10-12)
+
+### Features
+
+* **install:** install Grok Bot via Homebrew cask on macOS ([#30](https://github.com/andysolomon/dotfiles/issues/30)) ([1b32f80](https://github.com/andysolomon/dotfiles/commit/1b32f801f26eaca31ae4d216537874abb14f504b))
+
 ## [1.13.0](https://github.com/andysolomon/dotfiles/compare/v1.12.0...v1.13.0) (2026-10-12)
 
 ### Features
