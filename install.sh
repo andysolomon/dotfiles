@@ -209,7 +209,7 @@ install_node_global() {
   fi
 }
 
-for node_pkg in vercel convex; do
+for node_pkg in vercel convex rea-agents; do
   install_node_global "$node_pkg"
 done
 
