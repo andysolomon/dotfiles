@@ -64,7 +64,7 @@ export PATH="/opt/homebrew/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 if [[ -s "$NVM_DIR/nvm.sh" ]]; then
     . "$NVM_DIR/nvm.sh"  # Load NVM
-    nvm use default  # Use the default (usually the latest) version of Node
+    nvm use default --silent  # Use the default (usually the latest) version of Node
     # Alternatively, to always use the latest installed version, uncomment the next line:
     # nvm use `nvm ls-remote --lts | tail -1 | awk '{print $1}'`
 fi

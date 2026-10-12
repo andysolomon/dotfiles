@@ -10,3 +10,7 @@ node_modules/
 .factor/
 .nvimlog
 skills-lock.json
+
+# Machine-local overrides and secrets (*.local convention); vimrc.local is tracked
+*.local
+!/vimrc.local
