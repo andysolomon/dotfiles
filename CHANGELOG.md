@@ -1,3 +1,9 @@
+## [1.16.0](https://github.com/andysolomon/dotfiles/compare/v1.15.1...v1.16.0) (2026-10-12)
+
+### Features
+
+* **omarchy:** adopt quattro's bar layout ([#34](https://github.com/andysolomon/dotfiles/issues/34)) ([91f9ead](https://github.com/andysolomon/dotfiles/commit/91f9ead9d7933a7fae14d27d06e7116302691598))
+
 ## [1.15.1](https://github.com/andysolomon/dotfiles/compare/v1.15.0...v1.15.1) (2026-10-12)
 
 ### Bug Fixes
