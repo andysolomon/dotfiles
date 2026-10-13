@@ -63,7 +63,10 @@ export PATH="/opt/homebrew/bin:$PATH"
 # Setting up NVM (Node Version Manager) and adding Node to PATH
 export NVM_DIR="$HOME/.nvm"
 if [[ -s "$NVM_DIR/nvm.sh" ]]; then
-    . "$NVM_DIR/nvm.sh"  # Load NVM
+    # --no-use: nvm.sh would otherwise run its own `nvm use` on load and the
+    # explicit one below would repeat it (~1s each). Startup time matters beyond
+    # comfort: T3 Code drops the shell PATH if `zsh -ilc` takes over 5s.
+    . "$NVM_DIR/nvm.sh" --no-use  # Load NVM
     nvm use default --silent  # Use the default (usually the latest) version of Node
     # Alternatively, to always use the latest installed version, uncomment the next line:
     # nvm use `nvm ls-remote --lts | tail -1 | awk '{print $1}'`
