@@ -1,3 +1,9 @@
+## [1.16.2](https://github.com/andysolomon/dotfiles/compare/v1.16.1...v1.16.2) (2026-10-13)
+
+### Bug Fixes
+
+* **zsh:** run nvm use once per shell start ([#36](https://github.com/andysolomon/dotfiles/issues/36)) ([418e276](https://github.com/andysolomon/dotfiles/commit/418e2762f4de2dc290b1e0e519d50a813ed1af39))
+
 ## [1.16.1](https://github.com/andysolomon/dotfiles/compare/v1.16.0...v1.16.1) (2026-10-12)
 
 ### Bug Fixes
