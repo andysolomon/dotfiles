@@ -62,15 +62,50 @@ export PATH="/opt/homebrew/bin:$PATH"
 # Node.js setup
 # Setting up NVM (Node Version Manager) and adding Node to PATH
 export NVM_DIR="$HOME/.nvm"
+
+# Set REPLY to the bin directory of nvm's default Node by reading nvm's alias
+# files, without running nvm. Follows alias chains (default -> lts/* ->
+# lts/krypton -> v24.11.0) and takes the newest installed match for a partial
+# version (24 -> v24.18.0). Fails for anything else, such as `system`.
+_nvm_default_bin() {
+    local spec=default
+    local -a matches
+    repeat 5; do
+        [[ -f "$NVM_DIR/alias/$spec" ]] || break
+        spec="$(<"$NVM_DIR/alias/$spec")"
+    done
+    case "$spec" in
+        node|stable) matches=("$NVM_DIR"/versions/node/v*(N/nOn)) ;;
+        v[0-9]*|[0-9]*) matches=("$NVM_DIR"/versions/node/v${spec#v}(|.*)(N/nOn)) ;;
+    esac
+    (( $#matches )) || return 1
+    REPLY="$matches[1]/bin"
+    [[ -x "$REPLY/node" ]]
+}
+
 if [[ -s "$NVM_DIR/nvm.sh" ]]; then
-    # --no-use: nvm.sh would otherwise run its own `nvm use` on load and the
-    # explicit one below would repeat it (~1s each). Startup time matters beyond
-    # comfort: T3 Code drops the shell PATH if `zsh -ilc` takes over 5s.
-    . "$NVM_DIR/nvm.sh" --no-use  # Load NVM
-    nvm use default --silent  # Use the default (usually the latest) version of Node
-    # Alternatively, to always use the latest installed version, uncomment the next line:
-    # nvm use `nvm ls-remote --lts | tail -1 | awk '{print $1}'`
+    # Startup time matters beyond comfort: T3 Code drops the shell PATH if
+    # `zsh -ilc` takes over 5s, and a startup that is fine warm can pass that
+    # right after boot. Sourcing nvm.sh and running `nvm use default` cost
+    # ~1.5s, so put the default Node on PATH directly and load nvm itself the
+    # first time it is called.
+    if _nvm_default_bin; then
+        path=(${path:#$NVM_DIR/versions/node/*/bin})  # a Node inherited from the parent shell
+        export PATH="$REPLY:$PATH"
+        export NVM_BIN="$REPLY" NVM_INC="${REPLY:h}/include/node"
+        nvm() {
+            unfunction nvm
+            . "$NVM_DIR/nvm.sh" --no-use
+            nvm "$@"
+        }
+    else
+        # --no-use: nvm.sh would otherwise run its own `nvm use` on load and
+        # the explicit one below would repeat it (~1s each).
+        . "$NVM_DIR/nvm.sh" --no-use
+        nvm use default --silent
+    fi
 fi
+unfunction _nvm_default_bin
 
 # Racket
 # Adding Racket binaries to PATH
