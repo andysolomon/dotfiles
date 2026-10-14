@@ -1,3 +1,9 @@
+## [1.16.3](https://github.com/andysolomon/dotfiles/compare/v1.16.2...v1.16.3) (2026-10-14)
+
+### Bug Fixes
+
+* **zsh:** put nvm's default Node on PATH without running nvm ([#37](https://github.com/andysolomon/dotfiles/issues/37)) ([5898ef1](https://github.com/andysolomon/dotfiles/commit/5898ef177c24b71e6fc03523dc5d7072090b1a96))
+
 ## [1.16.2](https://github.com/andysolomon/dotfiles/compare/v1.16.1...v1.16.2) (2026-10-13)
 
 ### Bug Fixes
