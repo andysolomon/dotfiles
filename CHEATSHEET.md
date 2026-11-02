@@ -623,6 +623,8 @@ Use a **Nerd Font** (e.g. Hack Nerd Font) for devicons in nvim unless `DOTFILES_
 ```sh
 ssh mini                                  # auto-attaches this machine's Herdr session
 ssh macbook                               # auto-attaches that machine's Herdr session
+ssh omarchy                               # Omarchy desktop, connects as andysolomon
+ssh quattro                               # Omarchy desktop, connects as andysolomon
 ssh -t macbook 'NO_AUTO_HERDR=1 exec zsh -l' # plain shell, no Herdr
 herdr --remote andrews-mac-mini           # optional local thin client
 ```
