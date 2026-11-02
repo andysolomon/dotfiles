@@ -85,8 +85,9 @@ cd ~/dotfiles
 1. Installs a small set of Node-based global CLIs with `npm i -g` (currently `vercel`, `convex`, and `rea-agents`). Skipped if `npm` is missing; failures warn without aborting the installer.
 1. Installs the global Vercel agent skills via `npx --yes skills add --agent pi --agent claude-code -g -y https://github.com/vercel-labs/agent-skills`. The skills land in `~/.agents/skills/` and are symlinked into `~/.pi/agent/skills/` and `~/.claude/skills/`. Skipped if `npm` is missing; failures warn without aborting.
 1. On macOS, installs the Grok Bot desktop app with `brew install --cask grok-bot`. Skipped if `brew` is missing or the cask is already installed; failures warn without aborting.
+1. Installs the T3 Code desktop app if it is missing or older than Beta (0.1.0). macOS uses `brew install --cask t3-code`, skipped when `/Applications/T3 Code (Beta).app` exists. Arch-based Linux, including Omarchy, uses `yay -S --needed --noconfirm aur/t3code-bin`, because Omarchy's own repo still ships the old Alpha build. The Linux step is skipped while the app is running, so open agent sessions are not interrupted. Without `yay`, it warns if the app is missing. Failures warn without aborting.
 
-`install.sh` does not install or upgrade Homebrew itself or the broader npm package set; it only installs the named global CLIs, skills, and cask listed above.
+`install.sh` does not install or upgrade Homebrew itself or the broader npm package set; it only installs the named global CLIs, skills, and desktop apps listed above.
 
 ## Pi updates
 
@@ -316,35 +317,44 @@ tmux as daily config and run `tmux source-file ~/.tmux.conf`. Leave the Homebrew
 
 ## Tailscale machine workflow
 
-Use this inventory when operating across the Tailscale-connected Macs. Confirm
+Use this inventory when operating across the Tailscale-connected machines. Confirm
 `hostname` and `whoami` before making changes on a remote machine.
 
 Current devices:
 
-- `andrews-mac-mini` / `100.77.5.31`
-- `qianas-macbook-pro` / `100.122.22.119`
+- `andrews-mac-mini` / `100.77.5.31` / macOS / user `andrewsolomon` / `~/dotfiles`
+- `qianas-macbook-pro` / `100.122.22.119` / macOS (Intel) / user `andrewsolomon` / `~/dotfiles`
+- `omarchy` / `100.99.5.122` / Omarchy Linux / user `andysolomon` / `~/Documents/Github/dotfiles`
+- `quattro` / `100.95.99.56` / Omarchy Linux / user `andysolomon` / `~/Documents/Github/dotfiles`
+- `steamdeck` / `100.99.185.6` / Linux / offline since July 2026; SSH user and setup unverified
 
 Common SSH targets:
 
 ```sh
 ssh mini
 ssh macbook
+ssh omarchy
+ssh quattro
 ```
 
-Both aliases are defined in [`ssh/config`](ssh/config) and use the local
+These aliases are defined in [`ssh/config`](ssh/config) and use the local
 `~/.ssh/id_ed25519` key. `mini` connects to `andrews-mac-mini`; `macbook`
-connects to `qianas-macbook-pro`.
+connects to `qianas-macbook-pro`. `omarchy` and `quattro` connect as
+`andysolomon`. The first connection to a machine asks you to accept its host key.
 
-To apply these dotfiles on another Mac:
+To apply these dotfiles on another machine:
 
 ```sh
-cd ~/dotfiles
+cd ~/dotfiles   # ~/Documents/Github/dotfiles on omarchy and quattro
 git pull --ff-only
 ./install.sh
 herdr server reload-config
 ```
 
-Run T3 Code through:
+`install.sh` installs the T3 Code desktop app. The AUR package does not include
+the `t3` command; add it from **Settings → About** in the app.
+
+To run T3 Code without installing it:
 
 ```sh
 npxt3
@@ -355,6 +365,9 @@ This wraps the T3 Code no-install command:
 ```sh
 npx -y t3@latest
 ```
+
+T3 Code publishes no `t3` executable for Intel Macs, so use the desktop app on
+`qianas-macbook-pro`.
 
 Override the npm package if needed:
 

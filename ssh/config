@@ -13,6 +13,18 @@ Host macbook
   IdentityFile ~/.ssh/id_ed25519
   IdentitiesOnly yes
 
+Host omarchy
+  HostName omarchy
+  User andysolomon
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+
+Host quattro
+  HostName quattro
+  User andysolomon
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+
 Host *
   AddKeysToAgent yes
   IdentityFile ~/.ssh/id_ed25519

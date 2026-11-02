@@ -257,6 +257,48 @@ install_brew_cask() {
 
 install_brew_cask grok-bot
 
+# Install the T3 Code desktop app (idempotent). Beta is 0.1.0 and up. Omarchy's
+# pacman repo still ships the old Alpha build under the same package name, so
+# Arch installs name the AUR package explicitly. Failures warn but do not abort.
+T3_CODE_MIN_VERSION="0.1.0"
+
+install_t3_code() {
+  case "$(uname -s)" in
+    Darwin)
+      # brew will not replace an app it did not install, so a hand-installed
+      # copy counts as done.
+      if [ ! -d "/Applications/T3 Code (Beta).app" ]; then
+        install_brew_cask t3-code
+      fi
+      ;;
+    Linux)
+      if ! command -v yay >/dev/null 2>&1; then
+        if ! command -v t3code >/dev/null 2>&1; then
+          echo "WARNING: yay not found; install T3 Code by hand: https://github.com/pingdotgg/t3code/blob/main/docs/user/install.md" >&2
+        fi
+        return 0
+      fi
+      t3_code_installed="$(pacman -Q t3code-bin 2>/dev/null | awk '{print $2}')"
+      if [ -n "$t3_code_installed" ] && version_ge "${t3_code_installed%%-*}" "$T3_CODE_MIN_VERSION"; then
+        return 0
+      fi
+      # Agents run inside the app, so never replace it while it is open.
+      if pgrep -x t3code >/dev/null 2>&1; then
+        echo "WARNING: T3 Code is running; quit it and re-run install.sh to upgrade to Beta." >&2
+        return 0
+      fi
+      echo "Installing T3 Code from the AUR"
+      if yay -S --needed --noconfirm aur/t3code-bin; then
+        :
+      else
+        echo "WARNING: T3 Code install from the AUR failed." >&2
+      fi
+      ;;
+  esac
+}
+
+install_t3_code
+
 PLUG_PATH="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim"
 
 if [ ! -f "$PLUG_PATH" ]; then

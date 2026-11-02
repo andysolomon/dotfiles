@@ -35,6 +35,10 @@ It is a false positive — this repo has no web app. Ignore it.
 - It symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
 - It symlinks `ssh/config` to `~/.ssh/config`. A pre-existing real file is backed up to
   `~/.ssh/config.pre-dotfiles`. Keys and `known_hosts` remain machine-local.
+- It installs the T3 Code desktop app when it is missing or older than Beta (0.1.0): the
+  `t3-code` cask on macOS, `aur/t3code-bin` through `yay` on Arch-based Linux. Omarchy's
+  repo still ships the old Alpha build, so the AUR package is named explicitly. The Linux
+  step is skipped while `t3code` is running.
 - On Omarchy, it copies only the explicit allowlist: `omarchy/hypr/input.lua` to
   `~/.config/hypr/input.lua`, `omarchy/shell.json` to `~/.config/omarchy/shell.json`,
   and `omarchy/XCompose` to `~/.XCompose`. Parent directories are created as needed.
@@ -160,8 +164,9 @@ configuration, generated/themed files, and first-run hooks remain unmanaged.
 
 ### SSH
 
-`ssh/config` is installed as `~/.ssh/config`. It tracks safe host aliases `ssh mini`
-and `ssh macbook`; never commit private keys, `known_hosts`, or credentials.
+`ssh/config` is installed as `~/.ssh/config`. It tracks safe host aliases `ssh mini`,
+`ssh macbook`, `ssh omarchy`, and `ssh quattro`; never commit private keys, `known_hosts`,
+or credentials.
 
 ### Tailscale machine ops
 
@@ -169,7 +174,13 @@ Use this shared machine inventory for remote operations. Confirm `hostname` and
 `whoami` before changing another machine. Current known devices:
 
 - `andrews-mac-mini` / `Andrews-Mac-mini` / `100.77.5.31` / macOS / current Mac mini.
-- `qianas-macbook-pro` / `100.122.22.119` / macOS / other MacBook Pro.
+- `qianas-macbook-pro` / `100.122.22.119` / macOS (Intel) / other MacBook Pro.
+- `omarchy` / `100.99.5.122` / Omarchy Linux / SSH user `andysolomon` / dotfiles at
+  `~/Documents/Github/dotfiles`.
+- `quattro` / `100.95.99.56` / Omarchy Linux / SSH user `andysolomon` / dotfiles at
+  `~/Documents/Github/dotfiles`.
+- `steamdeck` / `100.99.185.6` / Linux / offline since July 2026; SSH user and setup
+  unverified.
 
 ## Conventions
 
