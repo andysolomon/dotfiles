@@ -1,3 +1,9 @@
+## [1.17.0](https://github.com/andysolomon/dotfiles/compare/v1.16.3...v1.17.0) (2026-11-02)
+
+### Features
+
+* **install:** install T3 Code Beta on every machine ([#38](https://github.com/andysolomon/dotfiles/issues/38)) ([7b14f87](https://github.com/andysolomon/dotfiles/commit/7b14f87f3a8d578984db398a753ff070d94701d7))
+
 ## [1.16.3](https://github.com/andysolomon/dotfiles/compare/v1.16.2...v1.16.3) (2026-10-14)
 
 ### Bug Fixes
