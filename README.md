@@ -67,11 +67,12 @@ cd ~/dotfiles
 
 1. Fails before any home, plugin, or parser mutation unless `nvim` is available and reports 0.12+.
 1. Symlinks each top-level repo item to `$HOME` as a dotfile.
-1. Skips `install.sh`, `README.md`, the repository-only `docs/` planning directory, `herdr/`, `omarchy/`, and `ssh/` from generic top-level symlinking.
+1. Skips `install.sh`, `README.md`, the repository-only `docs/` planning directory, `herdr/`, `omarchy/`, `ssh/`, and `voicestudio/` from generic top-level symlinking.
 1. Warns (does not overwrite) if a destination exists and is not a symlink.
 1. Symlinks `ssh/config` to `~/.ssh/config`. If a real file is already there, it is moved to `~/.ssh/config.pre-dotfiles` first. Private keys remain unmanaged.
 1. On Omarchy, copies only the explicit allowlist: `omarchy/hypr/input.lua` to `~/.config/hypr/input.lua`, `omarchy/shell.json` to `~/.config/omarchy/shell.json`, and `omarchy/XCompose` to `~/.XCompose`. Parent directories are created as needed. Identical regular files are skipped; differing files and symlinks are moved to timestamped backups before replacement.
 1. For XCompose, preserves any existing `~/.XCompose.local`. If it is absent, an empty mode-600 file is created only when `~/.XCompose` is absent or already equals the tracked wrapper. If an existing `~/.XCompose` differs while the local file is absent, the installer warns and leaves it untouched.
+1. On a Mac running VoiceStudio (`~/Library/LaunchAgents/sh.voicestudio.backend.plist` exists), installs `voicestudio/watchdog.plist` as `~/Library/LaunchAgents/sh.dotfiles.voicestudio-watchdog.plist`, with this checkout's paths filled in, and loads it. See [VoiceStudio memory watchdog](#voicestudio-memory-watchdog).
 1. If `~/.bin` is already a real directory (not a symlink to `bin/`), links each executable from `bin/` into `~/.bin/` so `tat` and the other PATH utilities resolve.
 1. Creates `~/.config/nvim/init.vim` (if missing) with `source ~/.vimrc`.
 1. Symlinks `herdr/config.toml` to `~/.config/herdr/config.toml` if that path is missing.
@@ -88,6 +89,30 @@ cd ~/dotfiles
 1. Installs the T3 Code desktop app if it is missing or older than Beta (0.1.0). macOS uses `brew install --cask t3-code`, skipped when `/Applications/T3 Code (Beta).app` exists. Arch-based Linux, including Omarchy, uses `yay -S --needed --noconfirm aur/t3code-bin`, because Omarchy's own repo still ships the old Alpha build. The Linux step is skipped while the app is running, so open agent sessions are not interrupted. Without `yay`, it warns if the app is missing. Failures warn without aborting.
 
 `install.sh` does not install or upgrade Homebrew itself or the broader npm package set; it only installs the named global CLIs, skills, and desktop apps listed above.
+
+## VoiceStudio memory watchdog
+
+macOS does not cap a process's memory, so a VoiceStudio that keeps growing would push
+the Mac into swap instead of being stopped. [`bin/voicestudio-watchdog`](bin/voicestudio-watchdog)
+runs every minute under launchd and:
+
+- caps PyTorch's GPU memory in VoiceStudio's launchd job with
+  `PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.5` and `PYTORCH_MPS_LOW_WATERMARK_RATIO=0.4`
+  (half of the GPU's recommended working set: 10 GB on the M4 Pro mini). A request over the
+  cap fails rather than swapping. PyTorch refuses to start when the low ratio is above the
+  high one, so both are set. If a VoiceStudio update rewrites the job, the next run puts
+  them back and reloads it.
+- restarts VoiceStudio (`launchctl kickstart -k`) when it and its child processes, such as
+  the OmniVoice sidecar, use more than 12 GB of memory, measured as macOS footprint. At most
+  one restart per 10 minutes.
+
+```sh
+voicestudio-watchdog --check                # what it sees and would do; changes nothing
+tail ~/Library/Logs/VoiceStudio/watchdog.log # actions it has taken
+```
+
+`VOICESTUDIO_MEMORY_LIMIT_MB`, `VOICESTUDIO_MPS_HIGH_WATERMARK` and
+`VOICESTUDIO_MPS_LOW_WATERMARK` override the defaults.
 
 ## Pi updates
 

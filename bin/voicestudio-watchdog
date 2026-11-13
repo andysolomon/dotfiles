@@ -1,0 +1,154 @@
+#!/bin/sh
+#
+# Keep VoiceStudio on this Mac from exhausting memory. launchd runs it every minute
+# (voicestudio/watchdog.plist, installed by install.sh on Macs running VoiceStudio).
+#
+#   1. Caps PyTorch's GPU (MPS) memory in VoiceStudio's launchd job, and puts the cap
+#      back if a VoiceStudio update rewrites the job.
+#   2. Restarts VoiceStudio when it and its child processes use more than
+#      VOICESTUDIO_MEMORY_LIMIT_MB, measured as macOS footprint, which counts GPU
+#      memory and compressed pages that ps's RSS leaves out. At most one restart
+#      per 10 minutes, so a model that is simply large cannot cause a restart loop.
+#
+#   voicestudio-watchdog           enforce both; actions go to the log
+#   voicestudio-watchdog --check   report what it sees and would do; change nothing
+#
+set -eu
+
+LABEL=sh.voicestudio.backend
+PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
+LIMIT_MB="${VOICESTUDIO_MEMORY_LIMIT_MB:-12288}"
+# Fractions of the GPU's recommended working set (20 GB on the M4 Pro mini), so 0.5
+# caps PyTorch at 10 GB; over it a request fails instead of the Mac swapping.
+# PyTorch refuses to start when LOW is above HIGH (LOW defaults to 1.4), so both are set.
+MPS_HIGH="${VOICESTUDIO_MPS_HIGH_WATERMARK:-0.5}"
+MPS_LOW="${VOICESTUDIO_MPS_LOW_WATERMARK:-0.4}"
+COOLDOWN_S=600
+LOG_DIR="$HOME/Library/Logs/VoiceStudio"
+LOG="$LOG_DIR/watchdog.log"
+LAST_RESTART="$LOG_DIR/watchdog.last-restart"
+DOMAIN="gui/$(id -u)"
+PLISTBUDDY=/usr/libexec/PlistBuddy
+
+check=0
+case "${1:-}" in
+  --check) check=1 ;;
+  "") ;;
+  *) echo "usage: voicestudio-watchdog [--check]" >&2; exit 2 ;;
+esac
+
+if [ "$(uname -s)" != Darwin ]; then
+  echo "voicestudio-watchdog: macOS only" >&2
+  exit 1
+fi
+if [ ! -f "$PLIST" ]; then
+  [ "$check" = 0 ] || echo "VoiceStudio is not installed here ($PLIST is missing)."
+  exit 0
+fi
+
+mkdir -p "$LOG_DIR"
+say() {
+  if [ "$check" = 1 ]; then
+    printf '%s\n' "$*"
+  else
+    printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> "$LOG"
+  fi
+}
+
+# Keep the log small: it only records actions, but a long-lived Mac can still fill it.
+if [ -f "$LOG" ] && [ "$(wc -c < "$LOG")" -gt 1048576 ]; then
+  tail -n 500 "$LOG" > "$LOG.tmp" && mv "$LOG.tmp" "$LOG"
+fi
+
+# --- 1. GPU memory cap in VoiceStudio's launchd job ------------------------------------
+
+job_env() {
+  "$PLISTBUDDY" -c "Print :EnvironmentVariables:$1" "$PLIST" 2>/dev/null || true
+}
+
+set_job_env() {
+  "$PLISTBUDDY" -c "Add :EnvironmentVariables dict" "$PLIST" 2>/dev/null || true
+  "$PLISTBUDDY" -c "Delete :EnvironmentVariables:$1" "$PLIST" 2>/dev/null || true
+  "$PLISTBUDDY" -c "Add :EnvironmentVariables:$1 string $2" "$PLIST"
+}
+
+# launchd reads a job's environment only when the job is loaded, so reload it.
+reload_job() {
+  launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true
+  attempt=0
+  until launchctl bootstrap "$DOMAIN" "$PLIST" 2>/dev/null; do
+    attempt=$((attempt + 1))
+    if [ "$attempt" -ge 10 ]; then
+      say "ERROR: could not reload $LABEL after changing its environment."
+      return 1
+    fi
+    sleep 1
+  done
+}
+
+if [ "$(job_env PYTORCH_MPS_HIGH_WATERMARK_RATIO)" != "$MPS_HIGH" ] || [ "$(job_env PYTORCH_MPS_LOW_WATERMARK_RATIO)" != "$MPS_LOW" ]; then
+  if [ "$check" = 1 ]; then
+    say "GPU cap: missing or different; would set PYTORCH_MPS_HIGH_WATERMARK_RATIO=$MPS_HIGH and PYTORCH_MPS_LOW_WATERMARK_RATIO=$MPS_LOW and reload $LABEL."
+  else
+    set_job_env PYTORCH_MPS_LOW_WATERMARK_RATIO "$MPS_LOW"
+    set_job_env PYTORCH_MPS_HIGH_WATERMARK_RATIO "$MPS_HIGH"
+    say "Set PYTORCH_MPS_HIGH_WATERMARK_RATIO=$MPS_HIGH and PYTORCH_MPS_LOW_WATERMARK_RATIO=$MPS_LOW in $PLIST; reloading $LABEL."
+    reload_job
+    exit 0
+  fi
+else
+  say "GPU cap: PYTORCH_MPS_HIGH_WATERMARK_RATIO=$MPS_HIGH, PYTORCH_MPS_LOW_WATERMARK_RATIO=$MPS_LOW (set)."
+fi
+
+# --- 2. Memory limit -------------------------------------------------------------------
+
+pid="$(launchctl print "$DOMAIN/$LABEL" 2>/dev/null | awk '$1 == "pid" { print $3; exit }')"
+if [ -z "$pid" ]; then
+  say "VoiceStudio is not running."
+  exit 0
+fi
+
+descendants() {
+  for child in $(pgrep -P "$1" 2>/dev/null); do
+    echo "$child"
+    descendants "$child"
+  done
+}
+
+footprint_mb() {
+  footprint -p "$1" 2>/dev/null | awk '
+    $1 == "phys_footprint:" {
+      v = $2; u = $3
+      if (u == "KB") v /= 1024; else if (u == "GB") v *= 1024; else if (u == "B" || u == "bytes") v /= 1048576
+      printf "%d\n", v; exit
+    }'
+}
+
+total=0
+breakdown=""
+for p in "$pid" $(descendants "$pid"); do
+  mb="$(footprint_mb "$p")"
+  [ -n "$mb" ] || continue
+  total=$((total + mb))
+  name="$(ps -o command= -p "$p" 2>/dev/null | awk '{ for (i = 1; i <= NF; i++) if ($i ~ /\.py$|^backend\.main/) { n = $i; sub(/.*\//, "", n); print n; exit } print "python" }')"
+  breakdown="$breakdown${breakdown:+, }$name $mb MB"
+done
+
+if [ "$total" -le "$LIMIT_MB" ]; then
+  say "Memory: $total MB of $LIMIT_MB MB ($breakdown)."
+  exit 0
+fi
+
+now="$(date +%s)"
+last="$(cat "$LAST_RESTART" 2>/dev/null || echo 0)"
+if [ $((now - last)) -lt "$COOLDOWN_S" ]; then
+  say "Over the limit: $total MB of $LIMIT_MB MB ($breakdown), but it was restarted $((now - last)) s ago; waiting."
+  exit 0
+fi
+if [ "$check" = 1 ]; then
+  say "Over the limit: $total MB of $LIMIT_MB MB ($breakdown); would restart $LABEL."
+  exit 0
+fi
+say "Over the limit: $total MB of $LIMIT_MB MB ($breakdown); restarting $LABEL."
+echo "$now" > "$LAST_RESTART"
+launchctl kickstart -k "$DOMAIN/$LABEL"
