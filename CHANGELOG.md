@@ -1,3 +1,9 @@
+## [1.18.0](https://github.com/andysolomon/dotfiles/compare/v1.17.0...v1.18.0) (2026-11-13)
+
+### Features
+
+* **mac:** cap VoiceStudio memory with a launchd watchdog ([#39](https://github.com/andysolomon/dotfiles/issues/39)) ([560dbda](https://github.com/andysolomon/dotfiles/commit/560dbda61b3e2f419a003e012f9f0a8dc438698a))
+
 ## [1.17.0](https://github.com/andysolomon/dotfiles/compare/v1.16.3...v1.17.0) (2026-11-02)
 
 ### Features
