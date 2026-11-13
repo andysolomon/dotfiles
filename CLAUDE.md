@@ -22,8 +22,8 @@ It is a false positive — this repo has no web app. Ignore it.
 - It iterates **every top-level file/dir** and symlinks it to `$HOME/.<name>`
   (e.g. `zshrc` → `~/.zshrc`, `vim/` → `~/.vim`). Skipped: `install.sh`, `README.md`,
   `docs/` (repo planning), `herdr/` (XDG config, not `~/.herdr`), `omarchy/`
-  (Omarchy-specific XDG config), and `ssh/` (installed as `~/.ssh/config`, without
-  managing private keys). A new top-level file
+  (Omarchy-specific XDG config), `ssh/` (installed as `~/.ssh/config`, without
+  managing private keys), and `voicestudio/` (a launchd job for the Mac). A new top-level file
   named `foo` becomes `~/.foo` on next install — name new files with that in mind.
 - It **never overwrites** top-level `~/.<name>` targets: if the destination already exists
   and is not a symlink, it only warns. Existing symlinks are left untouched. To re-link
@@ -50,6 +50,10 @@ It is a false positive — this repo has no web app. Ignore it.
   differing destination with no local file is warned about and left untouched.
 - Stock-identical Omarchy files, monitor configuration, generated/themed files, and
   Omarchy-installed first-run hooks remain unmanaged.
+- On a Mac running VoiceStudio (`~/Library/LaunchAgents/sh.voicestudio.backend.plist`
+  exists), it writes `voicestudio/watchdog.plist` with this checkout's absolute paths to
+  `~/Library/LaunchAgents/sh.dotfiles.voicestudio-watchdog.plist` and loads it. An
+  identical, loaded job is left alone.
 
 ## Reload without reinstalling
 
@@ -140,6 +144,19 @@ inside Herdr.
 - `tat` — focus or create a Herdr workspace for the current directory.
 - `git-churn` — rank files by commit frequency.
 - `replace` — project-wide find/replace helper.
+- `voicestudio-watchdog` — macOS only; see VoiceStudio (Mac) below.
+
+### VoiceStudio (Mac)
+
+The Mac mini is ReadAloud's primary VoiceStudio. macOS does not cap process memory, so
+`bin/voicestudio-watchdog` runs every minute under launchd (`sh.dotfiles.voicestudio-watchdog`).
+It keeps `PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.5` and `PYTORCH_MPS_LOW_WATERMARK_RATIO=0.4`
+in VoiceStudio's own launchd job, `sh.voicestudio.backend`, re-adding them and reloading the
+job if a VoiceStudio update rewrites it. Both ratios must be set: PyTorch refuses to start
+when the low ratio exceeds the high one, and the low ratio defaults to 1.4. It also
+restarts VoiceStudio when the service and its children use more than 12 GB of macOS
+footprint, at most once per 10 minutes. `voicestudio-watchdog --check` reports without
+changing anything; actions are logged to `~/Library/Logs/VoiceStudio/watchdog.log`.
 
 ### Omarchy
 

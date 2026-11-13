@@ -56,7 +56,7 @@ require_supported_nvim
 
 skip_top_level() {
   case "$1" in
-    install.sh|README.md|docs|herdr|omarchy|ssh) return 0 ;;
+    install.sh|README.md|docs|herdr|omarchy|ssh|voicestudio) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -145,6 +145,32 @@ if [ -f /etc/os-release ] && grep -q '^ID=omarchy$' /etc/os-release; then
   install_omarchy_copy "$PWD/omarchy/shell.json" "$HOME/.config/omarchy/shell.json"
   install_omarchy_xcompose
 fi
+
+# On a Mac running VoiceStudio (its launchd job exists), install the watchdog that caps
+# its GPU memory and restarts it when it outgrows its memory limit. launchd does not
+# expand variables, so the job is written with this checkout's absolute paths.
+install_voicestudio_watchdog() {
+  [ "$(uname -s)" = Darwin ] || return 0
+  [ -f "$HOME/Library/LaunchAgents/sh.voicestudio.backend.plist" ] || return 0
+  watchdog_label="sh.dotfiles.voicestudio-watchdog"
+  watchdog_plist="$HOME/Library/LaunchAgents/$watchdog_label.plist"
+  watchdog_job="$(sed -e "s#@DOTFILES@#$PWD#g" -e "s#@HOME@#$HOME#g" voicestudio/watchdog.plist)"
+  mkdir -p "$HOME/Library/Logs/VoiceStudio"
+  if [ -f "$watchdog_plist" ] && [ "$(cat "$watchdog_plist")" = "$watchdog_job" ] \
+      && launchctl print "gui/$(id -u)/$watchdog_label" >/dev/null 2>&1; then
+    return 0
+  fi
+  echo "Installing $watchdog_plist"
+  printf '%s\n' "$watchdog_job" > "$watchdog_plist"
+  launchctl bootout "gui/$(id -u)/$watchdog_label" 2>/dev/null || true
+  if launchctl bootstrap "gui/$(id -u)" "$watchdog_plist"; then
+    :
+  else
+    echo "WARNING: could not load $watchdog_plist." >&2
+  fi
+}
+
+install_voicestudio_watchdog
 
 # ~/.bin is on PATH (zsh/configs/post/path.zsh). If it is already a real
 # directory, the top-level loop cannot replace it with a symlink to bin/, so
